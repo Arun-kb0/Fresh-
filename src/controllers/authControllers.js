@@ -25,7 +25,7 @@ const authenticate = async (username, password, modal) => {
 // * admin
 const getAdminLoginPageController = async (req, res, next) => {
   try {
-    res.render('admin/auth/auth-login-basic')
+    res.render('auth/auth-login-basic',{isAdmin:true})
   } catch (error) {
     next(error)
   }
@@ -52,7 +52,7 @@ const adminLoginController = async (req, res, next) => {
 
 const getLoginPageController = async (req, res) => {
   try {
-    res.render('admin/auth/auth-register-basic')
+    res.render('auth/auth-login-basic', {isAdmin:false})
   } catch (error) {
     console.log(error)
   }
@@ -79,7 +79,7 @@ const loginController = async (req, res, next) => {
 
 const getSignUpPageController = async (req, res, next) => {
   try {
-    res.render('admin/auth/auth-register-basic')
+    res.render('auth/auth-register-basic')
   } catch (error) {
     next(error)
   }
