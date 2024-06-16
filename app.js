@@ -7,7 +7,8 @@ const path = require('path')
 
 const connectDB = require('./src/config/dbConnection')
 const sessionConfig = require('./src/config/sessionConfig')
-const authRouter = require('./src/routes/authRoutes')
+const authRouter = require('./src/routes/auth/authRoutes')
+const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
 
 
@@ -41,6 +42,8 @@ app.use('/static/auth',express.static(path.join(__dirname, 'public', 'auth')))
 // * routes
 app.use('/auth', authRouter)
 
+// * admin routes
+app.use('/admin', adminRouter)
 
 // * error handler middleware
 app.use(errorHandler)

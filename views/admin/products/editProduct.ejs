@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<!-- beautify ignore:start -->
+<html
+  lang="en"
+  class="light-style layout-menu-fixed"
+  dir="ltr"
+  data-theme="theme-default"
+  data-template="vertical-menu-template-free"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+
+    <title>Account settings - Account | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/admin/assets/img/favicon/favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="/static/admin/assets/vendor/fonts/boxicons.css" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="/static/admin/assets/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="/static/admin/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="/static/admin/assets/css/demo.css" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+
+    <!-- Page CSS -->
+
+    <!-- Helpers -->
+    <script src="/static/admin/assets/vendor/js/helpers.js"></script>
+
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="/static/admin/assets/js/config.js"></script>
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+       
+
+        <!-- Layout container -->
+        <div class="layout-page">
+         
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            <div class="container-xxl flex-grow-1 container-p-y">
+              <% if(isEdit) {%>
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Edit Product</h4>
+                <% }else { %>
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Create Product</h4>
+                  <% } %>
+              <div class="row">
+                  <div class="card mb-4">
+                    <h5 class="card-header">Profile Details</h5>
+                    <!-- Account -->
+                    <div class="card-body">
+                      <div class="d-flex align-items-start align-items-sm-center gap-4">
+                        <% if(!isEdit) {%>
+                          <svg height="100" width="100" xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                            <path
+                             d="M448 80c8.8 0 16 7.2 16 16V415.8l-5-6.5-136-176c-4.5-5.9-11.6-9.3-19-9.3s-14.4 3.4-19 9.3L202 340.7l-30.5-42.7C167 291.7 159.8 288 152 288s-15 3.7-19.5 10.1l-80 112L48 416.3l0-.3V96c0-8.8 7.2-16 16-16H448zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm80 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z" />
+                            </svg>
+                          <% } else { %>
+                            <img src="/static/admin/assets/img/avatars/1.png" alt="user-avatar" class="d-block rounded" height="100" width="100"
+                              id="uploadedAvatar" />
+                          <% } %>
+                        <div class="button-wrapper">
+                          <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                            <span class="d-none d-sm-block">Upload photo</span>
+                            <i class="bx bx-upload d-block d-sm-none"></i>
+                            <input
+                              type="file"
+                              id="upload"
+                              class="account-file-input"
+                              hidden
+                              accept="image/png, image/jpeg"
+                            />
+                          </label>
+
+                          <% if(isEdit) {%>
+                             <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
+                              <i class="bx bx-reset d-block d-sm-none"></i>
+                              <span class="d-none d-sm-block">Reset</span>
+                            </button>
+                          <% } %>
+                          <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="card-body">
+                      <form id="formAccountSettings" method="POST" onsubmit="return false">
+                        <div class="row">
+                          <div class="mb-3 col-md-6">
+                            <label for="Name" class="form-label">Name</label>
+                            <input
+                              class="form-control"
+                              type="text"
+                              id="Name"
+                              name="Name"
+                              value= <%= isEdit ?  "product name" : "" %>
+                              autofocus
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="id" class="form-label">Id</label>
+                            <input class="form-control" 
+                            type="text"
+                            name="id" id="id" 
+                            value = <%= isEdit ?  "Doe" : "" %>
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="category" class="form-label">Category</label>
+                            <input
+                              class="form-control"
+                              type="text"
+                              id="category"
+                              name="category"
+                              <% if (isEdit) {%>
+                                value="category name"
+                                placeholder="category name"
+                              <% } %>
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="price" class="form-label">Price</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="price"
+                              name="price"
+                              placeholder= <% isEdit ? "price" : "" %>
+
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label class="form-label" for="offer">Phone Number</label>
+                            <div class="input-group input-group-merge">
+                              <span class="input-group-text">US (+1)</span>
+                              <input
+                                type="text"
+                                id="offer"
+                                name="offer"
+                                class="form-control"
+                                placeholder= <% isEdit ? "202 555 0111" : "" %>
+                              />
+                            </div>
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="rating" class="form-label">Rating</label>
+                            <input 
+                            type="text" class="form-control" 
+                            id="rating" 
+                            name="rating" 
+                            placeholder= <% isEdit ? "202 555 0111" : "" %>
+                             />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="peopleRated" class="form-label">People rated</label>
+                            <input class="form-control" 
+                            type="text" 
+                            id="peopleRated" 
+                            name="peopleRated" 
+                            placeholder= <% isEdit ? "2" : "" %>
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="stock" class="form-label">Stock</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="stock"
+                              name="stock"
+                              placeholder= <% isEdit ? "231465" : "" %>
+                              maxlength="6"
+                            />
+                          </div>
+                         
+                          
+                        <div class="mt-2">
+                          <% if(isEdit) {%>
+                            <button type="submit" class="btn btn-primary me-2"> Save changes</button>
+                          <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                          <% } else {%>
+                            <button type="submit" class="btn btn-primary me-2"> Create new product</button>
+                          <% } %>
+                        </div>
+                      </form>
+                    </div>
+                    <!-- /Account -->
+                  </div>
+                 
+                </div>
+              </div>
+            </div>
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                <div class="mb-2 mb-md-0">
+                  ©
+                  <script>
+                    document.write(new Date().getFullYear());
+                  </script>
+                  , made with ❤️ by
+                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                </div>
+                <div>
+                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
+
+                  <a
+                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Documentation</a
+                  >
+
+                  <a
+                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Support</a
+                  >
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+   
+
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="/static/admin/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
+    <script src="/static/admin/assets/vendor/js/bootstrap.js"></script>
+    <script src="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+
+    <script src="/static/admin/assets/vendor/js/menu.js"></script>
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+
+    <!-- Main JS -->
+    <script src="/static/admin/assets/js/main.js"></script>
+
+    <!-- Page JS -->
+    <script src="/static/admin/assets/js/pages-account-settings-account.js"></script>
+
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+  </body>
+</html>

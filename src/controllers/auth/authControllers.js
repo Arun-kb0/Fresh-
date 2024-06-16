@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt')
-const adminModel = require('../model/adminModel')
-const { OK, NOT_FOUND, BAD_REQUEST, FORBIDDEN, CONFLICT, GONE } = require('../constants/httpStatusCodes')
-const CustomError = require('../constants/CustomError')
-const userModel = require('../model/userModel')
+const adminModel = require('../../model/adminModel')
+const { OK, NOT_FOUND, BAD_REQUEST, FORBIDDEN, CONFLICT, GONE } = require('../../constants/httpStatusCodes')
+const CustomError = require('../../constants/CustomError')
+const userModel = require('../../model/userModel')
 const nodeMailer = require('nodemailer')
-const otpVerificationModal = require('../model/otpVerificationModal')
+const otpVerificationModal = require('../../model/otpVerificationModal')
 
 
 // * nodemailer transport

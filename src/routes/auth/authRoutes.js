@@ -8,7 +8,7 @@ const {
   getVerifyPageController,
   verifyEmailController,
   resendOtpController
-} = require('../controllers/authControllers')
+} = require('../../controllers/auth/authControllers')
 
 const router = express.Router()
 
