@@ -146,7 +146,7 @@ const sendOtpToEmail = async ({ _id, email }) => {
       userId: _id,
       otp: hashedOtp,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 10 * 60 * 1000
+      expiresAt: Date.now() + 5 * 60 * 1000
     })
     await transporter.sendMail(mailOptions)
     return ({

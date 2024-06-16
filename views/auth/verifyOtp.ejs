@@ -69,19 +69,25 @@
                 <span id="small" class="opacity-0"> </span>
               </div>
 
-              <button id="submitBtn" class="btn btn-success d-grid w-100 " onsubmit="submit" disabled>
+              <button id="signupBtn" class="btn btn-success d-grid w-100 " onsubmit="submit" disabled>
                 Verify otp
               </button>
           </div>
           </form>
 
-          <!-- ! add timer here -->
-          <p class="text-center">
-            <span>New on our platform?</span>
-            <a href="auth/signup">
-              <span>resend</span>
-            </a>
-          </p>
+
+          <!-- * timer and resend btn -->
+          <div class="pb-2 px-4 d-flex justify-content-between align-items-center">
+            <p class="d-flex justify-content-center gap-2">
+              time left
+              <span id="timer" class=" justify-content-center">time left</span>
+            </p>
+            <p>
+              <a id="resendOtp" class="cursor-pointer">
+                <span>resend OTP</span>
+              </a>
+            </p>
+          </div>
 
         </div>
       </div>
@@ -91,7 +97,8 @@
   </div>
 
 
-  <!-- * passing isAdmin variable to script -->
+  <!-- * variable -->
+  <script> isVerifyOtp = true </script>
 
 
   <!-- Core JS -->
