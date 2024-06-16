@@ -8,8 +8,8 @@ const path = require('path')
 const connectDB = require('./src/config/dbConnection')
 const sessionConfig = require('./src/config/sessionConfig')
 const authRouter = require('./src/routes/authRoutes')
-const { error } = require('console')
 const errorHandler = require('./src/middleware/errorHandler')
+
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -34,7 +34,9 @@ app.use(sessionConfig)
 // app.use(express.static(path.join(__dirname, 'public', 'admin')))
 // app.use('/css', express.static(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css')))
 
-app.use('/static',express.static(path.join(__dirname, 'public', 'admin')))
+app.use('/static/admin',express.static(path.join(__dirname, 'public', 'admin')))
+app.use('/static/user',express.static(path.join(__dirname, 'public','user' )))
+app.use('/static/auth',express.static(path.join(__dirname, 'public', 'auth')))
 
 // * routes
 app.use('/auth', authRouter)
