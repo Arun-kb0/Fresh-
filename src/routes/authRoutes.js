@@ -4,7 +4,10 @@ const {
   signUpController,
   getAdminLoginPageController,
   adminLoginController,
-  getLoginPageController
+  getLoginPageController,
+  getVerifyPageController,
+  verifyEmailController,
+  resendOtpController
 } = require('../controllers/authControllers')
 
 const router = express.Router()
@@ -20,12 +23,17 @@ router.route('/admin/login')
 router.route('/login')
   .get(getLoginPageController)
   .post(loginController)
-  
+
 
 router.route('/signup')
   .get(getSignUpPageController)
   .post(signUpController)
 
+router.route('/verifyemail')
+  .get(getVerifyPageController)
+  .post(verifyEmailController)
+
+router.post('/resendotp' , resendOtpController )
 
 
 module.exports = router

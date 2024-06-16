@@ -13,6 +13,7 @@ const userSchema = new Schema({
   isPlus: { type: Boolean, default: false },
   isBlocked: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
+  isVerified: {type: Boolean , default:false},
   wallet: {
     balance: { type: Number, default: 0 },
     currency: { type: String, default: "INR" },

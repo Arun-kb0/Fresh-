@@ -4,46 +4,44 @@ $(function () {
   const form = $("#formAuthentication")
   const email = $("#email")
   const password = $("#password")
-  const submitBtn = $("#submitBtn")
+  const submitBtn = $("#signupBtn")
+  const name = $("#name")
 
-
+  name.on("input", checkName)
   email.on("input", checkEmail)
   password.on("input", checkPassword)
-
-  console.log("isAdmin", isAdmin)
 
   form.on("submit", function (e) {
     e.preventDefault()
 
-    if (!checkEmail() || !checkPassword()) {
+    if (!checkEmail() || !checkPassword() || !checkName()) {
       alert("invalid email or password")
       return
     }
 
     const data = {
+      name: name.val().trim(),
       username: email.val().trim(),
       password: password.val().trim()
     }
 
-    const url = isAdmin
-      ? "/auth/admin/login"
-      : "/auth/login"
-
     $.ajax({
-      url: url,
+      url: '/auth/signup',
       type: "POST",
       data: JSON.stringify(data),
       contentType: "application/json",
       success: function (data) {
         console.log(data)
-        console.log('login success')
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user))
-          email.val("")
-          password.val("")
-        } else {
-          alert("no user returned  from server")
-        }
+        window.location.href = '/auth/verifyemail'
+        
+        // if (data.user) {
+        //   localStorage.setItem('user', JSON.stringify(data.user))
+        //   name.val("")
+        //   email.val("")
+        //   password.val("")
+        // } else {
+        //   alert("no user returned  from server")
+        // }
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
@@ -53,8 +51,22 @@ $(function () {
     })
   })
 
-
   // * check inputs functions
+  function checkName() {
+    const nameValue = name.val().trim()
+    console.log(nameValue)
+    if (nameValue === '') {
+      setErrorFor(name, "cannot be empty")
+      return false
+    } else if (!isValidName(nameValue)) { 
+      setErrorFor(name , "invalid name")
+      return false
+    } else {
+      setSuccessFor(name)
+      return true
+    }
+  }
+
   function checkEmail() {
     const emailValue = email.val().trim()
     if (emailValue === "") {
@@ -123,6 +135,11 @@ $(function () {
   function isPassword(password) {
     const passwordRegex = /^.{8,}$/
     return passwordRegex.test(password)
+  }
+
+  function isValidName(name) {
+    const nameRegex = /^[a-zA-Z]+(?:\s[a-zA-Z]+(?:\s[a-zA-Z]+)*)?$/
+    return nameRegex.test(name)
   }
 
 })
