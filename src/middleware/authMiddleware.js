@@ -1,3 +1,4 @@
+const { UNAUTHORIZED } = require("../constants/httpStatusCodes")
 
 const auth = (req, res, next) => {
   console.log(req.path)

@@ -2,7 +2,7 @@ const express = require('express')
 const { getAdminHomeController } = require('../../controllers/admin/homeController')
 const { getUserEditController, getUsersController } = require('../../controllers/admin/usersContoller')
 const { getProductController, getEditProductController, getCreateProductController } = require('../../controllers/admin/productController')
-const { getEditCategoryController, getCreateCategoryController, getCategoriesController } = require('../../controllers/admin/categoryController')
+const { getEditCategoryController, getCreateCategoryController, getCategoriesController, editCategoryController, createCategoryController } = require('../../controllers/admin/categoryController')
 
 
 const router = express.Router()
@@ -27,9 +27,12 @@ router.route('/product/create')
 router.get('/categories', getCategoriesController)
 router.route('/category/edit')
   .get(getEditCategoryController)
+  .patch(editCategoryController)
 
 router.route('/category/create')
   .get(getCreateCategoryController)
+  .post(createCategoryController)
+
 
 
 
