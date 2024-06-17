@@ -9,7 +9,11 @@ $(function () {
         console.log(data)
         if (data) {
           localStorage.clear()
-          window.location.reload()
+          if (data.isAdmin) {
+            window.location.replace('/auth/admin/login')
+          } else {
+            window.location.replace('/auth/login')
+          }
         }
       },
       error: function (xhr, status, error) {
