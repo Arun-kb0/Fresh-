@@ -37,13 +37,21 @@ $(function () {
       success: function (data) {
         console.log(data)
         console.log('login success')
-        if (data.user) {
+        if (data?.user) {
           localStorage.setItem('user', JSON.stringify(data.user))
           email.val("")
           password.val("")
+          if (data?.user?.isAdmin) {
+            window.history.replaceState(null, null, '/admin/')
+            window.location.replace('/admin/')
+          } else {
+            window.history.replaceState(null, null, '/')
+            window.location.replace('/')
+          }
         } else {
-          alert("no user returned  from server")
+          console.log("no user returned  from server")
         }
+        
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)

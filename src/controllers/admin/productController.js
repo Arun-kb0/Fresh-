@@ -1,7 +1,7 @@
 
 const getProductController = async (req, res) => {
   try {
-    res.render('admin/products/productsTable')
+    res.render('admin/products/productsTable', { isAuthPage: false })
   } catch (error) {
     next(error)
   }
@@ -10,7 +10,7 @@ const getProductController = async (req, res) => {
 
 const getEditProductController = async (req, res) => {
   try {
-    res.render('admin/products/editProduct',{isEdit:true})
+    res.render('admin/products/editProduct', { isEdit: true, isAuthPage: false })
   } catch (error) {
     next(error)
   }
@@ -19,7 +19,7 @@ const getEditProductController = async (req, res) => {
 
 const getCreateProductController = async (req, res) => {
   try {
-    res.render('admin/products/editProduct', {isEdit:false})
+    res.render('admin/products/editProduct', { isEdit: false, isAuthPage: false })
   } catch (error) {
     next(error)
   }

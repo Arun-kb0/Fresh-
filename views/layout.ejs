@@ -10,6 +10,8 @@
 </head>
 
 <body>
+
+  <% if(!isAuthPage) {%>
   <!-- * NAV START -->
   <div class="layout-page">
     <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
@@ -87,7 +89,7 @@
                 <div class="dropdown-divider"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="/logout">
+                <a class="dropdown-item" id="logoutBtn">
                   <i class="bx bx-power-off me-2"></i>
                   <span class="align-middle">Log Out</span>
                 </a>
@@ -321,9 +323,15 @@
     </ul>
   </aside>
 
+  <% } %>
+
   <!-- * MENU END -->
 
   <%- body%>
+
+  <!-- * admin scripts -->
+  <script src="/static/auth/scripts/logoutScript.js"></script>
+
 </body>
 
 </html>

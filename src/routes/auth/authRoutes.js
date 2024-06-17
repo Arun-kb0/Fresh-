@@ -7,10 +7,13 @@ const {
   getLoginPageController,
   getVerifyPageController,
   verifyEmailController,
-  resendOtpController
+  resendOtpController,
+  logoutController
 } = require('../../controllers/auth/authControllers')
 
 const router = express.Router()
+
+
 
 
 // * admin
@@ -33,7 +36,10 @@ router.route('/verifyemail')
   .get(getVerifyPageController)
   .post(verifyEmailController)
 
-router.post('/resendotp' , resendOtpController )
+router.post('/resendotp', resendOtpController)
+
+// * logout
+router.get('/logout',logoutController)
 
 
 module.exports = router

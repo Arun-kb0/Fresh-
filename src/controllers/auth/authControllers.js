@@ -7,6 +7,9 @@ const nodeMailer = require('nodemailer')
 const otpVerificationModal = require('../../model/otpVerificationModal')
 
 
+
+
+
 // * nodemailer transport
 const transporter = nodeMailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -40,7 +43,13 @@ const authenticate = async (username, password, modal) => {
 // * admin
 const getAdminLoginPageController = async (req, res, next) => {
   try {
-    res.render('auth/auth-login-basic', { isAdmin: true })
+    if (req?.session?.isAuthorized) {
+      req?.session?.user?.isAdmin
+        ? res.redirect('/admin')
+        : res.redirect('/')
+      return
+    }
+    res.render('auth/auth-login-basic', { isAdmin: true, isAuthPage: true })
   } catch (error) {
     next(error)
   }
@@ -50,12 +59,15 @@ const adminLoginController = async (req, res, next) => {
   const { username, password } = req.body
   try {
     const admin = await authenticate(username, password, adminModel)
-    req.session.admin = {
+    req.session.user = {
       name: admin.name,
-      username: admin.username
+      username: admin.username,
+      isAdmin: true
     }
+    req.session.isAuthorized = true
+    console.log(req.session)
 
-    res.status(OK).json({ message: "admin login success", admin })
+    res.status(OK).json({ message: "admin login success", user: admin })
   } catch (error) {
     next(error)
   }
@@ -67,7 +79,14 @@ const adminLoginController = async (req, res, next) => {
 
 const getLoginPageController = async (req, res) => {
   try {
-    res.render('auth/auth-login-basic', { isAdmin: false })
+    if (req?.session?.isAuthorized) {
+      req?.session?.user?.isAdmin
+        ? res.redirect('/admin')
+        : res.redirect('/')
+      return
+    }
+
+    res.render('auth/auth-login-basic', { isAdmin: false, isAuthPage: true })
   } catch (error) {
     console.log(error)
   }
@@ -82,8 +101,13 @@ const loginController = async (req, res, next) => {
     const user = await authenticate(username, password, userModel)
     req.session.user = {
       name: user.name,
-      username: user.username
+      username: user.username,
+      isAdmin: false
     }
+    req.session.isAuthorized = true
+
+
+
     res.status(OK).json({ message: "login success", user })
   } catch (error) {
     next(error)
@@ -94,7 +118,13 @@ const loginController = async (req, res, next) => {
 
 const getSignUpPageController = async (req, res, next) => {
   try {
-    res.render('auth/auth-register-basic')
+    if (req?.session?.isAuthorized) {
+      req?.session?.user?.isAdmin
+        ? res.redirect('/admin')
+        : res.redirect('/')
+      return
+    }
+    res.render('auth/auth-register-basic', { isAuthPage: true })
   } catch (error) {
     next(error)
   }
@@ -170,7 +200,7 @@ const sendOtpToEmail = async ({ _id, email }) => {
 
 const getVerifyPageController = async (req, res, next) => {
   try {
-    res.render('auth/verifyOtp')
+    res.render('auth/verifyOtp', { isAuthPage: true })
   } catch (error) {
     next(error)
   }
@@ -240,7 +270,12 @@ const resendOtpController = async (req, res, next) => {
 
 const logoutController = async (req, res) => {
   try {
-
+    const isAdmin = req?.session?.user?.isAdmin
+      ? true : false
+    await req.session.destroy()
+    res.clearCookie('connect.sid')
+    console.log("logout success")
+    res.status(OK).json({ message: "logout success", isAdmin })
   } catch (error) {
     console.log(error)
   }

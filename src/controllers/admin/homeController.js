@@ -1,7 +1,7 @@
 
 const getAdminHomeController = async (req, res) => {
   try {
-    res.render('admin/home/index')
+    res.render('admin/home/index', { isAuthPage :false})
   } catch (error) {
     next(error)
   }

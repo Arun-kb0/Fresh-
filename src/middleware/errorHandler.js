@@ -1,4 +1,4 @@
-const CustomError = require("../constants/customError")
+const CustomError = require("../constants/CustomError")
 
 const errorHandler = async (err, req, res, next) => {
   let statusCode = err.statusCode || 500

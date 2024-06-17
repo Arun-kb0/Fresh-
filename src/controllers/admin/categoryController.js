@@ -1,7 +1,7 @@
 
 const getCategoriesController = async (req, res) => {
   try {
-    res.render('admin/category/categoriesTable')
+    res.render('admin/category/categoriesTable', { isAuthPage :false})
   } catch (error) {
     next(error)
   }
@@ -10,7 +10,7 @@ const getCategoriesController = async (req, res) => {
 
 const getEditCategoryController = async (req, res) => {
   try {
-    res.render('admin/category/editCategory', { isEdit: true })
+    res.render('admin/category/editCategory', { isEdit: true, isAuthPage: false })
   } catch (error) {
     next(error)
   }
@@ -19,7 +19,7 @@ const getEditCategoryController = async (req, res) => {
 
 const getCreateCategoryController = async (req, res) => {
   try {
-    res.render('admin/category/editCategory', { isEdit: false })
+    res.render('admin/category/editCategory', { isEdit: false, isAuthPage: false })
   } catch (error) {
     next(error)
   }

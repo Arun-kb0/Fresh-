@@ -104,12 +104,26 @@
 
                   <% if(!isAdmin){ %>
                     <p class="text-center">
-                      <span>New on our platform?</span>
+                      <span>New on our platform ? </span>
                       <a href="/auth/signup">
                         <span>Create an account</span>
                       </a>
                     </p>
                     <% }%>
+
+                    <% if(!isAdmin){ %>
+                      <p class="text-end">
+                        <a href="/auth/admin/login">
+                          <span>admin login</span>
+                        </a>
+                      </p>
+                      <% } else { %>
+                        <p class="text-end">
+                          <a href="/auth/login">
+                            <span>user login</span>
+                          </a>
+                        </p>
+                        <% } %>
           </div>
         </div>
         <!-- /Register -->
