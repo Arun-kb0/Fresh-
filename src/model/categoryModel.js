@@ -8,7 +8,8 @@ const categorySchema = new Schema({
     path: String
   },
   name: { type: String, required: true },
-  slug: { type: String }
+  slug: { type: String },
+  isDeleted: { type:Boolean , default:false}
 },
   { timestamps: true }
 )

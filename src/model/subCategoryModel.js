@@ -10,7 +10,8 @@ const subCategorySchema = new Schema({
   },
   name: { type: String, required: true },
   slug: { type: String },
-  parentId: { type: ObjectId }
+  parentId: { type: ObjectId, required: true },
+  isDeleted: { type: Boolean, default: false }
 },
   { timestamps: true }
 )

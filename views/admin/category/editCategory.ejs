@@ -109,10 +109,16 @@
                           <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
                         </div>
                       </div>
+                      <div class="py-2">
+                        <p class="text-muted mb-0">keep parent Id null or "" to edit parent </p>
+                        <p class="text-muted mb-0">add parent Id from table to edit child category</p>
+                      </div>
                     </div>
                     <hr class="my-0" />
                     <div class="card-body">
-                      <form id="formAccountSettings" method="POST" onsubmit="return false">
+                     
+
+                      <form id="formCategory" method="POST" onsubmit="return false">
                         <div class="row">
                           <div class="mb-3 col-md-6">
                             <label for="Name" class="form-label">Name</label>
@@ -120,8 +126,8 @@
                               class="form-control"
                               type="text"
                               id="Name"
-                              name="Name"
-                              value= <%= isEdit ?  "product name" : "" %>
+                              name="name"
+                              value= "<%= isEdit ? category?.name : "" %>"
                               autofocus
                             />
                           </div>
@@ -130,12 +136,17 @@
                             <input class="form-control" 
                             type="text"
                             name="subCategory" id="subCategory" 
-                            value = <%= isEdit ?  "Doe" : "" %>
+                            value= "<%= isEdit 
+                            ? category?.subCategories?.map((item)=> item.name)+", "
+                            : undefined %>"
                             />
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="id" class="form-label">Id</label>
-                            <input class="form-control" type="text" name="id" id="id" value=<%=isEdit ? "Doe" : "" %>
+                            <input class="form-control" type="text" 
+                            name="id"
+                             id="id"
+                              value=<%= isEdit ? category?._id : "" %>
                             />
                           </div>
                           <div class="mb-3 col-md-6">
@@ -146,10 +157,10 @@
                               id="parentId"
                               name="parentId"
                               <% if (isEdit) {%>
-                                value="category name"
-                                placeholder="category name"
-                              <% } %>
-                            />
+                                placeholder="add parent to edit child category"
+                                value = "<%= category?.parentId ? category?.parentId  : undefined %>"
+                                <% } %>
+                             />
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="slug" class="form-label">Slug</label>
@@ -158,8 +169,7 @@
                               class="form-control"
                               id="slug"
                               name="slug"
-                              placeholder= <% isEdit ? "slug" : "" %>
-
+                              placeholder= <%= isEdit ? category?.slug : "" %>
                             />
                           </div>
                           
@@ -228,7 +238,11 @@
     </div>
     <!-- / Layout wrapper -->
 
-   
+  <% if(isEdit) { %>
+    <script> isEdit = true</script>
+    <% } else {%>
+      <script> isEdit = false</script>
+      <% }%>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -248,7 +262,12 @@
     <!-- Page JS -->
     <script src="/static/admin/assets/js/pages-account-settings-account.js"></script>
 
+    <!-- * category script -->
+    <script src="/static/admin/scripts/category.js"></script>
+
+
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+  
   </body>
 </html>
