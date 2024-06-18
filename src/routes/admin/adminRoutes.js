@@ -1,11 +1,20 @@
 const express = require('express')
 const { getAdminHomeController } = require('../../controllers/admin/homeController')
 const { getUserEditController, getUsersController } = require('../../controllers/admin/usersContoller')
-const { getProductController, getEditProductController, getCreateProductController } = require('../../controllers/admin/productController')
-const { getEditCategoryController,
-  getCreateCategoryController, getCategoriesController, editCategoryController,
-  createCategoryController, deleteCategoryController
-
+const {
+  getProductController,
+  getEditProductController,
+  getCreateProductController, 
+  createProductController,
+  editProductController,
+  deleteProductController} = require('../../controllers/admin/productController')
+const {
+  getEditCategoryController,
+  getCreateCategoryController,
+  getCategoriesController,
+  editCategoryController,
+  createCategoryController,
+  deleteCategoryController
 } = require('../../controllers/admin/categoryController')
 
 
@@ -23,9 +32,12 @@ router.route('/user')
 router.get('/products', getProductController)
 router.route('/product/edit')
   .get(getEditProductController)
+  .patch(editProductController)
+  .delete(deleteProductController)
 
 router.route('/product/create')
   .get(getCreateProductController)
+  .post(createProductController)
 
 // * category
 router.get('/categories', getCategoriesController)
