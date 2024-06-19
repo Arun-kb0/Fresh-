@@ -4,9 +4,9 @@ const userModel = require("../../model/userModel")
 
 const getUsersController = async (req, res, next) => {
   try {
-    const users = await userModel.find({ isBlocked: false })
-    res.status(OK).json({ users })
-    // res.render('admin/users/usersTable', { isAuthPage: false,users })
+    const users = await userModel.find({})
+    // res.status(OK).json({ users })
+    res.render('admin/users/usersTable', { isAuthPage: false,users , users })
   } catch (error) {
     next(error)
   }
@@ -26,11 +26,10 @@ const blockUserController = async (req, res, next) => {
       { new: true }
     )
     if (user.isBlocked) {
-      res.status(OK).json({ message: `${user.name} blocked` })
+      res.status(OK).json({ message: `${user.name} blocked`,user })
       return
     }
-    res.status(OK).json({ message: `${user.name}  unblocked` })
-    console.log(user)
+    res.status(OK).json({ message: `${user.name}  unblocked`,user })
   } catch (error) {
     next(error)
   }
