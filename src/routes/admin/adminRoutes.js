@@ -1,6 +1,6 @@
 const express = require('express')
 const { getAdminHomeController } = require('../../controllers/admin/homeController')
-const { getUserEditController, getUsersController } = require('../../controllers/admin/usersContoller')
+const { getUserEditController, getUsersController, blockUserController } = require('../../controllers/admin/usersContoller')
 const {
   getProductController,
   getEditProductController,
@@ -25,8 +25,7 @@ router.route('/')
 
 // * user
 router.get('/users', getUsersController)
-router.route('/user')
-  .get(getUserEditController)
+router.patch('/user/block',blockUserController)
 
 // * products
 router.get('/products', getProductController)
