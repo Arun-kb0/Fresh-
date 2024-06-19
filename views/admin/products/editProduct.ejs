@@ -67,13 +67,13 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <% if(isEdit) {%>
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Edit Product</h4>
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Edit category</h4>
                 <% }else { %>
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Create Product</h4>
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Create category</h4>
                   <% } %>
               <div class="row">
                   <div class="card mb-4">
-                    <h5 class="card-header">Profile Details</h5>
+                    <h5 class="card-header">Category Details</h5>
                     <!-- Account -->
                     <div class="card-body">
                       <div class="d-flex align-items-start align-items-sm-center gap-4">
@@ -109,10 +109,16 @@
                           <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
                         </div>
                       </div>
+                      <div class="py-2">
+                        <p class="text-muted mb-0">keep parent Id null or "" to edit parent </p>
+                        <p class="text-muted mb-0">add parent Id from table to edit child category</p>
+                      </div>
                     </div>
                     <hr class="my-0" />
                     <div class="card-body">
-                      <form id="formAccountSettings" method="POST" onsubmit="return false">
+                     
+
+                      <form id="formProduct" method="POST" onsubmit="return false">
                         <div class="row">
                           <div class="mb-3 col-md-6">
                             <label for="Name" class="form-label">Name</label>
@@ -120,85 +126,132 @@
                               class="form-control"
                               type="text"
                               id="Name"
-                              name="Name"
-                              value= <%= isEdit ?  "product name" : "" %>
+                              name="name"
+                              value= "<%= isEdit ? product?.name : "" %>"
                               autofocus
                             />
                           </div>
                           <div class="mb-3 col-md-6">
-                            <label for="id" class="form-label">Id</label>
+                            <label for="subCategory" class="form-label">SubCategory</label>
                             <input class="form-control" 
                             type="text"
-                            name="id" id="id" 
-                            value = <%= isEdit ?  "Doe" : "" %>
+                            name="subCategory" id="subCategory" 
+                            value= "<%= isEdit ? product?.subcategory?.name  : "" %>"
                             />
                           </div>
                           <div class="mb-3 col-md-6">
-                            <label for="category" class="form-label">Category</label>
-                            <input
-                              class="form-control"
-                              type="text"
-                              id="category"
-                              name="category"
-                              <% if (isEdit) {%>
-                                value="category name"
-                                placeholder="category name"
-                              <% } %>
+                            <label for="subCategoryId" class="form-label">subcategory Id</label>
+                            <input class="form-control" 
+                            type="text"
+                            name="subCategoryId" id="subCategoryId" 
+                            value= "<%= isEdit ? product?.subcategory?._id  : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="id" class="form-label">Id</label>
+                            <input class="form-control" type="text" 
+                            name="id"
+                             id="id"
+                              value="<%= isEdit ? product?._id : "" %>"
                             />
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="price" class="form-label">Price</label>
                             <input
-                              type="text"
                               class="form-control"
+                              type="text"
                               id="price"
                               name="price"
-                              placeholder= <% isEdit ? "price" : "" %>
-
-                            />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label class="form-label" for="offer">Phone Number</label>
-                            <div class="input-group input-group-merge">
-                              <span class="input-group-text">US (+1)</span>
-                              <input
-                                type="text"
-                                id="offer"
-                                name="offer"
-                                class="form-control"
-                                placeholder= <% isEdit ? "202 555 0111" : "" %>
-                              />
-                            </div>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="rating" class="form-label">Rating</label>
-                            <input 
-                            type="text" class="form-control" 
-                            id="rating" 
-                            name="rating" 
-                            placeholder= <% isEdit ? "202 555 0111" : "" %>
+                              <% if (isEdit) {%>
+                                placeholder="enter original price"
+                                value = "<%= isEdit ? product?.price  : "" %>"
+                                <% } %>
                              />
                           </div>
                           <div class="mb-3 col-md-6">
-                            <label for="peopleRated" class="form-label">People rated</label>
-                            <input class="form-control" 
-                            type="text" 
-                            id="peopleRated" 
-                            name="peopleRated" 
-                            placeholder= <% isEdit ? "2" : "" %>
-                            />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="stock" class="form-label">Stock</label>
+                            <label for="finalPrice" class="form-label">Final Price</label>
                             <input
                               type="text"
                               class="form-control"
-                              id="stock"
-                              name="stock"
-                              placeholder= <% isEdit ? "231465" : "" %>
-                              maxlength="6"
+                              id="finalPrice"
+                              name="finalPrice"
+                              value= "<%= isEdit ? product?.finalPrice : "" %>"
                             />
                           </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="rating class="form-label">rating</label>
+                            <input type="text" class="form-control" 
+                            id="rating" 
+                            name='rating'
+                            value="<%=isEdit ? product?.rating : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="peopleRated class="form-label">peopleRated</label>
+                            <input type="text" class="form-control" 
+                            id="peopleRated" 
+                            name='peopleRated'
+                            value="<%=isEdit ? product?.peopleRated : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="stock class="form-label">stock</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="stock" 
+                            name='stock'
+                            value= "<%= isEdit ? product?.stock : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="description class="form-label">description</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="description" 
+                            name='description'
+                            value="<%= isEdit ? product?.productInfo?.description : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="featuresAndDetails class="form-label">featuresAndDetails</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="featuresAndDetails" 
+                            name='featuresAndDetails'
+                            value="<%= isEdit ? product?.productInfo?.featuresAndDetails : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="brand class="form-label">brand</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="brand" 
+                            name='brand'
+                            value="<%= isEdit ? product?.productInfo?.brand : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="soldBy class="form-label">soldBy</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="soldBy" 
+                            name='soldBy'
+                            value="<%= isEdit ? product?.productInfo?.soldBy : "" %>"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="location class="form-label">location</label>
+                            <input type="text" 
+                            class="form-control" 
+                            id="location" 
+                            name='location'
+                            value="<%= isEdit ? product?.productInfo?.location : "" %>"
+                            />
+                          </div>
+
+
+
+                          
                          
                           
                         <div class="mt-2">
@@ -206,7 +259,7 @@
                             <button type="submit" class="btn btn-primary me-2"> Save changes</button>
                           <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                           <% } else {%>
-                            <button type="submit" class="btn btn-primary me-2"> Create new product</button>
+                            <button type="submit" class="btn btn-primary me-2"> Create new category</button>
                           <% } %>
                         </div>
                       </form>
@@ -264,7 +317,11 @@
     </div>
     <!-- / Layout wrapper -->
 
-   
+  <% if(isEdit) { %>
+    <script> isEdit = true</script>
+    <% } else {%>
+      <script> isEdit = false</script>
+      <% }%>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -284,7 +341,12 @@
     <!-- Page JS -->
     <script src="/static/admin/assets/js/pages-account-settings-account.js"></script>
 
+    <!-- * category script -->
+    <script src="/static/admin/scripts/product.js"></script>
+
+
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+  
   </body>
 </html>

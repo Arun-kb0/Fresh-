@@ -1,11 +1,11 @@
 const CustomError = require("../../constants/CustomError")
 const { BAD_REQUEST, OK } = require("../../constants/httpStatusCodes")
-const categoryModel = require("../../model/categoryModel")
 const productModel = require("../../model/prodctModel")
 const subCategoryModel = require("../../model/subCategoryModel")
 
 
-const getProductController = async (req, res,next) => {
+// * get product list page
+const getProductController = async (req, res, next) => {
   try {
     const products = await productModel.aggregate([
       {
@@ -40,57 +40,76 @@ const getProductController = async (req, res,next) => {
           preserveNullAndEmptyArrays: true
         }
       }
-    ]).skip(0).limit(10).sort({rating:1, name:1})
+    ]).skip(0).limit(10).sort({ rating: 1, name: 1 })
 
-    res.status(OK).json({ products })
-    // res.render('admin/products/productsTable', { isAuthPage: false })
+    // res.status(OK).json({ products })
+    res.render('admin/products/productsTable', { isAuthPage: false, products: products })
   } catch (error) {
     next(error)
   }
 }
 
-
-const getEditProductController = async (req, res) => {
+// * edit
+const getEditProductController = async (req, res, next) => {
+  const { product } = req.query
   try {
-    res.render('admin/products/editProduct', { isEdit: true, isAuthPage: false })
-  } catch (error) {
-    next(error)
-  }
-}
-
-
-const getCreateProductController = async (req, res) => {
-  try {
-
-    res.render('admin/products/editProduct', { isEdit: false, isAuthPage: false })
-  } catch (error) {
-    next(error)
-  }
-}
-
-const createProductController = async (req, res, next) => {
-  const product = req.body
-  try {
-    const { categoryId } = product
-    isCategoryExists = await subCategoryModel.findOne({ _id: categoryId })
-    if (!isCategoryExists) {
-      const message = "category with give id doesn't exists"
+    console.log(product)
+    if (!product) {
+      const message = 'product required for editing'
       throw new CustomError(message, BAD_REQUEST)
     }
-    const newProduct = await productModel.create(product)
-    res.status(OK).json({ message: "new product created", product: newProduct })
+    const data = JSON.parse(product)
+    res.render('admin/products/editProduct', { isEdit: true, isAuthPage: false, product: data })
   } catch (error) {
     next(error)
   }
 }
 
-
-
 const editProductController = async (req, res, next) => {
-  const product = req.body
+  let product = req.body
   try {
-    const { _id, categoryId, price, finalPrice } = product
-    if (price < finalPrice) {
+   
+    const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = product
+    const categoryId = subCategoryId
+    const _id = id
+
+    product = {
+      _id,
+      name,
+      categoryId,
+      price: parseFloat(price),
+      finalPrice: parseFloat(finalPrice),
+      rating: parseInt(rating),
+      peopleRated: parseInt(peopleRated),
+      stock: parseInt(stock),
+      productInfo: {
+        ...rest
+      }
+    }
+    console.log(product)
+
+    const cleanObject = (obj) => {
+      let cleanedObj = {};
+      for (const [key, val] of Object.entries(obj)) {
+        if (val !== null && val !== undefined && val !== '') {
+          if (typeof val === 'object' && !Array.isArray(val)) {
+            const cleanedNestedObj = cleanObject(val);
+            if (Object.keys(cleanedNestedObj).length > 0) {
+              cleanedObj[key] = cleanedNestedObj;
+            }
+          } else {
+            cleanedObj[key] = val;
+          }
+        }
+      }
+      return cleanedObj;
+    };
+
+    const cleanedProduct = cleanObject(product);
+    console.log(cleanedProduct);
+
+
+    if (product.price < product.finalPrice) {
       const message = "final price must be less than price"
       throw new CustomError(message, BAD_REQUEST)
     }
@@ -115,7 +134,48 @@ const editProductController = async (req, res, next) => {
   }
 }
 
+// * create
+const getCreateProductController = async (req, res) => {
+  try {
+    res.render('admin/products/editProduct', { isEdit: false, isAuthPage: false })
+  } catch (error) {
+    next(error)
+  }
+}
 
+const createProductController = async (req, res, next) => {
+  let product = req.body
+  try {
+    console.log(product)
+    const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = product
+    const categoryId = subCategoryId
+    product = {
+      name,
+      categoryId,
+      price: parseFloat(price),
+      finalPrice: parseFloat(finalPrice),
+      rating: parseInt(rating),
+      peopleRated: parseInt(peopleRated),
+      stock: parseInt(stock),
+      productInfo: {
+        ...rest
+      }
+    }
+
+    isCategoryExists = await subCategoryModel.findOne({ _id: categoryId })
+    if (!isCategoryExists) {
+      const message = "category with give id doesn't exists"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+    const newProduct = await productModel.create(product)
+    res.status(OK).json({ message: "new product created", product: newProduct })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+// * delete
 const deleteProductController = async (req, res, next) => {
   const { productId } = req.query
   try {
