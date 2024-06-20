@@ -15,3 +15,27 @@
 .marginTopForBody{
   margin-top: 153px
 }
+
+.cardStoke{
+  border: solid #D5D9D9;
+  border-radius: 15px;
+  /* border-color: #D5D9D9; */
+}
+
+.cardImageContainer {
+  width: 160px;
+  height: 160;
+}
+
+.cardImage{
+  width: 160px;
+  height: 160;
+  padding: 12px;
+  object-fit:cover ;
+  overflow:hidden,
+  
+}
+
+.textLineTrough  {
+  text-decoration: line-through;
+}
