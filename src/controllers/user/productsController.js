@@ -1,9 +1,8 @@
-const { viewUsersPage } = require("../../constants/pageConfid")
 
 const getProductsController =async (req,res,next) => {
   try {
     
-    res.render('user/index', viewUsersPage)
+    res.render('user/index', viewUser)
   } catch (error) {
     next(error)
   }

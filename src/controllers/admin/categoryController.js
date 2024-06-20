@@ -3,6 +3,7 @@ const { BAD_REQUEST,
   OK, CONFLICT, NOT_FOUND,
   NOT_MODIFIED
 } = require('../../constants/httpStatusCodes')
+const { viewAdminPage } = require("../../constants/pageConfid")
 const categoryModel = require("../../model/categoryModel")
 const subCategoryModel = require("../../model/subCategoryModel")
 
@@ -38,8 +39,8 @@ const getCategoriesController = async (req, res, next) => {
       }
     ])
     console.log(categories.subCategories)
-    // res.status(200).json({ isAuthPage: false, categories: categories })
-    res.render('admin/category/categoriesTable', { isAuthPage: false, categories })
+    // res.status(200).json({ ...viewAdminPage, categories: categories })
+    res.render('admin/category/categoriesTable', { ...viewAdminPage, categories })
   } catch (error) {
     next(error)
   }
@@ -55,7 +56,7 @@ const getEditCategoryController = async (req, res,next) => {
   try {
     // console.log(category)
     const data = JSON.parse(category)
-    res.render('admin/category/editCategory', { isEdit: true, isAuthPage: false, category:data })
+    res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category:data })
   } catch (error) {
     next(error)
   }
@@ -122,7 +123,7 @@ const editCategoryController = async (req, res, next) => {
 // * create category
 const getCreateCategoryController = async (req, res) => {
   try {
-    res.render('admin/category/editCategory', { isEdit: false, isAuthPage: false })
+    res.render('admin/category/editCategory', { isEdit: false, ...viewAdminPage })
   } catch (error) {
     next(error)
   }

@@ -4,10 +4,10 @@ const { getUserEditController, getUsersController, blockUserController } = requi
 const {
   getProductController,
   getEditProductController,
-  getCreateProductController, 
+  getCreateProductController,
   createProductController,
   editProductController,
-  deleteProductController} = require('../../controllers/admin/productController')
+  deleteProductController } = require('../../controllers/admin/productController')
 const {
   getEditCategoryController,
   getCreateCategoryController,
@@ -16,16 +16,21 @@ const {
   createCategoryController,
   deleteCategoryController
 } = require('../../controllers/admin/categoryController')
+const { uploadImageToFirebase } = require('../../controllers/admin/uploadImageController')
+const multer = require("multer")
 
 
 const router = express.Router()
+const upload = multer({ storage: multer.memoryStorage() })
+
+
 
 router.route('/')
   .get(getAdminHomeController)
 
 // * user
 router.get('/users', getUsersController)
-router.patch('/user/block',blockUserController)
+router.patch('/user/block', blockUserController)
 
 // * products
 router.get('/products', getProductController)
@@ -36,7 +41,7 @@ router.route('/product/edit')
 
 router.route('/product/create')
   .get(getCreateProductController)
-  .post(createProductController)
+  .post(upload.single("filename"), createProductController)
 
 // * category
 router.get('/categories', getCategoriesController)
@@ -50,6 +55,7 @@ router.route('/category/create')
   .post(createCategoryController)
 
 
+// router.post('/imageupload', upload.single("filename"), uploadImageToFirebase)
 
 
 

@@ -4,10 +4,11 @@ const Schema = mongoose.Schema
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 const productSchema = new Schema({
-  image: {
-    fileName: { type: [String], default: [] },
-    path: { type: [String], default: [] },
-  },
+  image: [{
+    fileName: { type: String },
+    originalName:{type:String},
+    path: { type: String },
+  }],
   name: { type: String, required: true },
   price: { type: Number, required: true },
   finalPrice: { type: Number, required: true },

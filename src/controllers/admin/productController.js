@@ -1,5 +1,7 @@
 const CustomError = require("../../constants/CustomError")
-const { BAD_REQUEST, OK } = require("../../constants/httpStatusCodes")
+const { BAD_REQUEST, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
+const { viewAdminPage } = require("../../constants/pageConfid")
+const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const productModel = require("../../model/prodctModel")
 const subCategoryModel = require("../../model/subCategoryModel")
 
@@ -43,7 +45,7 @@ const getProductController = async (req, res, next) => {
     ]).skip(0).limit(10).sort({ rating: 1, name: 1 })
 
     // res.status(OK).json({ products })
-    res.render('admin/products/productsTable', { isAuthPage: false, products: products })
+    res.render('admin/products/productsTable', { ...viewAdminPage, products: products })
   } catch (error) {
     next(error)
   }
@@ -59,7 +61,7 @@ const getEditProductController = async (req, res, next) => {
       throw new CustomError(message, BAD_REQUEST)
     }
     const data = JSON.parse(product)
-    res.render('admin/products/editProduct', { isEdit: true, isAuthPage: false, product: data })
+    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: data })
   } catch (error) {
     next(error)
   }
@@ -68,7 +70,7 @@ const getEditProductController = async (req, res, next) => {
 const editProductController = async (req, res, next) => {
   let product = req.body
   try {
-   
+
     const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = product
     const categoryId = subCategoryId
     const _id = id
@@ -137,36 +139,57 @@ const editProductController = async (req, res, next) => {
 // * create
 const getCreateProductController = async (req, res) => {
   try {
-    res.render('admin/products/editProduct', { isEdit: false, isAuthPage: false })
+    res.render('admin/products/editProduct', { isEdit: false, ...viewAdminPage })
   } catch (error) {
     next(error)
   }
 }
 
 const createProductController = async (req, res, next) => {
-  let product = req.body
+  const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = req.body
   try {
-    console.log(product)
-    const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = product
+    console.log(req.file)
+    // console.log(req.body.name)
     const categoryId = subCategoryId
+    // console.log(name)
+    if (!stock || !price || !finalPrice || !name) {
+      const message = "name , stock , price , final price are required"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+
+    if (!req.file) {
+      const message = "image required to create a product"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+    if (!categoryId) {
+      const message = "subcategory Id is required to crete a product"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+    isCategoryExists = await subCategoryModel.findOne({ _id: categoryId })
+    if (!isCategoryExists) {
+      const message = "category with give id doesn't exists"
+      throw new CustomError(message, NOT_FOUND)
+    }
+
+    console.log(req.file)
+    const image = await uploadImageToFirebase(req.file,'product')
+    console.log(image)
+
     product = {
+      image: [image],
       name,
       categoryId,
       price: parseFloat(price),
       finalPrice: parseFloat(finalPrice),
-      rating: parseInt(rating),
-      peopleRated: parseInt(peopleRated),
+      rating: rating ? parseInt(rating) : 0,
+      peopleRated: peopleRated ? parseInt(peopleRated) : 0,
       stock: parseInt(stock),
       productInfo: {
         ...rest
       }
     }
 
-    isCategoryExists = await subCategoryModel.findOne({ _id: categoryId })
-    if (!isCategoryExists) {
-      const message = "category with give id doesn't exists"
-      throw new CustomError(message, BAD_REQUEST)
-    }
+   
     const newProduct = await productModel.create(product)
     res.status(OK).json({ message: "new product created", product: newProduct })
   } catch (error) {
