@@ -12,7 +12,7 @@ const authRouter = require('./src/routes/auth/authRoutes')
 const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
 const { auth } = require('./src/middleware/authMiddleware')
-
+const productRouter= require('./src/routes/user/productRoutes')
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -43,8 +43,13 @@ app.use('/auth', authRouter)
 // * auth middleware
 // app.use(auth)
 
+// * user routes
+app.use('/', productRouter)
+
 // * admin routes
-app.use('/admin',adminRouter)
+app.use('/admin', adminRouter)
+
+
 
 
 // * error handler middleware

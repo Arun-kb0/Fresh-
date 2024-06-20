@@ -6,7 +6,7 @@ const getUsersController = async (req, res, next) => {
   try {
     const users = await userModel.find({})
     // res.status(OK).json({ users })
-    res.render('admin/users/usersTable', { isAuthPage: false,users , users })
+    res.render('admin/users/usersTable', { isAuthPage: false , isAdmin:false })
   } catch (error) {
     next(error)
   }
