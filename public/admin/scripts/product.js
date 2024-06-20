@@ -2,66 +2,11 @@ $(function () {
 
   const deleteProductBtn = $(".deleteProductBtn")
   const productForm = $("#formProduct")
-  const imageUploadBtn = $("#productImageUpload")
   const image = $("#upload")[0]
 
 
   deleteProductBtn.on("click", deleteProductHelper)
-  // productForm.on("submit", CreateOrEditProductHelper)
-
-  productForm.on("submit", function (e) {
-    e.preventDefault()
-    const formData = $(this).serializeArray()
-    let formObject = {}
-    formData.forEach((item) => {
-      if (item.value !== "") {
-        formObject[item.name] = item.value.trim()
-      }
-    })
-    // !
-    const file = image.files[0]
-    const formDataObject = new FormData()
-
-    for (const key in formObject) {
-      formDataObject.append(key, formObject[key]);
-    }
-    formDataObject.append("filename", file)
-
-    // const combinedData = {
-    //   formData: formDataObject,
-    //   jsonData: formObject
-    // }
-    // !
-
-    let url, method
-    if (isEdit) {
-      url = '/admin/product/edit'
-      method = 'PATCH'
-    } else {
-      url = '/admin/product/create'
-      method = "POST"
-    }
-
-    // console.log(combinedData)
-    $.ajax({
-      url: url,
-      method: method,
-      data: formDataObject,
-      processData:false,
-      contentType: false,
-      success: function (data) {
-        console.log(data)
-        alert(data.message)
-      },
-      error: function (xhr, status, error) {
-        const res = JSON.parse(xhr.responseText)
-        alert(res.message)
-        console.log(error)
-      }
-    })
-  })
-
-
+  productForm.on("submit", CreateOrEditProductHelper)
 
 
   function CreateOrEditProductHelper(e) {
@@ -73,7 +18,13 @@ $(function () {
         formObject[item.name] = item.value.trim()
       }
     })
-    console.log(formObject)
+    const file = image.files[0]
+    const formDataObject = new FormData()
+    for (const key in formObject) {
+      formDataObject.append(key, formObject[key]);
+    }
+    formDataObject.append("filename", file)
+    console.log(formDataObject)
 
     let url, method
     if (isEdit) {
@@ -87,8 +38,9 @@ $(function () {
     $.ajax({
       url: url,
       method: method,
-      data: JSON.stringify(formObject),
-      contentType: "application/json",
+      data: formDataObject,
+      processData: false,
+      contentType: false,
       success: function (data) {
         console.log(data)
         alert(data.message)
@@ -118,5 +70,7 @@ $(function () {
       }
     })
   }
+
+
 
 })

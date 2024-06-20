@@ -5,6 +5,7 @@ const Schema = mongoose.Schema
 const categorySchema = new Schema({
   image: {
     fileName: String,
+    originalName:String,
     path: String
   },
   name: { type: String, required: true },

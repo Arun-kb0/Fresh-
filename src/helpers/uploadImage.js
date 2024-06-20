@@ -18,8 +18,8 @@ const uploadImageToFirebase = async (file, directory) => {
     const downloadedUrl = await getDownloadURL(snapshot.ref)
     const image = {
       fileName,
-      originalname: file.originalname,
-      path: downloadedUrl
+      originalName: file.originalname,
+      path: downloadedUrl,
     }
     return image
   } catch (error) {

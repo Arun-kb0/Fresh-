@@ -16,7 +16,6 @@ const {
   createCategoryController,
   deleteCategoryController
 } = require('../../controllers/admin/categoryController')
-const { uploadImageToFirebase } = require('../../controllers/admin/uploadImageController')
 const multer = require("multer")
 
 
@@ -36,7 +35,7 @@ router.patch('/user/block', blockUserController)
 router.get('/products', getProductController)
 router.route('/product/edit')
   .get(getEditProductController)
-  .patch(editProductController)
+  .patch(upload.single("filename"), editProductController)
   .delete(deleteProductController)
 
 router.route('/product/create')
@@ -47,15 +46,14 @@ router.route('/product/create')
 router.get('/categories', getCategoriesController)
 router.route('/category/edit')
   .get(getEditCategoryController)
-  .patch(editCategoryController)
+  .patch(upload.single("filename"), editCategoryController)
   .delete(deleteCategoryController)
 
 router.route('/category/create')
   .get(getCreateCategoryController)
-  .post(createCategoryController)
+  .post(upload.single("filename"),createCategoryController)
 
 
-// router.post('/imageupload', upload.single("filename"), uploadImageToFirebase)
 
 
 

@@ -1,8 +1,9 @@
+const  mongoose  = require("mongoose")
 const CustomError = require("../../constants/CustomError")
 const { BAD_REQUEST, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
 const { viewAdminPage } = require("../../constants/pageConfid")
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
-const productModel = require("../../model/prodctModel")
+const productModel = require("../../model/productModel")
 const subCategoryModel = require("../../model/subCategoryModel")
 
 
@@ -53,15 +54,51 @@ const getProductController = async (req, res, next) => {
 
 // * edit
 const getEditProductController = async (req, res, next) => {
-  const { product } = req.query
+  const { productId } = req.query
+  console.log(productId)
   try {
-    console.log(product)
-    if (!product) {
+    if (!productId) {
       const message = 'product required for editing'
       throw new CustomError(message, BAD_REQUEST)
     }
-    const data = JSON.parse(product)
-    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: data })
+    const productObjectId = mongoose.Types.ObjectId.createFromHexString(productId)
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          _id: productObjectId,
+          isDeleted: false
+        }
+      },
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "subcategory"
+        }
+      },
+      {
+        $addFields: {
+          subcategory: {
+            $filter: {
+              input: "$subcategory",
+              as: "category",
+              cond: {
+                $eq: ["$$category.isDeleted", false]
+              }
+            }
+          }
+        }
+      },
+      {
+        $unwind: {
+          path: "$subcategory",
+          preserveNullAndEmptyArrays: true
+        }
+      }
+    ])
+    console.log(product[0])
+    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0] })
   } catch (error) {
     next(error)
   }

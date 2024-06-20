@@ -4,9 +4,10 @@ const { BAD_REQUEST,
   NOT_MODIFIED
 } = require('../../constants/httpStatusCodes')
 const { viewAdminPage } = require("../../constants/pageConfid")
+const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const categoryModel = require("../../model/categoryModel")
 const subCategoryModel = require("../../model/subCategoryModel")
-
+const mongoose = require('mongoose')
 
 
 
@@ -47,24 +48,58 @@ const getCategoriesController = async (req, res, next) => {
 }
 
 
-
-
-
 // * edit category
-const getEditCategoryController = async (req, res,next) => {
-  const { category } = req.query
+const getEditCategoryController = async (req, res, next) => {
+  const { categoryId, subcategory } = req.query
   try {
-    // console.log(category)
-    const data = JSON.parse(category)
-    res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category:data })
+    const categoryObjectId = mongoose.Types.ObjectId.createFromHexString(categoryId)
+    if (subcategory) {
+      const category = await subCategoryModel.findOne({ _id: categoryObjectId, isDeleted: false })
+      res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category: category })
+      return
+    }
+
+    const category = await categoryModel.aggregate([
+      {
+        $match: {
+          _id: categoryObjectId,
+          isDeleted: false,
+        }
+      },
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "_id",
+          foreignField: "parentId",
+          as: "subCategories"
+        }
+      },
+      {
+        $addFields: {
+          subCategories: {
+            $filter: {
+              input: "$subCategories",
+              as: "subCategory",
+              cond: {
+                $eq: ["$$subCategory.isDeleted", false]
+              }
+            }
+          }
+        }
+      }
+    ])
+
+    res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category: category[0] })
   } catch (error) {
     next(error)
   }
 }
 
+
 const editCategoryController = async (req, res, next) => {
   const category = req.body
   try {
+    console.log(category)
     if (typeof category.id !== "string" || category.id.length !== 24) {
       const message = "category id is required for editing"
       throw new CustomError(message, BAD_REQUEST)
@@ -131,6 +166,9 @@ const getCreateCategoryController = async (req, res) => {
 
 const createCategoryController = async (req, res, next) => {
   const category = req.body
+  const file = req.file
+
+  console.log(file, category)
   try {
     if (!category || !category.name) {
       const message = "not enough details to create a category"
@@ -143,6 +181,13 @@ const createCategoryController = async (req, res, next) => {
       const message = "category already exists"
       throw new CustomError(message, CONFLICT)
     }
+
+    if (!file) {
+      const message = "image is required to create category"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+    const image = await uploadImageToFirebase(file, 'category')
+
     if (category?.parentId) {
       if (typeof category.parentId !== "string" || !category.parentId.length === 24) {
         const message = "invalid parent id keep it \"\" or null"
@@ -161,6 +206,7 @@ const createCategoryController = async (req, res, next) => {
 
       const newSubCategory = await subCategoryModel.create({
         ...category,
+        image,
         name: name,
         parentId: parentCategory._id
       })
@@ -170,6 +216,7 @@ const createCategoryController = async (req, res, next) => {
     }
     const newCategory = await categoryModel.create({
       ...category,
+      image,
       name: name,
     })
     res.status(OK).json({ message: "category created", category: newCategory })

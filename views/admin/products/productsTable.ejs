@@ -98,7 +98,7 @@
                             <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
                               <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up"
                                 title= "<%= item.name %>">
-                                <img src="<%= item?.image?.path %>" alt="<%= item?.image?.fileName %>" class="rounded-circle" />
+                                <img src="<%= item?.image[0]?.path %>" alt="<%= item?.image?.fileName %>" class="rounded-circle" />
                               </li>
                             </ul>
                           </td>
@@ -139,7 +139,8 @@
                                 <i class="bx bx-dots-vertical-rounded"></i>
                               </button>
                               <div class="dropdown-menu" style="margin: 50px;" >
-                                <a class="dropdown-item" id="getEditCategoryBtn" href="/admin/product/edit?product=<%= JSON.stringify(item) %>" ><i class="bx bx-edit-alt me-1"></i> Edit</a>                                         
+                                <!-- <a class="dropdown-item" id="getEditCategoryBtn" href="/admin/product/edit?product=<%= JSON.stringify(item) %>" ><i class="bx bx-edit-alt me-1"></i> Edit</a>                                          -->
+                                <a class="dropdown-item getEditCategoryBtn"  href="/admin/product/edit?productId=<%= item._id %>" ><i class="bx bx-edit-alt me-1"></i> Edit</a>                                         
                                 <a class="dropdown-item deleteProductBtn" href="javascript:void(0);" data-item="<%= item._id %>" ><i class="bx bx-trash me-1"></i> Delete</a>
                               </div>
                             </div>
