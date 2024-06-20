@@ -1,4 +1,5 @@
 const { OK } = require("../../constants/httpStatusCodes")
+const {  viewAdminPage } = require("../../constants/pageConfid")
 const userModel = require("../../model/userModel")
 
 
@@ -6,7 +7,7 @@ const getUsersController = async (req, res, next) => {
   try {
     const users = await userModel.find({})
     // res.status(OK).json({ users })
-    res.render('admin/users/usersTable', { isAuthPage: false , isAdmin:false })
+    res.render('admin/users/usersTable', {...viewAdminPage, users})
   } catch (error) {
     next(error)
   }
