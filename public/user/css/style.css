@@ -39,3 +39,24 @@
 .textLineTrough  {
   text-decoration: line-through;
 }
+
+.scrollContainer {
+  overflow: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+.scroll-content {
+  display: flex;
+}
+
+.scroll-item {
+  min-width: 200px;
+  /* adjust based on your content */
+  margin-right: 10px;
+}

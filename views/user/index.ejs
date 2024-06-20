@@ -67,28 +67,85 @@
 	<!-- end search area -->
 
 
-
+	<div class="my-5"> </div>
 	<!-- product section -->
 	<div class="product-section mt-150 mb-150 ">
 		<div class="container mt-5 ">
 			<!--  *Top deals section -->
 
-			<section>
+			<section class="mt-5">
 				<h3><span class="orange-text">Top Deals</span> On Grocery</h3>
-				<div class="row d-flex justify-content-between ">
+				<div class="d-flex justify-content-between scrollContainer">
+					<% for(let item of products){ %>
+						<!-- * mycard -->
+						<div class="col-lg-2 col-md-3 m-1 mx-3 text-center cardStoke p-2">
+							<div class="d-flex flex-column align-content-center ">
+								<div class="d-flex justify-content-center ">
+									<a class="cardImage">
+										<img src="<%= item.image[0]?.path  %>" alt="<%= item.image[0].originalName  %>">
+									</a>
+								</div>
+								<h6>
+									<%= item.name %>
+								</h6>
+								<h5>₹<%= item.finalPrice %>
+								</h5>
+								<div class="d-flex ">
+									<p class=" text-secondary px-3 textLineTrough">
+										<%= item.price %>
+									</p>
+									<p class="text-success px-3">20%</p>
+								</div>
+								<div class="d-flex align-items-baseline">
+									<div class="d-flex pb-3 px-3">
+										<% for(let i=0;i< 5 ;i++) {%>
+											<% if(i<item.rating) {%>
+												<i class="fa-solid fa-star fa-lg text-warning"></i>
+												<% } else { %>
+													<i class="fa-regular fa-star fa-lg text-warning"></i>
+													<% } %>
+														<% } %>
+									</div>
+									<span class="text-secondary">
+										<%= item.peopleRated %>
+									</span>
+								</div>
+								<button class="btn btn-outline-secondary rounded-pill">
+									<span>Add</span>
+								</button>
+							</div>
+						</div>
+						<!-- * end card -->
+						<% } %>
+
+				</div>
+			</section>
+			<!--  *end Top deals section -->
+
+
+			<!--  *food favorites section -->
+			<section class="mt-5">
+				<h3><span class="orange-text">Food</span> Favorites</h3>
+				<div class="d-flex justify-content-between scrollContainer">
+
 				<% for(let item of products){ %>
 					<!-- * mycard -->
-					<div class="col-lg-2 col-md-3  text-center cardStoke p-2">
+					<div class="col-lg-2 col-md-3 m-1 mx-3 text-center cardStoke p-2">
 						<div class="d-flex flex-column align-content-center ">
 							<div class="d-flex justify-content-center ">
 								<a class="cardImage">
 									<img src="<%= item.image[0]?.path  %>" alt="<%= item.image[0].originalName  %>">
 								</a>
 							</div>
-							<h6><%= item.name  %></h6>
-							<h5>₹<%= item.finalPrice %></h5>
+							<h6>
+								<%= item.name %>
+							</h6>
+							<h5>₹<%= item.finalPrice %>
+							</h5>
 							<div class="d-flex ">
-								<p class=" text-secondary px-3 textLineTrough"><%= item.price %></p>
+								<p class=" text-secondary px-3 textLineTrough">
+									<%= item.price %>
+								</p>
 								<p class="text-success px-3">20%</p>
 							</div>
 							<div class="d-flex align-items-baseline">
@@ -101,7 +158,9 @@
 												<% } %>
 													<% } %>
 								</div>
-								<span class="text-secondary"> <%= item.peopleRated  %></span>
+								<span class="text-secondary">
+									<%= item.peopleRated %>
+								</span>
 							</div>
 							<button class="btn btn-outline-secondary rounded-pill">
 								<span>Add</span>
@@ -110,53 +169,11 @@
 					</div>
 					<!-- * end card -->
 					<% } %>
+			</div>
+		</section>
+		<!-- * food favorites section end  -->
 
-				</div>
-			</section>
-			<!--  *end Top deals section -->
-
-
-			<!--  *food favorites section -->
-			<section class="mt-5">
-				<h3><span class="orange-text">Food</span> Favorites</h3>
-				<div class="row">
-					<!-- * card -->
-					<div class="col-lg-2 col-md-3  text-center cardStoke p-2">
-						<div class="d-flex flex-column align-content-center ">
-							<div class="d-flex justify-content-center ">
-								<a class="cardImage">
-									<img src="static/user/assets/img/products/product-img-1.jpg" alt="filename">
-								</a>
-							</div>
-							<h6>Item name</h6>
-							<h5>price</h5>
-							<div class="d-flex ">
-								<p class=" text-secondary px-3 textLineTrough">price</p>
-								<p class="text-success px-3">offer</p>
-							</div>
-							<div class="d-flex align-items-baseline">
-								<div class="d-flex pb-3 px-3">
-									<% for(let i=0;i<5;i++) {%>
-										<% if(i<3) {%>
-											<i class="fa-solid fa-star fa-lg text-warning"></i>
-											<% } else { %>
-												<i class="fa-regular fa-star fa-lg text-warning"></i>
-												<% } %>
-													<% } %>
-								</div>
-								<span class="text-secondary"> 100</span>
-							</div>
-							<button class="btn btn-outline-secondary rounded-pill">
-								<span>Add</span>
-							</button>
-						</div>
-					</div>
-					<!-- * end card -->
-				</div>
-			</section>
-			<!-- * food favorites section end  -->
-
-		</div>
+	</div>
 	</div>
 	<!-- end product section -->
 
