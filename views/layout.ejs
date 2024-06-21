@@ -12,11 +12,10 @@
 
   <% if(!isAuthPage && isAdmin) {%>
     <%- include('admin/components/adminNavbar') %>
-      <%- include('admin/components/adminSidebar') %>
-        <% } else{ %>
-
+    <%- include('admin/components/adminSidebar') %>
+  <% } else if(!isAuthPage && !isAdmin ){ %>
           <%- include('user/components/navbar') %>
-            <% } %>
+  <% } %>
 
               <%- body%>
 

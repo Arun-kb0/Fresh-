@@ -41,7 +41,7 @@ app.use('/static/auth',express.static(path.join(__dirname, 'public', 'auth')))
 app.use('/auth', authRouter)
 
 // * auth middleware
-// app.use(auth)
+app.use(auth)
 
 // * user routes
 app.use('/', productRouter)
