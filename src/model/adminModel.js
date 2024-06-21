@@ -10,6 +10,7 @@ const adminSchema = new Schema({
   phone: { type: String },
   isActive: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: true },
+  isBlocked: { type: Boolean, default: false },
 }, { timestamps: true })
 
 

@@ -13,6 +13,8 @@ const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
 const { auth } = require('./src/middleware/authMiddleware')
 const productRouter= require('./src/routes/user/productRoutes')
+const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMiddleware')
+const { logger } = require('./src/middleware/loggerMiddleware')
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -37,6 +39,9 @@ app.use('/static/admin',express.static(path.join(__dirname, 'public', 'admin')))
 app.use('/static/user',express.static(path.join(__dirname, 'public','user' )))
 app.use('/static/auth',express.static(path.join(__dirname, 'public', 'auth')))
 
+// * logger
+app.use(logger)
+
 // * routes
 app.use('/auth', authRouter)
 
@@ -47,7 +52,7 @@ app.use(auth)
 app.use('/', productRouter)
 
 // * admin routes
-app.use('/admin', adminRouter)
+app.use('/admin',adminCheck, adminRouter)
 
 
 

@@ -23,13 +23,13 @@ const transporter = nodeMailer.createTransport({
 
 
 
-
+// * auth check
 const authenticate = async (username, password, modal) => {
   if (typeof username !== 'string' || typeof password !== 'string' ||
     username.length <= 1 || password.length < 6) {
     throw new CustomError("username or password is not valid", BAD_REQUEST)
   }
-  const user = await modal.findOne({ username })
+  const user = await modal.findOne({ username , isBlocked:false })
   if (!user) {
     throw new CustomError("username not found", FORBIDDEN)
   }
@@ -42,9 +42,11 @@ const authenticate = async (username, password, modal) => {
 
 // * admin
 const getAdminLoginPageController = async (req, res, next) => {
+  const {isAuthorized , user } = req?.session
   try {
-    if (req?.session?.isAuthorized) {
-      req?.session?.user?.isAdmin
+    console.log("get admin page ")
+    if (isAuthorized) {
+      user?.isAdmin
         ? res.redirect('/admin')
         : res.redirect('/')
       return
@@ -69,6 +71,7 @@ const adminLoginController = async (req, res, next) => {
 
     res.status(OK).json({ message: "admin login success", user: admin })
   } catch (error) {
+    console.error(error)
     next(error)
   }
 }
