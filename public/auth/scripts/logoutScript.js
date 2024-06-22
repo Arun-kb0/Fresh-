@@ -10,8 +10,10 @@ $(function () {
         if (data) {
           localStorage.clear()
           if (data.isAdmin) {
+            window.history.replaceState(null, null, '/auth/admin/login')
             window.location.replace('/auth/admin/login')
           } else {
+            window.history.replaceState(null, null, '/auth/login')
             window.location.replace('/auth/login')
           }
         }
