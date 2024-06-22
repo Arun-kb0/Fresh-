@@ -48,11 +48,11 @@ app.use('/auth', authRouter)
 // * auth middleware
 app.use(auth)
 
-// * user routes
-app.use('/', productRouter)
-
 // * admin routes
 app.use('/admin',adminCheck, adminRouter)
+
+// * user routes
+app.use('/',userCheck, productRouter)
 
 
 
