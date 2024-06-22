@@ -23,13 +23,14 @@ const transporter = nodeMailer.createTransport({
 
 
 
+
 // * auth check
 const authenticate = async (username, password, modal) => {
   if (typeof username !== 'string' || typeof password !== 'string' ||
     username.length <= 1 || password.length < 6) {
     throw new CustomError("username or password is not valid", BAD_REQUEST)
   }
-  const user = await modal.findOne({ username , isBlocked:false })
+  const user = await modal.findOne({ username, isBlocked: false })
   if (!user) {
     throw new CustomError("username not found", FORBIDDEN)
   }
@@ -42,7 +43,7 @@ const authenticate = async (username, password, modal) => {
 
 // * admin
 const getAdminLoginPageController = async (req, res, next) => {
-  const {isAuthorized , user } = req?.session
+  const { isAuthorized, user } = req?.session
   try {
     console.log("get admin page ")
     if (isAuthorized) {
@@ -51,7 +52,7 @@ const getAdminLoginPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/auth-login-basic', { isAdmin: true, isAuthPage: true })
+    res.render('auth/login', { isAdmin: true, isAuthPage: true })
   } catch (error) {
     next(error)
   }
@@ -89,7 +90,7 @@ const getLoginPageController = async (req, res) => {
       return
     }
 
-    res.render('auth/auth-login-basic', { isAdmin: false, isAuthPage: true })
+    res.render('auth/login', { isAdmin: false, isAuthPage: true })
   } catch (error) {
     console.log(error)
   }
@@ -127,7 +128,7 @@ const getSignUpPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/auth-register-basic', { isAuthPage: true })
+    res.render('auth/signup', { isAuthPage: true })
   } catch (error) {
     next(error)
   }

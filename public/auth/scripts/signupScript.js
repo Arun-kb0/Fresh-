@@ -5,6 +5,8 @@ $(function () {
   const password = $("#password")
   const submitBtn = $("#signupBtn")
   const name = $("#name")
+  const confirmPassword = $("#confirmPassword")
+  
 
   const otp = $("#otp")
   const resendOtp = $("#resendOtp")
@@ -17,11 +19,12 @@ $(function () {
     otp.on("input", checkOtp)
     form.on("submit", handleOtpVerification)
     resendOtp.on("click", handleResendOtp)
-    
+
   } else {
     name.on("input", checkName)
     email.on("input", checkEmail)
     password.on("input", checkPassword)
+    confirmPassword.on("input", checkConfirmPassword)
     form.on("submit", handleSignup)
   }
 
@@ -48,9 +51,9 @@ $(function () {
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
       userId: otpData.userId,
-      email:otpData.email
+      email: otpData.email
     }
-    
+
     $.ajax({
       url: "/auth/resendotp",
       type: "POST",
@@ -100,9 +103,11 @@ $(function () {
           console.log(user)
           localStorage.setItem('user', JSON.stringify(user))
           localStorage.setItem('wallet', JSON.stringify(wallet))
+          otp.val("")
+          window.location.href = "/"
+        } else {
+          console.error("no user found")
         }
-        otp.val("")
-        // window.location.href = "/"
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
@@ -116,14 +121,14 @@ $(function () {
   // * signup handling
   function handleSignup(e) {
     e.preventDefault()
-    if (!checkEmail() || !checkPassword() || !checkName()) {
-      alert("invalid email or password")
+    if (!checkEmail() || !checkPassword() || !checkName() || !checkConfirmPassword()) {
+      console.log("invalid email or password")
       return
     }
     const data = {
       name: name.val().trim(),
       username: email.val().trim(),
-      password: password.val().trim()
+      password: password.val()
     }
 
     $.ajax({
@@ -199,7 +204,7 @@ $(function () {
   }
 
   function checkPassword() {
-    const passwordValue = password.val().trim()
+    const passwordValue = password.val()
     if (passwordValue === "") {
       setErrorFor(password, "cannot be empty")
       return false
@@ -212,10 +217,26 @@ $(function () {
     }
   }
 
+  function checkConfirmPassword() {
+    const confirmPasswordValue = confirmPassword.val()
+    console.log(confirmPasswordValue)
+    if (confirmPasswordValue === "") {
+      setErrorFor(confirmPassword, "cannot be empty")
+      return false
+    } else if (!isConfirmPasswordValid(confirmPasswordValue)) {
+      setErrorFor(confirmPassword, "confirm password is not same as password")
+      return false
+    } else {
+      setSuccessFor(confirmPassword)
+      return true
+    }
+
+  }
+
   // * validation error function
   function setErrorFor(input, msg) {
     let parent
-    if (input.attr("name") === "password") {
+    if (input.attr("name") === "password" || input.attr("name") === "confirmPassword" ) {
       parent = input.parent().parent()
     } else {
       parent = input.parent()
@@ -230,7 +251,7 @@ $(function () {
   // * validation success function
   function setSuccessFor(input) {
     let parent
-    if (input.attr("name") === "password") {
+    if (input.attr("name") === "password" || input.attr("name") === "confirmPassword") {
       parent = input.parent().parent()
     } else {
       parent = input.parent()
@@ -264,6 +285,9 @@ $(function () {
     return otpRegex.test(otp)
   }
 
+  function isConfirmPasswordValid(confirmPasswordValue) {
+      return confirmPasswordValue === password.val()
+  }
 
 
 })
