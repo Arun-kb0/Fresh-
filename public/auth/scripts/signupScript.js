@@ -6,7 +6,6 @@ $(function () {
   const submitBtn = $("#signupBtn")
   const name = $("#name")
   const confirmPassword = $("#confirmPassword")
-  
 
   const otp = $("#otp")
   const resendOtp = $("#resendOtp")
@@ -28,9 +27,13 @@ $(function () {
     form.on("submit", handleSignup)
   }
 
+
   // * timer function
   function startTimer() {
-    let timeLeft = 5 * 60
+    if (!resendOtp.hasClass("disabled")) {
+      resendOtp.addClass("disabled")
+    }
+    let timeLeft = 3 * 60
     updateTimer()
     const timerInterval = setInterval(updateTimer, 1000)
     function updateTimer() {
@@ -40,6 +43,7 @@ $(function () {
       if (timeLeft > 0) {
         timeLeft--
       } else {
+        resendOtp.removeClass("disabled")
         clearInterval(timerInterval)
       }
     }
@@ -48,10 +52,10 @@ $(function () {
 
   // * handle otp resend
   function handleResendOtp() {
+    startTimer()
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
-      userId: otpData.userId,
-      email: otpData.email
+      email: otpData.username,
     }
 
     $.ajax({
@@ -67,9 +71,13 @@ $(function () {
         // window.location.href = "/"
       },
       error: function (xhr, status, error) {
+        if (xhr.status === 400) {
+          window.location.href = "/auth/signup"
+          return
+        }
         const res = JSON.parse(xhr.responseText)
         alert(res.message)
-        console.log(ErrorEvent)
+        console.log(error)
       }
     })
   }
@@ -86,7 +94,7 @@ $(function () {
     }
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
-      userId: otpData.userId,
+      username: otpData.username,
       otp: otp.val().trim()
     }
 
@@ -137,12 +145,13 @@ $(function () {
       data: JSON.stringify(data),
       contentType: "application/json",
       success: function (resData) {
-        console.log(resData)
-        if (resData?.data?.userId) {
+        console.log(resData.data.username)
+        if (resData?.data?.username) {
           localStorage.setItem('otpVerificationData', JSON.stringify(resData.data))
           name.val("")
           email.val("")
           password.val("")
+          confirmPassword.val("")
           window.location.href = '/auth/verifyemail'
         } else {
           alert("no user returned  from server")
@@ -236,7 +245,7 @@ $(function () {
   // * validation error function
   function setErrorFor(input, msg) {
     let parent
-    if (input.attr("name") === "password" || input.attr("name") === "confirmPassword" ) {
+    if (input.attr("name") === "password" || input.attr("name") === "confirmPassword") {
       parent = input.parent().parent()
     } else {
       parent = input.parent()
@@ -286,7 +295,7 @@ $(function () {
   }
 
   function isConfirmPasswordValid(confirmPasswordValue) {
-      return confirmPasswordValue === password.val()
+    return confirmPasswordValue === password.val()
   }
 
 
