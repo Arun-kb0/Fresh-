@@ -11,6 +11,7 @@ $(function () {
   const resendOtp = $("#resendOtp")
   const timerSpan = $("#timer")
 
+  const serverErrorMessage = $("#serverErrorMessage")
 
   // * controlling on signup and otp verify pages
   if (isVerifyOtp) {
@@ -94,7 +95,7 @@ $(function () {
     }
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
-      username: otpData.username,
+      username: otpData?.username,
       otp: otp.val().trim()
     }
 
@@ -109,18 +110,21 @@ $(function () {
           const { wallet, ...user } = resData.user
           console.log(wallet)
           console.log(user)
+          otp.val("")
           localStorage.setItem('user', JSON.stringify(user))
           localStorage.setItem('wallet', JSON.stringify(wallet))
-          otp.val("")
-          window.location.href = "/"
+          window.history.replaceState(null, null, '/')
+          window.location.replace('/')
         } else {
-          console.error("no user found")
+          setErrorFor(otp, "invalid otp")
+          // console.error("no user found")
         }
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
-        console.log(ErrorEvent)
+        setErrorFor(otp, "invalid otp ")
+        // alert(res.message)
+        console.log(error)
       }
     })
   }
@@ -154,12 +158,14 @@ $(function () {
           confirmPassword.val("")
           window.location.href = '/auth/verifyemail'
         } else {
-          alert("no user returned  from server")
+          setErrorFromServer("no user returned from server")
+          // alert("no user returned  from server")
         }
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        // alert(res.message)
+        setErrorFromServer(res.message)
         console.log(error)
       }
     })
@@ -174,7 +180,7 @@ $(function () {
       setErrorFor(otp, "cannot be empty")
       return false
     } else if (!isValidOtp(otpValue)) {
-      setErrorFor(otp, "invalid otp")
+      setErrorFor(otp, "must be 4 digits")
       return false
     } else {
       setSuccessFor(otp)
@@ -199,6 +205,7 @@ $(function () {
   }
 
   function checkEmail() {
+    clearServerError()
     const emailValue = email.val().trim()
     if (emailValue === "") {
       setErrorFor(email, "cannot be empty")
@@ -271,6 +278,20 @@ $(function () {
     small.addClass("opacity-0")
     submitBtn.prop("disabled", false)
     console.log(` validation success`)
+  }
+
+  // * set server error
+  function setErrorFromServer(message) {
+    serverErrorMessage.removeClass()
+    serverErrorMessage.addClass("text-danger opacity-1")
+    serverErrorMessage.text(message)
+    submitBtn.prop("disabled", true)
+  }
+
+  function clearServerError() {
+    serverErrorMessage.removeClass()
+    serverErrorMessage.text("")
+    submitBtn.prop("disabled", false)
   }
 
   // * validation regex helpers

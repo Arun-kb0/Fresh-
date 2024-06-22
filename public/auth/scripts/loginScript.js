@@ -5,21 +5,21 @@ $(function () {
   const email = $("#email")
   const password = $("#password")
   const submitBtn = $("#submitBtn")
+  const serverErrorMessage = $("#serverErrorMessage")
 
 
   email.on("input", checkEmail)
   password.on("input", checkPassword)
+  form.on("submit", handleLogin)
 
   console.log("isAdmin", isAdmin)
 
-  form.on("submit", function (e) {
+  function handleLogin(e) {
     e.preventDefault()
-
     if (!checkEmail() || !checkPassword()) {
       alert("invalid email or password")
       return
     }
-
     const data = {
       username: email.val().trim(),
       password: password.val().trim()
@@ -49,21 +49,24 @@ $(function () {
             window.location.replace('/')
           }
         } else {
+          setErrorFromServer("invalid username or password")
           console.log("no user returned  from server")
         }
-        
+
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        setErrorFromServer(res.message)
+        // alert(res.message)
         console.log(error)
       }
     })
-  })
+  }
 
 
   // * check inputs functions
   function checkEmail() {
+    clearServerError()
     const emailValue = email.val().trim()
     if (emailValue === "") {
       setErrorFor(email, "cannot be empty")
@@ -78,6 +81,7 @@ $(function () {
   }
 
   function checkPassword() {
+    clearServerError()
     const passwordValue = password.val().trim()
     if (passwordValue === "") {
       setErrorFor(password, "cannot be empty")
@@ -120,6 +124,21 @@ $(function () {
     small.addClass("opacity-0")
     submitBtn.prop("disabled", false)
     console.log(` validation success`)
+  }
+
+
+  // * set server error
+  function setErrorFromServer(message) {
+    serverErrorMessage.removeClass()
+    serverErrorMessage.addClass("text-danger opacity-1")
+    serverErrorMessage.text(message)
+    submitBtn.prop("disabled", true)
+  }
+
+  function clearServerError() {
+    serverErrorMessage.removeClass()
+    serverErrorMessage.text("")
+    submitBtn.prop("disabled", false)
   }
 
   // * validation regex helpers
