@@ -12,9 +12,11 @@ const authRouter = require('./src/routes/auth/authRoutes')
 const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
 const { auth } = require('./src/middleware/authMiddleware')
-const productRouter= require('./src/routes/user/productRoutes')
+const productRouter = require('./src/routes/user/productRoutes')
 const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMiddleware')
 const { logger } = require('./src/middleware/loggerMiddleware')
+const passport = require('passport')
+require('./src/config/passportGoogleConfig')
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -33,14 +35,17 @@ app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
 app.use(sessionConfig)
+app.use(passport.initialize())
+app.use(passport.session())
 
 
-app.use('/static/admin',express.static(path.join(__dirname, 'public', 'admin')))
-app.use('/static/user',express.static(path.join(__dirname, 'public','user' )))
-app.use('/static/auth',express.static(path.join(__dirname, 'public', 'auth')))
+app.use('/static/admin', express.static(path.join(__dirname, 'public', 'admin')))
+app.use('/static/user', express.static(path.join(__dirname, 'public', 'user')))
+app.use('/static/auth', express.static(path.join(__dirname, 'public', 'auth')))
 
 // * logger
 app.use(logger)
+
 
 // * routes
 app.use('/auth', authRouter)
@@ -49,10 +54,10 @@ app.use('/auth', authRouter)
 app.use(auth)
 
 // * admin routes
-app.use('/admin',adminCheck, adminRouter)
+app.use('/admin', adminCheck, adminRouter)
 
 // * user routes
-app.use('/',userCheck, productRouter)
+app.use('/', userCheck, productRouter)
 
 
 

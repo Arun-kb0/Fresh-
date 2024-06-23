@@ -5,21 +5,10 @@ const CustomError = require('../../constants/CustomError')
 const userModel = require('../../model/userModel')
 const otpVerificationModal = require('../../model/otpVerificationModal')
 const { sendOtpToEmail } = require('../../helpers/sendOtp')
+const passport = require('passport')
 
 
 
-
-
-// // * nodemailer transport
-// const transporter = nodeMailer.createTransport({
-//   host: process.env.SMTP_HOST,
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   }
-// })
 
 
 
@@ -213,10 +202,10 @@ const resendOtpController = async (req, res, next) => {
     const otpRecord = await otpVerificationModal.findOne({ username: email })
     await otpVerificationModal.deleteMany({ username: email })
     if (!otpRecord) {
-      throw new CustomError("not user details found" , BAD_REQUEST)
+      throw new CustomError("not user details found", BAD_REQUEST)
     }
     console.log(otpRecord)
-    const {name , password} = otpRecord
+    const { name, password } = otpRecord
     const data = await sendOtpToEmail({ email, name, password })
     res.status(OK).json(data)
   } catch (error) {
@@ -252,5 +241,7 @@ module.exports = {
   getSignUpPageController,
   loginController,
   signUpController,
-  logoutController
+  logoutController,
+
+  
 }

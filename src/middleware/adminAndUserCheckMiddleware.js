@@ -1,8 +1,9 @@
 
 
 const adminCheck = (req, res, next) => {
+  console.log("admin check")
   try {
-    if (req.session.user.isAdmin) {
+    if (req?.session?.user?.isAdmin || !req?.user?.provider) {
       return next()
     } else {
       res.redirect('/')
@@ -15,10 +16,10 @@ const adminCheck = (req, res, next) => {
 
 
 const userCheck = (req, res, next) => {
-  console.log("not user")
-  console.log(req.session.user.isAdmin)
+  console.log("user check")
+  console.log(req?.session?.user?.isAdmin)
   try {
-    if (req.session.user.isAdmin === false ) {
+    if (req?.session?.user?.isAdmin === false || req?.user?.provider ) {
       return next()
     } else {
       res.redirect('/admin/')

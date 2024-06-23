@@ -8,7 +8,7 @@ const errorHandler = async (err, req, res, next) => {
     statusCode = err.statusCode
     message = err.message
   }
-  console.log(err.message)
+  console.error(err)
   res.status(statusCode).json({ message })
 }
 

@@ -6,13 +6,13 @@ const userSchema = new Schema({
   image: { type: String },
   name: { type: String, required: true },
   username: { type: String, required: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   phone: { type: String },
   isActive: { type: Boolean, default: false },
   isPlus: { type: Boolean, default: false },
   isBlocked: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
-  isVerified: {type: Boolean , default:false},
+  isVerified: { type: Boolean, default: false },
   wallet: {
     balance: { type: Number, default: 0 },
     currency: { type: String, default: "INR" },
@@ -31,5 +31,6 @@ const userSchema = new Schema({
   timestamps: true
 })
 
+userSchema.index({ username: 1 })
 
 module.exports = mongoose.model("users", userSchema)

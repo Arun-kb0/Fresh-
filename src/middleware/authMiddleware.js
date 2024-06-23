@@ -1,7 +1,10 @@
 
 const auth = (req, res, next) => {
+  console.log(req?.user?.provider )
   try {
-    if (req.session.isAuthorized === true) {
+    if (req?.session?.isAuthorized === true 
+      || req?.user?.provider ==='google'
+    ) {
       return next()
     }
 
@@ -12,7 +15,6 @@ const auth = (req, res, next) => {
     }
 
   } catch (error) {
-    console.log(error)
     res.status(500).json({message:error.message})
   }
 }

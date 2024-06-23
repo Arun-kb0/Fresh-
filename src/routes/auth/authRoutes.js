@@ -8,8 +8,9 @@ const {
   getVerifyPageController,
   verifyEmailController,
   resendOtpController,
-  logoutController
+  logoutController,
 } = require('../../controllers/auth/authControllers')
+const passport = require('passport')
 
 const router = express.Router()
 
@@ -39,7 +40,21 @@ router.route('/verifyemail')
 router.post('/resendotp', resendOtpController)
 
 // * logout
-router.get('/logout',logoutController)
+router.get('/logout', logoutController)
+
+
+// * google oAuth passport
+router.get('/google', passport.authenticate('google', {
+  scope: ['email', 'profile']
+}))
+
+router.get('/google/callback', passport.authenticate('google', {
+  successRedirect: '/',
+  failureRedirect: '/auth/login'
+}))
+
+// * google auth success
+
 
 
 module.exports = router
