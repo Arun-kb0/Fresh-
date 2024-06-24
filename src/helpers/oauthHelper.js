@@ -1,6 +1,6 @@
 const userModel = require("../model/userModel")
 
-const oauthCreateOrCheckUser = async (req, profile) => {
+const oauthGoogleCreateOrCheckUser = async (profile) => {
   try {
     // console.log(profile._json)
     const { given_name, picture, email, email_verified } = profile
@@ -20,16 +20,41 @@ const oauthCreateOrCheckUser = async (req, profile) => {
   }
 }
 
-module.exports = {
-  oauthCreateOrCheckUser
+
+const oauthFacebookCreateOrCheckUser = async (profile) => {
+  try {
+    console.log(profile)
+    const { id, photos, displayName } = profile
+    // const user = {
+    //   userId: id,
+    //   name: displayName,
+    //   image: photos[0].value,
+    //   isVerified: true,
+    //   provider:'facebook'
+    // }
+    let user = await userModel.findOne({ userId: id })
+    if (!user) {
+      user = await userModel.create({
+        userId: id,
+        name: displayName,
+        image: photos[0].value,
+        isVerified: true,
+        provider: 'facebook'
+      })
+    }
+    return user
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 // _json: {
-//   sub: '116535338502398400509',
-//     name: 'Arun KB BCR62',
-//       given_name: 'Arun',
-//         family_name: 'KB BCR62',
-//           picture: 'https://lh3.googleusercontent.com/a/ACg8ocIw5iym5VA3Z5ILaaM-onugDfS3JsavtUBGMpLmoTJDIsNeLks=s96-c',
-//             email: 'arun11.kb@gmail.com',
-//               email_verified: true
+//   id: '122157406718091971',
+//     name: 'Arun Kb',
+//       picture: { data: [Object] }
 // }
+
+module.exports = {
+  oauthGoogleCreateOrCheckUser,
+  oauthFacebookCreateOrCheckUser
+}

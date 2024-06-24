@@ -3,9 +3,11 @@ const Schema = mongoose.Schema
 
 
 const userSchema = new Schema({
+  userId: { type: String, required: true },
+  provider:{type:String , default:null},
   image: { type: String },
   name: { type: String, required: true },
-  username: { type: String, required: true },
+  username: { type: String, required: false },
   password: { type: String, required: false },
   phone: { type: String },
   isActive: { type: Boolean, default: false },

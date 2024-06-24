@@ -48,12 +48,48 @@ router.get('/google', passport.authenticate('google', {
   scope: ['email', 'profile']
 }))
 
-router.get('/google/callback', passport.authenticate('google', {
-  successRedirect: '/',
-  failureRedirect: '/auth/login'
-}))
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/auth/login' }),
+  (req, res) => {
+    const { name, username, isAdmin, _id } = req.user
+    const user = {
+      name, username, isAdmin, _id
+    }
+    req.session.user = { ...user }
+    req.session.isAuthorized = true
+    req.user = null
+    const query = new URLSearchParams(user).toString()
+    res.redirect(`/?${query}`)
+  }
+)
 
-// * google auth success
+// * passport facebook route
+
+router.get('/facebook',
+  passport.authenticate('facebook'));
+
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', {
+    failureRedirect: '/auth/login'
+  }),
+  (req, res) => {
+    // console.log(req?.user)
+    const { name, userId, isAdmin, provider } = req.user
+    const user = {
+      name,
+      userId,
+      isAdmin,
+      provider
+    }
+    req.session.user = { ...user }
+    req.session.isAuthorized = true
+    req.user = null
+    const query = new URLSearchParams(user).toString()
+    res.redirect(`/?${query}`)
+  }
+)
+
 
 
 

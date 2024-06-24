@@ -5,7 +5,7 @@ const productModel = require('../../model/productModel')
 const getProductsController =async (req,res,next) => {
   try {
     const products = await productModel.find({ isDeleted: false }).limit(9)
-    res.render('user/home/index', {...viewUsersPage , products})
+    res.render('user/home/home', {...viewUsersPage , products})
   } catch (error) {
     next(error)
   }

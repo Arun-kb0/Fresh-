@@ -17,6 +17,7 @@ const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMid
 const { logger } = require('./src/middleware/loggerMiddleware')
 const passport = require('passport')
 require('./src/config/passportGoogleConfig')
+require('./src/config/passportFacebookConfig')
 
 const PORT = process.env.PORT || 3000
 const app = express()

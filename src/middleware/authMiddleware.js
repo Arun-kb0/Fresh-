@@ -1,6 +1,8 @@
 
 const auth = (req, res, next) => {
-  console.log(req?.user?.provider )
+  // console.log(req?.user?.provider)
+  // console.log(req?.user)
+  
   try {
     if (req?.session?.isAuthorized === true 
       || req?.user?.provider ==='google'
