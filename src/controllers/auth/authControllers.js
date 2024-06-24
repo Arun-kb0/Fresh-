@@ -9,10 +9,6 @@ const passport = require('passport')
 
 
 
-
-
-
-
 // * auth check
 const authenticate = async (username, password, modal) => {
   if (typeof username !== 'string' || typeof password !== 'string' ||
@@ -90,7 +86,8 @@ const loginController = async (req, res, next) => {
     req.session.user = {
       name: user.name,
       username: user.username,
-      isAdmin: false
+      isAdmin: false,
+      provider: null
     }
     req.session.isAuthorized = true
     res.status(OK).json({ message: "login success", user })
@@ -183,7 +180,8 @@ const verifyEmailController = async (req, res, next) => {
     req.session.user = {
       name: name,
       username: username,
-      isAdmin: false
+      isAdmin: false,
+      provider: null
     }
     req.session.isAuthorized = true
     res.status(OK).json({ message: "email verified", user })
@@ -228,6 +226,28 @@ const logoutController = async (req, res) => {
 }
 
 
+// *  oauth success response
+const oauthSuccessController = async (req, res, next) => {
+  try {
+    const { name, username = null, isAdmin, userId, provider } = req.user
+    const user = {
+      name,
+      username,
+      isAdmin,
+      userId,
+      provider
+    }
+    req.session.user = { ...user }
+    req.session.isAuthorized = true
+    req.user = null
+    const query = new URLSearchParams(user).toString()
+    res.redirect(`/?${query}`)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 
 module.exports = {
   getAdminLoginPageController,
@@ -243,5 +263,6 @@ module.exports = {
   signUpController,
   logoutController,
 
-  
+  oauthSuccessController,
+
 }
