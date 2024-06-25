@@ -6,19 +6,20 @@ $(function () {
 
   function handleBlockUser() {
     const userId = this.getAttribute("data-item")
+    const button = $(this)
     console.log(userId)
     $.ajax({
       url: `/admin/user/block?userId=${userId}`,
       method: "PATCH",
       success: function (data) {
         if (data.user?.isBlocked) {
-          blockBtn
+          button
             .removeClass("btn-outline-danger")
             .addClass("btn-outline-success")
             .text("unblock")
 
         } else {
-          blockBtn
+          button
             .removeClass("btn-outline-success")
             .addClass("btn-outline-danger")
             .text("block")

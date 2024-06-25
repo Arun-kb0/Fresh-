@@ -76,7 +76,10 @@
                       <tr>
                         <th>Image</th>
                         <th>Name </th>
-                        <th>id</th>
+                        <th>Email </th>
+                        <th>Provider </th>
+                        <th>userId </th>
+                        <th>mongodb id</th>
                         <th>Block or unblock</th>
                       </tr>
                     </thead>
@@ -90,13 +93,25 @@
                             <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
                               <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up"
                                 title= "<%= item.name %>">
-                                <img src="<%= item?.image?.path %>" alt="<%= item?.image?.fileName %>" class="rounded-circle" />
+                                <img 
+                                src="<%= item?.image ? item.image : "/static/admin/image/noImage.jpg" %>"
+                                 alt="<%= item?.image?.fileName %>"
+                                  class="rounded-circle" />
                               </li>
                             </ul>
                           </td>
 
                           <td>
                              <strong> <%= item.name %> </strong>
+                          </td>
+                          <td>
+                             <strong> <%= item.username %> </strong>
+                          </td>
+                          <td>
+                             <strong> <%= item.provider %> </strong>
+                          </td>
+                          <td>
+                             <strong> <%= item.userId %> </strong>
                           </td>
                           <td>
                               <%= item?._id %> 
