@@ -4,11 +4,28 @@ $(function () {
   const formCategory = $("#formCategory")
   const image = $("#upload")[0]
 
+  const imageContainer = $(".imageContainer")
+  const imageOuterContainer = $("#imageOuterContainer")
 
 
   deleteCategoryBtn.on("click", deleteCategoryHelper)
   deleteSubCategoryBtn.on("click", deleteCategoryHelper)
   formCategory.on("submit", updateOrCreateCategory)
+  image.on("input", handleImageView)
+
+
+  function handleImageView() {
+    if (this.files) {
+      imageOuterContainer.empty();
+      const imageUrl = URL.createObjectURL(this.files[0])
+      const img = $('<img>')
+        .attr('src', imageUrl)
+        .addClass('d-block shadow p-1 mx-1 rounded')
+        .css({ height: '100px', width: '100px' });
+      imageOuterContainer.append(img);
+    }
+  }
+
 
 
 

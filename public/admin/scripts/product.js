@@ -20,8 +20,8 @@ $(function () {
         const imageUrl = URL.createObjectURL(this.files[i])
         const img = $('<img>')
           .attr('src', imageUrl)
-          .addClass('d-block shadow p-1 mx-1 rounded') // Add any additional classes here if needed
-          .css({ height: '100px', width: '100px' }); // Set image dimensions
+          .addClass('d-block shadow p-1 mx-1 rounded') 
+          .css({ height: '100px', width: '100px' }); 
         imageOuterContainer.append(img);
       }
     }
