@@ -20,7 +20,13 @@ const multer = require("multer")
 
 
 const router = express.Router()
-const upload = multer({ storage: multer.memoryStorage() })
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    files: 5,
+    fileSize : 1024 * 1024 * 2
+   }
+})
 
 
 
@@ -35,12 +41,12 @@ router.patch('/user/block', blockUserController)
 router.get('/products', getProductController)
 router.route('/product/edit')
   .get(getEditProductController)
-  .patch(upload.single("filename"), editProductController)
+  .patch(upload.array("filename",5), editProductController)
   .delete(deleteProductController)
 
 router.route('/product/create')
   .get(getCreateProductController)
-  .post(upload.single("filename"), createProductController)
+  .post(upload.array("filename",5), createProductController)
 
 // * category
 router.get('/categories', getCategoriesController)

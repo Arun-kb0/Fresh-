@@ -5,6 +5,8 @@ require('dotenv').config()
 const expressEjsLayouts = require("express-ejs-layouts")
 const cookieParser = require("cookie-parser")
 const path = require('path')
+const passport = require('passport')
+
 
 const connectDB = require('./src/config/dbConnection')
 const sessionConfig = require('./src/config/sessionConfig')
@@ -15,7 +17,6 @@ const { auth } = require('./src/middleware/authMiddleware')
 const productRouter = require('./src/routes/user/productRoutes')
 const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMiddleware')
 const { logger } = require('./src/middleware/loggerMiddleware')
-const passport = require('passport')
 require('./src/config/passportGoogleConfig')
 require('./src/config/passportFacebookConfig')
 

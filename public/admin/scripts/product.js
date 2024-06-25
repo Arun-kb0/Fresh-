@@ -2,11 +2,30 @@ $(function () {
 
   const deleteProductBtn = $(".deleteProductBtn")
   const productForm = $("#formProduct")
-  const image = $("#upload")[0]
+  const image = $("#upload")
+
+  const imageContainer = $(".imageContainer")
+  const imageOuterContainer = $("#imageOuterContainer")
 
 
   deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
+  image.on("input", handleImageView)
+
+  function handleImageView() {
+    if (this.files) {
+      imageOuterContainer.empty();
+      for (let i = 0; i < this.files.length; i++) {
+        if (i > 4) break
+        const imageUrl = URL.createObjectURL(this.files[i])
+        const img = $('<img>')
+          .attr('src', imageUrl)
+          .addClass('d-block shadow p-1 mx-1 rounded') // Add any additional classes here if needed
+          .css({ height: '100px', width: '100px' }); // Set image dimensions
+        imageOuterContainer.append(img);
+      }
+    }
+  }
 
 
   function CreateOrEditProductHelper(e) {
@@ -18,12 +37,17 @@ $(function () {
         formObject[item.name] = item.value.trim()
       }
     })
-    const file = image.files[0]
+    // const file = image.files[0]
     const formDataObject = new FormData()
     for (const key in formObject) {
       formDataObject.append(key, formObject[key]);
     }
-    formDataObject.append("filename", file)
+    // formDataObject.append("filename", file)
+
+    const files = image[0].files
+    for (const file of files) {
+      formDataObject.append('filename', file)
+    }
     console.log(formDataObject)
 
     let url, method

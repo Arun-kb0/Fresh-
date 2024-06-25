@@ -1,4 +1,4 @@
-const  mongoose  = require("mongoose")
+const mongoose = require("mongoose")
 const CustomError = require("../../constants/CustomError")
 const { BAD_REQUEST, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
 const { viewAdminPage } = require("../../constants/pageConfid")
@@ -43,7 +43,7 @@ const getProductController = async (req, res, next) => {
           preserveNullAndEmptyArrays: true
         }
       }
-    ]).skip(0).limit(10).sort({ rating: 1, name: 1 })
+    ]).skip(0).limit(15).sort({ rating: 1, name: 1 })
 
     // res.status(OK).json({ products })
     res.render('admin/products/productsTable', { ...viewAdminPage, products: products })
@@ -111,6 +111,8 @@ const editProductController = async (req, res, next) => {
     const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = product
     const categoryId = subCategoryId
     const _id = id
+    const files = req.files
+    // console.log(files)
 
     product = {
       _id,
@@ -125,7 +127,6 @@ const editProductController = async (req, res, next) => {
         ...rest
       }
     }
-    console.log(product)
 
     const cleanObject = (obj) => {
       let cleanedObj = {};
@@ -145,7 +146,7 @@ const editProductController = async (req, res, next) => {
     };
 
     const cleanedProduct = cleanObject(product);
-    console.log(cleanedProduct);
+    // console.log(cleanedProduct);
 
 
     if (product.price < product.finalPrice) {
@@ -162,6 +163,16 @@ const editProductController = async (req, res, next) => {
       const message = "category with give id doesn't exists"
       throw new CustomError(message, BAD_REQUEST)
     }
+
+    if (files) {
+      images = []
+      for (const file of files) {
+        images.push(await uploadImageToFirebase(file, 'product'))
+      }
+      product.image = [...isProductExists.image, ...images]
+      console.log(images)
+    }
+
     const editedProduct = await productModel.findOneAndUpdate(
       { _id },
       { ...product },
@@ -185,17 +196,22 @@ const getCreateProductController = async (req, res) => {
 const createProductController = async (req, res, next) => {
   const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = req.body
   try {
-    console.log(req.file)
+    console.log(req.files)
     // console.log(req.body.name)
     const categoryId = subCategoryId
+    const files = req.files
     // console.log(name)
     if (!stock || !price || !finalPrice || !name) {
       const message = "name , stock , price , final price are required"
       throw new CustomError(message, BAD_REQUEST)
     }
 
-    if (!req.file) {
+    if (!files) {
       const message = "image required to create a product"
+      throw new CustomError(message, BAD_REQUEST)
+    }
+    if (files.length < 3) {
+      const message = "minimum 3 images required to create a product"
       throw new CustomError(message, BAD_REQUEST)
     }
     if (!categoryId) {
@@ -208,12 +224,14 @@ const createProductController = async (req, res, next) => {
       throw new CustomError(message, NOT_FOUND)
     }
 
-    console.log(req.file)
-    const image = await uploadImageToFirebase(req.file,'product')
-    console.log(image)
+    let images = []
+    for (const file of files) {
+      images.push(await uploadImageToFirebase(file, 'product'))
+    }
+    console.log(images)
 
     product = {
-      image: [image],
+      image: images,
       name,
       categoryId,
       price: parseFloat(price),
@@ -226,7 +244,7 @@ const createProductController = async (req, res, next) => {
       }
     }
 
-   
+
     const newProduct = await productModel.create(product)
     res.status(OK).json({ message: "new product created", product: newProduct })
   } catch (error) {
