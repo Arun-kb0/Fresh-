@@ -6,7 +6,7 @@ const expressEjsLayouts = require("express-ejs-layouts")
 const cookieParser = require("cookie-parser")
 const path = require('path')
 const passport = require('passport')
-
+const flash = require('connect-flash')
 
 const connectDB = require('./src/config/dbConnection')
 const sessionConfig = require('./src/config/sessionConfig')
@@ -39,6 +39,7 @@ app.use(cookieParser())
 app.use(sessionConfig)
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(flash())
 
 
 app.use('/static/admin', express.static(path.join(__dirname, 'public', 'admin')))

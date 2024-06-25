@@ -6,7 +6,7 @@ $(function () {
 
   const imageContainer = $(".imageContainer")
   const imageOuterContainer = $("#imageOuterContainer")
-
+  const bsAlert = $("#bsAlert")
 
   deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
@@ -20,8 +20,8 @@ $(function () {
         const imageUrl = URL.createObjectURL(this.files[i])
         const img = $('<img>')
           .attr('src', imageUrl)
-          .addClass('d-block shadow p-1 mx-1 rounded') 
-          .css({ height: '100px', width: '100px' }); 
+          .addClass('d-block shadow p-1 mx-1 rounded')
+          .css({ height: '100px', width: '100px' });
         imageOuterContainer.append(img);
       }
     }
@@ -67,11 +67,13 @@ $(function () {
       contentType: false,
       success: function (data) {
         console.log(data)
-        alert(data.message)
+        bsAlert
+          .removeClass('d-none')
+          .text(data.message)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        showAlert(res.message)
         console.log(error)
       }
     })
@@ -93,6 +95,16 @@ $(function () {
         console.log(error)
       }
     })
+  }
+
+  function showAlert(message) {
+    bsAlert
+      .removeClass('d-none')
+      .text(message)
+
+    setTimeout(() => {
+      bsAlert.addClass('d-none')
+    }, 10000 * 1)
   }
 
 

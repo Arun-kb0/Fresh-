@@ -6,6 +6,8 @@ $(function () {
 
   const imageContainer = $(".imageContainer")
   const imageOuterContainer = $("#imageOuterContainer")
+  const bsAlert = $("#bsAlert")
+
 
 
   deleteCategoryBtn.on("click", deleteCategoryHelper)
@@ -13,7 +15,7 @@ $(function () {
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
 
-
+// * image preview
   function handleImageView() {
     if (this.files) {
       imageOuterContainer.empty();
@@ -27,8 +29,7 @@ $(function () {
   }
 
 
-
-
+  // * update or create
   function updateOrCreateCategory(e) {
 
     console.log(image)
@@ -66,52 +67,15 @@ $(function () {
       contentType: false,
       success: function (data) {
         console.log(data)
-        alert(data.message)
+        showAlert(data.message)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        showAlert(res.message)
         console.log(error)
       }
     })
   }
-
-
-
-  // function updateOrCreateCategory(e) {
-  //   e.preventDefault()
-  //   const formData = $(this).serializeArray()
-  //   let formObject = {}
-  //   formData.forEach((item) => {
-  //     formObject[item.name] = item.value.trim()
-  //   })
-  //   console.log(formObject)
-  //   let url, method
-  //   if (isEdit) {
-  //     url = '/admin/category/edit'
-  //     method = 'PATCH'
-  //   } else {
-  //     url = '/admin/category/create'
-  //     method = "POST"
-  //   }
-
-  //   $.ajax({
-  //     url: url,
-  //     method: method,
-  //     data: JSON.stringify(formObject),
-  //     contentType: "application/json",
-  //     success: function (data) {
-  //       console.log(data)
-  //       alert(data.message)
-  //     },
-  //     error: function (xhr, status, error) {
-  //       const res = JSON.parse(xhr.responseText)
-  //       alert(res.message)
-  //       console.log(error)
-  //     }
-  //   })
-  // }
-
 
   function deleteCategoryHelper() {
     const categoryId = this.getAttribute("data-item")
@@ -121,15 +85,32 @@ $(function () {
       method: "DELETE",
       success: function (data) {
         console.log(data)
-        alert(data.message)
+        showAlert(data.message)
+        // alert(data.message)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        showAlert(res.message)
         console.log(error)
+        // alert(res.message)
       }
     })
   }
+
+  // * show alert function
+  function showAlert(message) {
+    bsAlert
+      .removeClass('d-none')
+      .text(message)
+
+    setTimeout(() => {
+      bsAlert.addClass('d-none')
+    }, 10000 * 1)
+  }
+
+
+
+
 
 
 })

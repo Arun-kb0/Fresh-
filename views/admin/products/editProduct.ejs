@@ -52,6 +52,7 @@
   </head>
 
   <body>
+
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
@@ -64,14 +65,26 @@
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
+            
 
             <div class="container-xxl flex-grow-1 container-p-y">
+              <!-- * alert -->
+              <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+                <div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+                </div>
+              </div>
+              <!-- * alert end -->
+
+              
+
               <% if(isEdit) {%>
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Edit products</h4>
                 <% }else { %>
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products /</span> Create products</h4>
                   <% } %>
+
               <div class="row">
+
                   <div class="card mb-4">
                     <h5 class="card-header">Product Details</h5>
                     <!-- Account -->

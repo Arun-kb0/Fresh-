@@ -56,6 +56,7 @@ const getProductController = async (req, res, next) => {
 const getEditProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
+
   try {
     if (!productId) {
       const message = 'product required for editing'
@@ -98,7 +99,7 @@ const getEditProductController = async (req, res, next) => {
       }
     ])
     console.log(product[0])
-    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0] })
+    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0], message })
   } catch (error) {
     next(error)
   }
@@ -178,7 +179,7 @@ const editProductController = async (req, res, next) => {
       { ...product },
       { new: true }
     )
-    res.status(OK).json({ message: "product updated", product: editedProduct })
+    res.status(OK).json({ message: "product updated", product: editedProduct , message })
   } catch (error) {
     next(error)
   }
