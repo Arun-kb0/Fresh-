@@ -8,9 +8,27 @@ $(function () {
   const imageOuterContainer = $("#imageOuterContainer")
   const bsAlert = $("#bsAlert")
 
+  const showCategoryDropdown = $("#showCategoriesDropdownBtn")
+  const categoryDropdown = $("#categoryDropdown")
+
+
   deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
   image.on("input", handleImageView)
+
+
+
+  categoryDropdown.find('.dropdown-item')
+    .on('click', function () {
+      const selectedCategory = $(this).text();
+      const selectedCategoryId = $(this).attr("data-item")
+      console.log(selectedCategory)
+      $('#showCategoriesDropdownBtn').text("");
+      $('#showCategoriesDropdownBtn').text(selectedCategory);
+      $("#subCategoryId").val(selectedCategoryId)
+      $("#subCategory").val(selectedCategory.trim())
+    });
+
 
   function handleImageView() {
     if (this.files) {
@@ -67,9 +85,7 @@ $(function () {
       contentType: false,
       success: function (data) {
         console.log(data)
-        bsAlert
-          .removeClass('d-none')
-          .text(data.message)
+        showAlert(data.message)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
@@ -87,11 +103,11 @@ $(function () {
       method: "DELETE",
       success: function (data) {
         console.log(data)
-        alert(data.message)
+        showAlert(data.message)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        showAlert(res.message)
         console.log(error)
       }
     })

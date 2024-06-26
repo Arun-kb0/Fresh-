@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
           accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
         }
       };
-      resetFileInput.onclick = () => {
-        fileInput.value = '';
-        accountUserImage.src = resetImage;
-      };
+      // resetFileInput.onclick = () => {
+      //   fileInput.value = '';
+      //   accountUserImage.src = resetImage;
+      // };
     }
   })();
 });

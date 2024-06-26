@@ -178,6 +178,26 @@
                              />
                           </div>
                           <div class="mb-3 col-md-6">
+                          <div class="dropdown">
+                            <button 
+                              id="showCategoriesDropdownBtn"
+                              class="btn btn-secondary dropdown-toggle" 
+                              type="button"
+                              data-bs-toggle="dropdown" 
+                              aria-expanded="false"
+                            >
+                              Parent categories
+                            </button>
+                            <ul class="dropdown-menu" id="categoryDropdown">
+                              <% for(const item of categories) { %>
+                              <li><a class="dropdown-item" data-item="<%= item._id %>" >
+                                <%= item.name %>
+                                </a></li>
+                                <% } %>
+                            </ul>
+                          </div>
+                          </div>
+                          <div class="mb-3 col-md-6">
                             <label for="slug" class="form-label">Slug</label>
                             <input
                               type="text"

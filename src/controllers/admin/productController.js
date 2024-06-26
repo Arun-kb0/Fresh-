@@ -52,7 +52,7 @@ const getProductController = async (req, res, next) => {
   }
 }
 
-// * edit
+// * edit 
 const getEditProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
@@ -98,8 +98,8 @@ const getEditProductController = async (req, res, next) => {
         }
       }
     ])
-    console.log(product[0])
-    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0], message })
+    const subCategory = await subCategoryModel.find({isDeleted:false})
+    res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0], subCategory })
   } catch (error) {
     next(error)
   }
@@ -179,7 +179,7 @@ const editProductController = async (req, res, next) => {
       { ...product },
       { new: true }
     )
-    res.status(OK).json({ message: "product updated", product: editedProduct , message })
+    res.status(OK).json({ message: "product updated", product: editedProduct })
   } catch (error) {
     next(error)
   }
@@ -188,7 +188,8 @@ const editProductController = async (req, res, next) => {
 // * create
 const getCreateProductController = async (req, res) => {
   try {
-    res.render('admin/products/editProduct', { isEdit: false, ...viewAdminPage })
+    const subCategory = await subCategoryModel.find({ isDeleted: false })
+    res.render('admin/products/editProduct', { isEdit: false, ...viewAdminPage, subCategory })
   } catch (error) {
     next(error)
   }

@@ -14,7 +14,8 @@ const {
   getCategoriesController,
   editCategoryController,
   createCategoryController,
-  deleteCategoryController
+  deleteCategoryController,
+  getAllCategoriesForDropDown
 } = require('../../controllers/admin/categoryController')
 const multer = require("multer")
 
@@ -50,6 +51,7 @@ router.route('/product/create')
 
 // * category
 router.get('/categories', getCategoriesController)
+router.get('/categoriesForDropdown', getAllCategoriesForDropDown)
 router.route('/category/edit')
   .get(getEditCategoryController)
   .patch(upload.single("filename"), editCategoryController)

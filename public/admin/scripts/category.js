@@ -2,12 +2,13 @@ $(function () {
   const deleteCategoryBtn = $(".deleteCategoryBtn")
   const deleteSubCategoryBtn = $(".deleteSubCategoryBtn")
   const formCategory = $("#formCategory")
-  const image = $("#upload")[0]
+  const image = $("#upload")
 
   const imageContainer = $(".imageContainer")
   const imageOuterContainer = $("#imageOuterContainer")
   const bsAlert = $("#bsAlert")
-
+  const showCategoryDropdown = $("#showCategoriesDropdownBtn")
+  const categoryDropdown = $("#categoryDropdown")
 
 
   deleteCategoryBtn.on("click", deleteCategoryHelper)
@@ -15,9 +16,25 @@ $(function () {
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
 
-// * image preview
+  console.log("dada")
+  console.log(categoryDropdown)
+  
+  categoryDropdown.find('.dropdown-item')
+    .on('click', function () {
+      const selectedCategory = $(this).text();
+      const selectedCategoryId = $(this).attr("data-item")
+      console.log(selectedCategory)
+      $('#showCategoriesDropdownBtn').text("");
+      $('#showCategoriesDropdownBtn').text(selectedCategory);
+      $("#parentId").val(selectedCategoryId)
+    });
+
+
+
+  // * image preview
   function handleImageView() {
     if (this.files) {
+      console.log(this?.files[0])
       imageOuterContainer.empty();
       const imageUrl = URL.createObjectURL(this.files[0])
       const img = $('<img>')
@@ -42,7 +59,7 @@ $(function () {
         formObject[item.name] = item.value.trim()
       }
     })
-    const file = image.files[0]
+    const file = image[0].files[0]
     const formDataObject = new FormData()
     for (const key in formObject) {
       formDataObject.append(key, formObject[key]);

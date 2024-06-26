@@ -88,7 +88,7 @@ const getEditCategoryController = async (req, res, next) => {
         }
       }
     ])
-
+    console.log(categories[0])
     res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category: category[0] })
   } catch (error) {
     next(error)
@@ -158,7 +158,8 @@ const editCategoryController = async (req, res, next) => {
 // * create category
 const getCreateCategoryController = async (req, res) => {
   try {
-    res.render('admin/category/editCategory', { isEdit: false, ...viewAdminPage })
+    const categories =  await categoryModel.find({isDeleted:false})
+    res.render('admin/category/editCategory', { isEdit: false, ...viewAdminPage, categories })
   } catch (error) {
     next(error)
   }
@@ -271,6 +272,16 @@ const deleteCategoryController = async (req, res, next) => {
 }
 
 
+const getAllCategoriesForDropDown = async (req,res,next) => {
+  try {
+    const categories  = await categoryModel.find({isDeleted:false})
+    res.status(OK).json({message: "get categories success" , categories})
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 module.exports = {
   getCategoriesController,
   getEditCategoryController,
@@ -278,4 +289,5 @@ module.exports = {
   createCategoryController,
   editCategoryController,
   deleteCategoryController,
+  getAllCategoriesForDropDown
 }

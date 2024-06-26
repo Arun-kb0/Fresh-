@@ -186,6 +186,21 @@
                             />
                           </div>
                           <div class="mb-3 col-md-6">
+                            <div class="dropdown">
+                              <button id="showCategoriesDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Sub categories
+                              </button>
+                              <ul class="dropdown-menu" id="categoryDropdown">
+                                <% for(const item of subCategory ) { %>
+                                  <li><a class="dropdown-item" data-item="<%= item._id %>">
+                                      <%= item.name %>
+                                    </a></li>
+                                  <% } %>
+                              </ul>
+                            </div>
+                          </div>
+                          <div class="mb-3 col-md-6">
                             <label for="id" class="form-label">Id</label>
                             <input class="form-control" type="text" 
                             name="id"
@@ -297,7 +312,7 @@
                             <button type="submit" class="btn btn-primary me-2"> Save changes</button>
                           <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                           <% } else {%>
-                            <button type="submit" class="btn btn-primary me-2"> Create new category</button>
+                            <button type="submit" class="btn btn-primary me-2"> Create new product</button>
                           <% } %>
                         </div>
                       </form>
