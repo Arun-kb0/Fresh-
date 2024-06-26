@@ -33,6 +33,9 @@
 	<!-- responsive -->
 	<link rel="stylesheet" href="static/user/assets/css/responsive.css">
 
+	<!-- * product zoom css -->
+	<link rel="stylesheet" href="static/user/css/productZoom.css">
+
 </head>
 
 <body class="marginTopForBody">
@@ -75,16 +78,19 @@
 		<!-- * image -->
 		<section class="d-flex col-4 py-5 productImageSection">
 			<div class="d-block col-3 ">
-				<div class="cardStokeSmallImage p-2 my-2">
-					<img src="<%= product?.image[0].path %>" alt="<%= product.image.originalName  %>">
-				</div>
-				<div class="cardStokeSmallImage p-2 my-2">
-					<img src="<%= product?.image[0].path %>" alt="<%= product.image.originalName  %>">
-				</div>
+				<% for(const image of product.image) {%>
+					<div class="cardStokeSmallImage p-2 my-2 shadow">
+						<img src="<%= image.path %>" alt="<%= image.originalName  %>">
+					</div>
+					<% } %>
 			</div>
-			<div class="productMainImage">
-				<img src="<%= product.image[0].path %>" alt="<%= product.image[0].originalName  %>">
+			
+			<!-- * zoom content start -->
+			<div class="productMainImage shadow">
+				<img id="productImage" src="<%= product.image[0].path %>" alt="<%= product.image[0].originalName %>">
+				<div id="magnifier"></div>
 			</div>
+			<!-- * zoom content end -->
 		</section>
 		<!-- * end image -->
 
@@ -103,8 +109,8 @@
 				</li>
 				<li>
 					<div class="d-flex justify-content-between py-2 align-items-center">
-						<section class="d-flex">
-							<div class="d-flex pb-3 pr-5 ">
+						<section class="d-flex align-items-center"  >
+							<div class="d-flex align-items-center pb-3 pr-5 ">
 								<% for(let i=0;i< 5 ;i++) {%>
 									<% if(i<product.rating) {%>
 										<i class="fa-solid fa-star fa-lg text-warning"></i>
@@ -113,9 +119,9 @@
 											<% } %>
 												<% } %>
 							</div>
-							<span>
-								<%= product.peopleRated %>
-							</span>
+							<div>
+								<span class="h5 text-secondary" ><%= product.peopleRated %></span>
+							</div>
 						</section>
 						<section>
 							<i class="fa-regular fa-heart fa-lg"></i>
@@ -126,7 +132,7 @@
 				<li>
 					<div class="flex">
 						<h5>
-							<%= product.price %>
+							₹ <%= product.price %>
 						</h5>
 						<h5>
 							<%= product?.offer %>
@@ -134,7 +140,7 @@
 					</div>
 				</li>
 				<li>
-					<p> MRP <%= product.finalPrice %> (including all taxes)</p>
+					<p> MRP ₹<%= product.finalPrice %> (including all taxes)</p>
 				</li>
 				<li>
 					<div class="w-100 bg-secondary divider"></div>
@@ -153,9 +159,9 @@
 							<p>Rs 100 Cashback on the first purchase of Rs 600 Or Above</p>
 							<small>6 Offer/s Available</small>
 						</div>
-					<button class="btn btn-outline-secondary rounded-pill">
-						<span>View all</span>
-					</button>
+						<button class="btn btn-outline-secondary rounded-pill">
+							<span>View all</span>
+						</button>
 					</article>
 				</li>
 				<li>
@@ -166,7 +172,14 @@
 					<h5>Deliver to</h5>
 					<div>
 						<p>pin <span>address</span></p>
-						<p class=""><span class="text-success">In stock </span>Delivery Between 21st Jun to 23rd Jun</p>
+						<p class="">
+							<% if(product.stock>0) {%>
+								<span class="text-success">In stock</span>
+								<% }else { %>
+									<span class="text-danger">Out of stock</span>
+									<% } %>
+										Delivery Between 21st Jun to 23rd Jun
+						</p>
 					</div>
 				</li>
 				<li>
@@ -186,17 +199,16 @@
 
 				<li>
 					<h5>Features & Details</h5>
-					<p>
-						<%= product.productInfo?.FeaturesAndDetails %>
+					<p class="text-secondary">
+						<%= product.productInfo?.featuresAndDetails %>
 					</p>
 				</li>
 				<li>
 					<div class="w-100 bg-secondary divider"></div>
 				</li>
-
 				<li>
 					<h5>Description</h5>
-					<p>
+					<p class="text-secondary">
 						<%= product.productInfo?.description %>
 					</p>
 				</li>
@@ -249,7 +261,9 @@
 		<section class="col-4 ratingSection">
 			<h4>Ratings & Reviews</h4>
 			<div>
-				<h5><%= product.rating  %> </h5>
+				<h5>
+					<%= product.rating %>
+				</h5>
 				<div class="d-flex pb-3 pr-5 ">
 					<% for(let i=0;i< 5 ;i++) {%>
 						<% if(i<product.rating) {%>
@@ -259,7 +273,9 @@
 								<% } %>
 									<% } %>
 				</div>
-				<span> <%= product.peopleRated %></span>
+				<span>
+					<%= product.peopleRated %>
+				</span>
 			</div>
 
 			<div>
@@ -283,31 +299,31 @@
 		<!-- * reviews -->
 		<section class="col-7 ">
 			<ul class="productDetailsList col-10">
-				<li >
+				<li>
 					<h4>Reviews from customers</h4>
 				</li>
 				<% for(let i=0;i<5;i++){ %>
-				<li class="my-3">
-					<section class="card">
-						<div  class="card-body">
-							<div class="d-flex justify-content-between">
-								<div class="d-flex pb-3 pr-5 ">
-									<% for(let i=0;i< 5 ;i++) {%>
-										<% if(i<product.rating) {%>
-											<i class="fa-solid fa-star fa-lg text-warning"></i>
-											<% } else { %>
-												<i class="fa-regular fa-star fa-lg text-warning"></i>
-												<% } %>
+					<li class="my-3">
+						<section class="card shadow rounded">
+							<div class="card-body">
+								<div class="d-flex justify-content-between">
+									<div class="d-flex pb-3 pr-5 ">
+										<% for(let i=0;i< 5 ;i++) {%>
+											<% if(i<product.rating) {%>
+												<i class="fa-solid fa-star fa-lg text-warning"></i>
+												<% } else { %>
+													<i class="fa-regular fa-star fa-lg text-warning"></i>
 													<% } %>
+														<% } %>
+									</div>
+									<span>8 Apr 22</span>
 								</div>
-								<span>8 Apr 22</span>
+								<h6>Nice</h6>
+								<p>Fragrance is awesome.</p>
 							</div>
-							<h6>Nice</h6>
-							<p>Fragrance is awesome.</p>
-						</div>
-					</section>
-				</li>
-				<% } %>
+						</section>
+					</li>
+					<% } %>
 
 			</ul>
 
@@ -415,6 +431,8 @@
 	<!-- main js -->
 	<script src="static/user/assets/js/main.js"></script>
 
+	<!-- * single product script -->
+	<script src="static/user/scripts/singleProduct.js"></script>
 </body>
 
 </html>
