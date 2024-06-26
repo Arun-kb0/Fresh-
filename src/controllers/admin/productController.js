@@ -217,7 +217,7 @@ const createProductController = async (req, res, next) => {
       const message = "image required to create a product"
       throw new CustomError(message, BAD_REQUEST)
     }
-    if (files.length < 3) {
+    if (files.length <= 2) {
       const message = "minimum 3 images required to create a product"
       throw new CustomError(message, BAD_REQUEST)
     }
@@ -287,8 +287,8 @@ const deleteImageController = async (req, res, next) => {
     if (!imageId) throw new CustomError("invalid image id", BAD_REQUEST)
 
     const product = await productModel.findOne({ "image._id": imageId, isDeleted: false })
-    if (product.image.length < 2) {
-      const message = "must have minimum 2 images"
+    if (product.image.length <= 3) {
+      const message = "must have minimum 3 images"
       throw new CustomError(message, NOT_ACCEPTABLE)
     }
     const data = await productModel.updateOne(
