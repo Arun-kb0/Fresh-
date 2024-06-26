@@ -108,8 +108,8 @@
                           <% } else { %>
                             <div class="d-flex " id="imageOuterContainer">
                             <% for(let singleImage of product.image ) {%>
-                                <div class="position-relative shadow bg-white mx-2 rounded ">
-                                  <a  class="position-absolute right-0 top-0">
+                                <div class="position-relative shadow bg-white mx-2 rounded image-container" data-image-id="<%= singleImage?._id  %>">
+                                  <a  class="position-absolute right-0 top-0 deleteImageBtn p-1 cursor-pointer" data-item="<%= singleImage?._id  %>">
                                     <i class="fa-solid fa-circle-xmark" ></i>
                                   </a>
                                   <img 

@@ -98,7 +98,7 @@ const getEditProductController = async (req, res, next) => {
         }
       }
     ])
-    const subCategory = await subCategoryModel.find({isDeleted:false})
+    const subCategory = await subCategoryModel.find({ isDeleted: false })
     res.render('admin/products/editProduct', { isEdit: true, ...viewAdminPage, product: product[0], subCategory })
   } catch (error) {
     next(error)
@@ -276,11 +276,32 @@ const deleteProductController = async (req, res, next) => {
 }
 
 
+const deleteImageController = async (req, res, next) => {
+  const { imageId } = req.query
+  try {
+    const data = await productModel.updateOne(
+      { isDeleted: false, "image._id": imageId },
+      {
+        $pull: {
+          image: { _id: imageId }
+        }
+      }
+    )
+    console.log("data")
+    console.log(data)
+    res.status(OK).json({ message: "image deleted", data })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 module.exports = {
   getProductController,
   getEditProductController,
   getCreateProductController,
   createProductController,
   editProductController,
-  deleteProductController
+  deleteProductController,
+  deleteImageController
 }

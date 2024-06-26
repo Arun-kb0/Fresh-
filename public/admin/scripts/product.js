@@ -10,13 +10,37 @@ $(function () {
 
   const showCategoryDropdown = $("#showCategoriesDropdownBtn")
   const categoryDropdown = $("#categoryDropdown")
+  const deleteImageBtn = $(".deleteImageBtn")
 
 
   deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
   image.on("input", handleImageView)
+  deleteImageBtn.on("click", handleImageDelete)
+  
 
+// * delete image
+  function handleImageDelete() {
+    const imageId = $(this).attr("data-item")
 
+    console.log(`click ${imageId}`)
+
+    $.ajax({
+      url: `/admin/product/image?imageId=${imageId}`,
+      method: "DELETE",
+      success: function (data) {
+        console.log(data)
+        $(`.image-container[data-image-id='${imageId}']`).remove();
+        showAlert(data.message)
+      },
+      error: function (xhr, status, error) {
+        console.log(error.message)
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+      }
+    })
+
+  }
 
   categoryDropdown.find('.dropdown-item')
     .on('click', function () {

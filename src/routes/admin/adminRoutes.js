@@ -7,7 +7,8 @@ const {
   getCreateProductController,
   createProductController,
   editProductController,
-  deleteProductController } = require('../../controllers/admin/productController')
+  deleteProductController, 
+  deleteImageController} = require('../../controllers/admin/productController')
 const {
   getEditCategoryController,
   getCreateCategoryController,
@@ -44,6 +45,9 @@ router.route('/product/edit')
   .get(getEditProductController)
   .patch(upload.array("filename",5), editProductController)
   .delete(deleteProductController)
+
+router.delete('/product/image', deleteImageController)
+
 
 router.route('/product/create')
   .get(getCreateProductController)
