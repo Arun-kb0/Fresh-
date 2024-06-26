@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const CustomError = require("../../constants/CustomError")
-const { BAD_REQUEST, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
+const { BAD_REQUEST, OK, NOT_FOUND, NOT_ACCEPTABLE, CONFLICT } = require("../../constants/httpStatusCodes")
 const { viewAdminPage } = require("../../constants/pageConfid")
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const productModel = require("../../model/productModel")
@@ -165,6 +165,11 @@ const editProductController = async (req, res, next) => {
       throw new CustomError(message, BAD_REQUEST)
     }
 
+    if ((isProductExists.image.length + files.length) > 5) {
+      const message = "image count exceed"
+      throw new CustomError(message, CONFLICT)
+    }
+
     if (files) {
       images = []
       for (const file of files) {
@@ -279,6 +284,13 @@ const deleteProductController = async (req, res, next) => {
 const deleteImageController = async (req, res, next) => {
   const { imageId } = req.query
   try {
+    if (!imageId) throw new CustomError("invalid image id", BAD_REQUEST)
+
+    const product = await productModel.findOne({ "image._id": imageId, isDeleted: false })
+    if (product.image.length < 2) {
+      const message = "must have minimum 2 images"
+      throw new CustomError(message, NOT_ACCEPTABLE)
+    }
     const data = await productModel.updateOne(
       { isDeleted: false, "image._id": imageId },
       {

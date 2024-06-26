@@ -6,7 +6,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const productSchema = new Schema({
   image: [{
     fileName: { type: String },
-    originalName:{type:String},
+    originalName: { type: String },
     path: { type: String },
   }],
   name: { type: String, required: true },
@@ -28,6 +28,8 @@ const productSchema = new Schema({
 },
   { timestamps: true }
 )
+
+
 
 
 const productModel = mongoose.model("products", productSchema)
