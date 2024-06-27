@@ -106,37 +106,39 @@
                     </div>
                   </form>
                   <!-- * oauth providers -->
-                  <div class="d-flex justify-content-center">
-                    <a class="btn btn-light " href="/auth/google/">
-                      <i class="fa-brands fa-google"></i>
-                    </a>
-                    <a class="btn btn-light " href="/auth/facebook/">
-                      <i class="fa-brands fa-facebook-f"></i>
-                    </a>
-                  </div>
-
-                  <% if(!isAdmin){ %>
-                    <p class="text-center">
-                      <span>New on our platform ? </span>
-                      <a href="/auth/signup">
-                        <span>Create an account</span>
+                  <% if(!isAdmin) {%>
+                    <div class="d-flex justify-content-center">
+                      <a class="btn btn-light " href="/auth/google/">
+                        <i class="fa-brands fa-google"></i>
                       </a>
-                    </p>
-                    <% }%>
+                      <a class="btn btn-light " href="/auth/facebook/">
+                        <i class="fa-brands fa-facebook-f"></i>
+                      </a>
+                    </div>
+                    <% } %>
 
                       <% if(!isAdmin){ %>
-                        <p class="text-end">
-                          <a href="/auth/admin/login">
-                            <span>admin login</span>
+                        <p class="text-center">
+                          <span>New on our platform ? </span>
+                          <a href="/auth/signup">
+                            <span>Create an account</span>
                           </a>
                         </p>
-                        <% } else { %>
-                          <p class="text-end">
-                            <a href="/auth/login">
-                              <span>user login</span>
-                            </a>
-                          </p>
-                          <% } %>
+                        <% }%>
+
+                          <% if(!isAdmin){ %>
+                            <p class="text-end">
+                              <a href="/auth/admin/login">
+                                <span>admin login</span>
+                              </a>
+                            </p>
+                            <% } else { %>
+                              <p class="text-end">
+                                <a href="/auth/login">
+                                  <span>user login</span>
+                                </a>
+                              </p>
+                              <% } %>
           </div>
         </div>
         <!-- /Register -->
