@@ -171,10 +171,8 @@ const editProductController = async (req, res, next) => {
       }
       return cleanedObj;
     };
-
-    const cleanedProduct = cleanObject(product);
-    // console.log(cleanedProduct);
-
+    cleanObject(product);
+    product.stock = stock
 
     if (product.price < product.finalPrice) {
       const message = "final price must be less than price"
