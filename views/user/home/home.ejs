@@ -76,13 +76,13 @@
 			<section class="mt-5 position-relative">
 				<h3><span class="orange-text">Top Deals</span> On Grocery</h3>
 
-				<div class="d-flex justify-content-between align-items-center my-3">
+				<div class="d-flex justify-content-between align-items-center my-3 topBrandsBtnContainer">
 					<button id="scroll-left" class="btn btn-secondary rounded-pill scroll-button left"><i
 							class="fas fa-chevron-left"></i></button>
 					<button id="scroll-right" class="btn btn-secondary rounded-pill scroll-button right"><i
 							class="fas fa-chevron-right"></i></button>
 				</div>
-				<div class="d-flex justify-content-between scrollContainer">
+				<div class="d-flex justify-content-between scrollContainer topBrand">
 					<% for(let item of products){ %>
 						<!-- * mycard -->
 						<div class="col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke ">
@@ -134,13 +134,13 @@
 			<section class="mt-5 position-relative">
 				<h3><span class="orange-text">Favorite</span> Foods</h3>
 			
-				<div class="d-flex justify-content-between align-items-center  my-3">
-					<button id="scroll-left" class="btn btn-secondary rounded-pill scroll-button left"><i
+				<div class="d-flex justify-content-between align-items-center  my-3 favFoodContainer">
+					<button id="scroll-left" class="btn btn-secondary rounded-pill scroll-button left "><i
 							class="fas fa-chevron-left"></i></button>
-					<button id="scroll-right" class="btn btn-secondary rounded-pill scroll-button right"><i
+					<button id="scroll-right" class="btn btn-secondary rounded-pill scroll-button right "><i
 							class="fas fa-chevron-right"></i></button>
 				</div>
-				<div class="d-flex justify-content-between scrollContainer">
+				<div class="d-flex justify-content-between scrollContainer favFood">
 					<% for(let item of products){ %>
 						<!-- * mycard -->
 						<div class="col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke ">
@@ -288,6 +288,9 @@
 
 	<!--  * home script -->
 	<script src="static/user/scripts/homeScript.js"></script>
+	<!-- * scroll script  -->
+	<script src="static/user/scripts/scrollCards.js"></script>
+
 
 </body>
 
