@@ -9,7 +9,14 @@ const subCategoryModel = require("../../model/subCategoryModel")
 
 // * get product list page
 const getProductController = async (req, res, next) => {
+  const { page = 1 } = req.query
   try {
+
+    const LIMIT = 6
+    const startIndex = (Number(page) - 1) * LIMIT
+    const total = await productModel.countDocuments({ isDeleted: false })
+    const numberOfPages = Math.ceil(total / LIMIT)
+
     const products = await productModel.aggregate([
       {
         $match: {
@@ -42,11 +49,30 @@ const getProductController = async (req, res, next) => {
           path: "$subcategory",
           preserveNullAndEmptyArrays: true
         }
+      },
+      {
+        $sort: {
+          rating: 1,
+          name: 1
+        }
+      },
+      {
+        $skip: startIndex
+      },
+      {
+        $limit: LIMIT
       }
-    ]).skip(0).limit(15).sort({ rating: 1, name: 1 })
+    ])
 
-    // res.status(OK).json({ products })
-    res.render('admin/products/productsTable', { ...viewAdminPage, products: products })
+
+    console.log("products array length ", products.length)
+    
+    res.render('admin/products/productsTable', {
+      ...viewAdminPage,
+      products: products,
+      page: Number(page),
+      numberOfPages,
+    })
   } catch (error) {
     next(error)
   }

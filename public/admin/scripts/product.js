@@ -12,14 +12,47 @@ $(function () {
   const categoryDropdown = $("#categoryDropdown")
   const deleteImageBtn = $(".deleteImageBtn")
 
+  // * pagination btns
+  const prevBtn = $("#prevBtn")
+  const nextBtn = $("#nextBtn")
+
+
 
   deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
   image.on("input", handleImageView)
   deleteImageBtn.on("click", handleImageDelete)
-  
 
-// * delete image
+  nextBtn.on("click", handleNext)
+  prevBtn.on("click", handlePrev)
+
+
+  
+  let { page, numberOfPages } = pageDetails
+  if (numberOfPages === page) {
+    nextBtn.prop("disabled", true)
+  }
+  if (1 === page) {
+    prevBtn.prop("disabled", true)
+  }
+
+  function handleNext() {
+    if (numberOfPages > page) {
+      page++
+      console.log(page)
+      window.location.href = `/admin/products?page=${page}`
+    }
+  }
+
+  function handlePrev() {
+    if (1 < page) {
+      page--
+      console.log(page)
+      window.location.href = `/admin/products?page=${page}`
+    }
+  }
+
+  // * delete image
   function handleImageDelete() {
     const imageId = $(this).attr("data-item")
 
