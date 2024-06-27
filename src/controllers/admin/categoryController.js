@@ -12,7 +12,13 @@ const mongoose = require('mongoose')
 
 
 const getCategoriesController = async (req, res, next) => {
+  const { page = 1 } = req.query
   try {
+    const LIMIT = 6
+    const startIndex = (Number(page) - 1) * LIMIT
+    const total = await categoryModel.countDocuments({ isDeleted: false })
+    const numberOfPages = Math.ceil(total / LIMIT)
+
     const categories = await categoryModel.aggregate([
       {
         $match: { isDeleted: false }
@@ -37,11 +43,17 @@ const getCategoriesController = async (req, res, next) => {
             }
           }
         }
-      }
+      },
+      { $sort: { name: 1 } },
+      { $skip: startIndex },
+      { $limit: LIMIT },
     ])
-    console.log(categories.subCategories)
-    // res.status(200).json({ ...viewAdminPage, categories: categories })
-    res.render('admin/category/categoriesTable', { ...viewAdminPage, categories })
+    res.render('admin/category/categoriesTable', {
+      ...viewAdminPage,
+      categories,
+      page: Number(page),
+      numberOfPages,
+    })
   } catch (error) {
     next(error)
   }
@@ -158,7 +170,7 @@ const editCategoryController = async (req, res, next) => {
 // * create category
 const getCreateCategoryController = async (req, res) => {
   try {
-    const categories =  await categoryModel.find({isDeleted:false})
+    const categories = await categoryModel.find({ isDeleted: false })
     res.render('admin/category/editCategory', { isEdit: false, ...viewAdminPage, categories })
   } catch (error) {
     next(error)
@@ -272,10 +284,10 @@ const deleteCategoryController = async (req, res, next) => {
 }
 
 
-const getAllCategoriesForDropDown = async (req,res,next) => {
+const getAllCategoriesForDropDown = async (req, res, next) => {
   try {
-    const categories  = await categoryModel.find({isDeleted:false})
-    res.status(OK).json({message: "get categories success" , categories})
+    const categories = await categoryModel.find({ isDeleted: false })
+    res.status(OK).json({ message: "get categories success", categories })
   } catch (error) {
     next(error)
   }

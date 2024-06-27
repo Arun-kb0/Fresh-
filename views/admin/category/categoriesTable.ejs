@@ -49,6 +49,9 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/static/admin/assets/js/config.js"></script>
+
+    <!-- * css style  -->
+    <link rel="stylesheet" href="/static/admin/css/style.css"></link>
   </head>
 
   <body>
@@ -76,7 +79,7 @@
 
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Users /</span> Categories and sub categories</h4>
               <a class="btn btn-primary my-2" href="/admin/category/create"> Create category</a>
-              <!-- Hoverable Table rows -->
+              <!-- category Table rows -->
               <div class="card">
                 <div class="table-responsive text-nowrap">
                   <table class="table table-hover">
@@ -157,6 +160,24 @@
               </div>
               <!--/ category Table rows -->
 
+              <!-- *pagination  -->
+              <div class="d-flex justify-content-center align-items-center p-2 ">
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
+                  <i class="fa-solid fa-chevron-left fa-xs"></i>
+                </button>
+                <div id="pageInfoContainer">
+                  <span>
+                    <%= page %> out of
+                  </span>
+                  <span>
+                    <%= numberOfPages %>
+                  </span>
+                </div>
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+              <!-- *pagination end -->
               <hr class="my-5" />
 
 
@@ -279,7 +300,13 @@
     </div>
     <!-- / Layout wrapper -->
 
-   
+   <!-- * variable  -->
+  <script>
+    const pageDetails = {
+      page: parseInt("<%= page %>"),
+      numberOfPages: parseInt("<%= numberOfPages %>"),
+    } 
+  </script>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->

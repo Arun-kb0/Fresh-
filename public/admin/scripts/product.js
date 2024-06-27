@@ -27,7 +27,6 @@ $(function () {
   prevBtn.on("click", handlePrev)
 
 
-  
   let { page, numberOfPages } = pageDetails
   if (numberOfPages === page) {
     nextBtn.prop("disabled", true)

@@ -11,23 +11,58 @@ $(function () {
   const categoryDropdown = $("#categoryDropdown")
 
 
+  // * pagination btns
+  const prevBtn = $("#prevBtn")
+  const nextBtn = $("#nextBtn")
+
+
   deleteCategoryBtn.on("click", deleteCategoryHelper)
   deleteSubCategoryBtn.on("click", deleteCategoryHelper)
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
 
-  console.log("dada")
-  console.log(categoryDropdown)
-  
-  categoryDropdown.find('.dropdown-item')
-    .on('click', function () {
-      const selectedCategory = $(this).text();
-      const selectedCategoryId = $(this).attr("data-item")
-      console.log(selectedCategory)
-      $('#showCategoriesDropdownBtn').text("");
-      $('#showCategoriesDropdownBtn').text(selectedCategory);
-      $("#parentId").val(selectedCategoryId)
-    });
+  categoryDropdown.find('.dropdown-item').on("click", handleCategoryDropdown)
+
+
+  nextBtn.on("click", handleNext)
+  prevBtn.on("click", handlePrev)
+
+  // * pagination
+  let { page, numberOfPages } = pageDetails
+  if (numberOfPages === page) {
+    nextBtn.prop("disabled", true)
+  }
+  if (1 === page) {
+    prevBtn.prop("disabled", true)
+  }
+
+  function handleNext() {
+    if (numberOfPages > page) {
+      page++
+      console.log(page)
+      window.location.href = `/admin/categories?page=${page}`
+    }
+  }
+
+  function handlePrev() {
+    if (1 < page) {
+      page--
+      console.log(page)
+      window.location.href = `/admin/categories?page=${page}`
+    }
+  }
+  // * pagination end
+
+
+  // * drop down
+  function handleCategoryDropdown() {
+    const selectedCategory = $(this).text();
+    const selectedCategoryId = $(this).attr("data-item")
+    console.log(selectedCategory)
+    $('#showCategoriesDropdownBtn').text("");
+    $('#showCategoriesDropdownBtn').text(selectedCategory);
+    $("#parentId").val(selectedCategoryId)
+  };
 
 
 
