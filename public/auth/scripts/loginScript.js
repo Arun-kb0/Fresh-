@@ -38,6 +38,7 @@ $(function () {
         console.log(data)
         console.log('login success')
         if (data?.user) {
+          console.log(data.user)
           localStorage.setItem('user', JSON.stringify(data.user))
           email.val("")
           password.val("")

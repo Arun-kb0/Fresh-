@@ -2,6 +2,7 @@
 
 const adminCheck = (req, res, next) => {
   console.log("admin check")
+  console.log(req.session)
   try {
     if (req?.session?.user?.isAdmin || !req?.user?.provider) {
       return next()
@@ -17,9 +18,9 @@ const adminCheck = (req, res, next) => {
 
 const userCheck = (req, res, next) => {
   console.log("user check")
-  console.log(req?.session?.user?.isAdmin)
   try {
-    if (req?.session?.user?.isAdmin === false || req?.user?.provider ) {
+    console.log(req?.session?.cookie)
+    if (req?.session?.user?.isAdmin === false || req ) {
       return next()
     } else {
       res.redirect('/admin/')

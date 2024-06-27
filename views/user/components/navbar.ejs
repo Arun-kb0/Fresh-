@@ -20,10 +20,23 @@
       </span>
     </div>
 
-    <div class="header-icons">
-      <a class="text-white" id="logoutBtn">
-        <i class="fa-solid fa-user "></i>
-      </a>
+    <div class="header-icons d-flex" >
+      <div class="dropdown">
+        <a id="navUserDropdown" class="btn btn-outline-secondary dropdown-toggle rounded-pill " 
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa-solid fa-user "></i>
+        </a>
+        <ul class="dropdown-menu  " id="navUserDropdown">
+          <li id="loginSection">
+            <a class="dropdown-item text-dark" href="auth/login">Login</a>
+            <a class="dropdown-item text-dark" id="logoutBtn" style="display: none;">Logout</a>
+          </li>
+          <li id="userSection" style="display: none;">
+            <span class="dropdown-item text-dark" id="userImage"></span>
+            <a class="dropdown-item text-dark" id="logoutBtn2">Logout</a>
+          </li>
+        </ul>
+      </div>
       <a class="text-white">
         <i class="fa-solid fa-cart-shopping"></i>
       </a>
@@ -76,7 +89,7 @@
                 </ul>
               </li>
               <li><a href="shop.html">All categories</a>
-                <li></li>
+              <li></li>
             </ul>
           </nav>
           <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
@@ -88,7 +101,3 @@
   </div>
 </div>
 <!-- end header -->
-
-
-
-

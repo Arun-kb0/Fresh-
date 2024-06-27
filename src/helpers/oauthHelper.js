@@ -3,9 +3,9 @@ const userModel = require("../model/userModel")
 const oauthGoogleCreateOrCheckUser = async (profile) => {
   try {
     // console.log(profile._json)
-    const { given_name, picture, email, email_verified,sub } = profile
+    const { given_name, picture, email, email_verified, sub } = profile
     let user
-    
+
     user = await userModel.findOne({ username: email })
     if (!user) {
       user = await userModel.create({
@@ -14,10 +14,19 @@ const oauthGoogleCreateOrCheckUser = async (profile) => {
         username: email,
         image: picture,
         isVerified: email_verified,
-        provider:'google'
+        provider: 'google'
       })
     }
-    return user
+
+    const sessionUser = {
+      name: user.name,
+      username: user.username,
+      isAdmin: user.isAdmin,
+      userId: user.userId,
+      provider: user.provider
+    }
+
+    return sessionUser
   } catch (error) {
     console.log(error)
   }
@@ -38,7 +47,14 @@ const oauthFacebookCreateOrCheckUser = async (profile) => {
         provider: 'facebook'
       })
     }
-    return user
+    const sessionUser = {
+      name: user.name,
+      username: null,
+      isAdmin: user.isAdmin,
+      userId: user.userId,
+      provider: user.provider
+    }
+    return sessionUser
   } catch (error) {
     console.error(error)
   }

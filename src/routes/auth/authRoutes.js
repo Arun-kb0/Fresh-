@@ -46,7 +46,8 @@ router.get('/logout', logoutController)
 
 // * google oAuth passport
 router.get('/google', passport.authenticate('google', {
-  scope: ['email', 'profile']
+  scope: ['email', 'profile'],
+  prompt:"select_account"
 }))
 
 router.get('/google/callback',
@@ -57,6 +58,10 @@ router.get('/google/callback',
 // * passport facebook route
 router.get('/facebook',
   passport.authenticate('facebook'));
+// router.get('/facebook',
+//   passport.authenticate('facebook', {
+//     prompt: "select_account"
+//   }));
 
 router.get('/facebook/callback',
   passport.authenticate('facebook', {

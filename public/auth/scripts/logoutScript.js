@@ -1,20 +1,27 @@
 $(function () {
   const logoutBtn = $("#logoutBtn")
+  const logoutBtn2 = $("#logoutBtn2")
 
-  logoutBtn.on("click", function () {
+  logoutBtn.on("click", handleLogout)
+  logoutBtn2.on("click", handleLogout)
+
+
+  function handleLogout() {
     $.ajax({
       url: "/auth/logout",
       type: "GET",
       success: function (data) {
         console.log(data)
         if (data) {
+          console.log(data)
           localStorage.clear()
           if (data.isAdmin) {
             window.history.replaceState(null, null, '/auth/admin/login')
             window.location.replace('/auth/admin/login')
           } else {
-            window.history.replaceState(null, null, '/auth/login')
-            window.location.replace('/auth/login')
+            window.location.replace('/')
+            // window.history.replaceState(null, null, '/auth/login')
+            // window.location.replace('/auth/login')
           }
         }
       },
@@ -24,5 +31,5 @@ $(function () {
         console.log(error)
       }
     })
-  })
+  }
 })

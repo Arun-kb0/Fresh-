@@ -225,21 +225,12 @@ const logoutController = async (req, res) => {
   }
 }
 
-
 // *  oauth success response
 const oauthSuccessController = async (req, res, next) => {
   try {
-    const { name, username = null, isAdmin, userId, provider } = req.user
-    const user = {
-      name,
-      username,
-      isAdmin,
-      userId,
-      provider
-    }
-    req.session.user = { ...user }
-    req.session.isAuthorized = true
-    req.user = null
+    const user = req.user
+    console.log(req.user)
+    console.log(req?.Session)
     const query = new URLSearchParams(user).toString()
     res.redirect(`/?${query}`)
   } catch (error) {

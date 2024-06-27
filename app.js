@@ -54,13 +54,14 @@ app.use(logger)
 app.use('/auth', authRouter)
 
 // * auth middleware
-app.use(auth)
+// app.use(auth)
 
 // * admin routes
-app.use('/admin', adminCheck, adminRouter)
+app.use('/admin', auth, adminCheck, adminRouter)
 
 // * user routes
-app.use('/', userCheck, productRouter)
+// app.use('/', userCheck, productRouter)
+app.use('/', userCheck,  productRouter)
 
 
 

@@ -20,8 +20,11 @@
   
   <%- body%>
 
-
-  <!-- * auth scripts -->
+  <% if(!isAdmin) {%>
+    <script src="/static/admin/assets/vendor/js/bootstrap.js"></script>
+    <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
+    <% } %>
+    <!-- * auth scripts -->
     <script src="/static/auth/scripts/logoutScript.js"></script>
 
 </body>

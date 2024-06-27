@@ -1,7 +1,10 @@
 
 const auth = (req, res, next) => {
-  // console.log(req?.user?.provider)
-  // console.log(req?.user)
+  console.log("auth middleware")
+  console.log(req?.user?.provider)
+  console.log(req?.user)
+  console.log(req?.session)
+  
   
   try {
     if (req?.session?.isAuthorized === true 
