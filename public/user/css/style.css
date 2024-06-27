@@ -65,6 +65,27 @@
 }
 
 
+.scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.scroll-button.left {
+  left: -4%;
+}
+
+.scroll-button.right {
+  right: -4%;
+}
+
+.priceTextColor {
+  color: #CC0C39;
+}
+
+/* * home end */
+
 /* * single product */
 
 .productMainImage {

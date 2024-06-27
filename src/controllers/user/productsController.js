@@ -17,8 +17,9 @@ const getSingleProductController = async (req, res, next) => {
   console.log(productId)
   try {
     const product = await productModel.findOne({ _id: productId, isDeleted: false })
+    const suggestions = await productModel.find({isDeleted:false})
     console.log(product)
-    res.render('user/products/singleProduct', { ...viewUsersPage, product })
+    res.render('user/products/singleProduct', { ...viewUsersPage, product, suggestions })
   } catch (error) {
     next(error)
   }
