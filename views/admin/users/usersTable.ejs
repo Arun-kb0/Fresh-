@@ -49,6 +49,9 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/static/admin/assets/js/config.js"></script>
+  <!-- * css style  -->
+  <link rel="stylesheet" href="/static/admin/css/style.css"> </link>
+
   </head>
 
   <body>
@@ -118,18 +121,10 @@
                           <td>
                              <strong> <%= item.name %> </strong>
                           </td>
-                          <td>
-                             <strong> <%= item.username %> </strong>
-                          </td>
-                          <td>
-                             <strong> <%= item.provider %> </strong>
-                          </td>
-                          <td>
-                             <strong> <%= item.userId %> </strong>
-                          </td>
-                          <td>
-                              <%= item?._id %> 
-                          </td>
+                          <td> <%= item.username %> </td>
+                          <td>  <%= item.provider %>  </td>
+                          <td><%= item.userId %> </td>
+                          <td><%= item?._id %> </td>
                           <td>
                             <%  if(item?.isBlocked){ %>
                               <button class="btn btn-outline-success blockBtn" data-item="<%= item._id %>" >unblock</button>
@@ -146,6 +141,25 @@
                 </div>
               </div>
               <!--/ product Table rows -->
+
+              <!-- *pagination  -->
+              <div class="d-flex justify-content-center align-items-center p-2 ">
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
+                  <i class="fa-solid fa-chevron-left fa-xs"></i>
+                </button>
+                <div id="pageInfoContainer">
+                  <span>
+                    <%= page %> out of
+                  </span>
+                  <span>
+                    <%= numberOfPages %>
+                  </span>
+                </div>
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+              <!-- *pagination end -->
 
               <hr class="my-5" />
 
@@ -197,7 +211,12 @@
     </div>
     <!-- / Layout wrapper -->
 
-   
+   <script>
+    const pageDetails = {
+      page: parseInt("<%= page %>"),
+      numberOfPages: parseInt("<%= numberOfPages %>"),
+    } 
+  </script>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
