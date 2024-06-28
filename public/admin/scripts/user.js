@@ -1,16 +1,24 @@
 $(function () {
 
   const blockBtn = $(".blockBtn")
-  const bsAlert = $("#bsAlert")
-
+  const unblockBtn = $(".unblockBtn")
   // * pagination btns
   const prevBtn = $("#prevBtn")
   const nextBtn = $("#nextBtn")
 
-  blockBtn.on("click", handleBlockUser)
+  const modelText = $(".modal-header h5")
+  const modelYesBtn = $("#yesBtn")
+  const modelNoBtn = $("#noBtn")
 
+
+  // blockBtn.on("click", handleBlockUser)
+  // unblockBtn.on("click", handleBlockUser)
+
+  blockBtn.on("click", confirmBlock)
+  unblockBtn.on("click", confirmUnblock)
   nextBtn.on("click", handleNext)
   prevBtn.on("click", handlePrev)
+
 
 
   // * pagination
@@ -39,27 +47,50 @@ $(function () {
   }
   // * pagination end
 
-  // * block user
-  function handleBlockUser() {
+  // * confirm block user
+  function confirmBlock() {
     const userId = this.getAttribute("data-item")
     const button = $(this)
+    modelText.text("confirm block user")
+    modelNoBtn.off("click");
+    modelYesBtn.off("click");
+    modelNoBtn.on("click", function () { })
+    modelYesBtn.on("click", function () { handleBlockUser(userId, button) })
+  }
+
+  // * confirm unblock user
+  function confirmUnblock() {
+    const userId = this.getAttribute("data-item")
+    const button = $(this)
+    modelText.text("confirm unblock user")
+    modelNoBtn.off("click");
+    modelYesBtn.off("click");
+    modelNoBtn.on("click", function () { })
+    modelYesBtn.on("click", function () { handleBlockUser(userId, button) })
+  }
+
+
+  // * block and unblock
+  function handleBlockUser(userId,button) {
+    console.log(button.text())
     console.log(userId)
     $.ajax({
       url: `/admin/user/block?userId=${userId}`,
       method: "PATCH",
       success: function (data) {
-        if (data.user?.isBlocked) {
-          button
-            .removeClass("btn-outline-danger")
-            .addClass("btn-outline-success")
-            .text("unblock")
+        
+        // if (data.user?.isBlocked) {
+        //   button
+        //     .removeClass("btn-outline-danger")
+        //     .addClass("btn-outline-success")
+        //     .text("unblock")
 
-        } else {
-          button
-            .removeClass("btn-outline-success")
-            .addClass("btn-outline-danger")
-            .text("block")
-        }
+        // } else {
+        //   button
+        //     .removeClass("btn-outline-success")
+        //     .addClass("btn-outline-danger")
+        //     .text("block")
+        // }
         showAlert(data.message)
       },
       error: function (xhr, status, error) {
@@ -70,15 +101,5 @@ $(function () {
     })
   }
 
-
-  function showAlert(message) {
-    bsAlert
-      .removeClass('d-none')
-      .text(message)
-
-    setTimeout(() => {
-      bsAlert.addClass('d-none')
-    }, 10000 * 1)
-  }
 
 })

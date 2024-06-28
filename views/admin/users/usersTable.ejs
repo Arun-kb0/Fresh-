@@ -55,6 +55,7 @@
   </head>
 
   <body>
+
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
@@ -68,6 +69,8 @@
           <div class="content-wrapper">
             <!-- Content -->
 
+            
+
             <div class="container-xxl flex-grow-1 container-p-y">
                     <!-- * alert -->
                     <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
@@ -75,6 +78,26 @@
                       </div>
                     </div>
                     <!-- * alert end -->
+
+                    <!-- * confirm block user modal -->
+                    <div class="modal fade" id="blockConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">confirm block user</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-footer">
+                            <button id="noBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">no</button>
+                            <button  id="yesBtn" type="button"  class="btn btn-primary" data-bs-dismiss="modal" >yes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- * confirm block modal -->
+
+                   
+
 
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Users /</span> Users list</h4>
 
@@ -127,9 +150,23 @@
                           <td><%= item?._id %> </td>
                           <td>
                             <%  if(item?.isBlocked){ %>
-                              <button class="btn btn-outline-success blockBtn" data-item="<%= item._id %>" >unblock</button>
+                              <button 
+                                 class="btn btn-outline-success unblockBtn"  
+                                data-item="<%= item._id %>"  
+                                data-bs-toggle="modal" 
+                                data-bs-target="#blockConfirmModal"
+                               >
+                               unblock
+                              </button>
                             <% } else {%>
-                              <button class="btn btn-outline-danger blockBtn" data-item="<%= item._id %>" > block</button>
+                              <button
+                                 class="btn btn-outline-danger blockBtn" 
+                                data-item="<%= item._id %>"   
+                                data-bs-toggle="modal"
+                                data-bs-target="#blockConfirmModal"
+                              > 
+                                block
+                              </button>
                             <% } %>
                           </td>
                         </tr>
@@ -232,6 +269,9 @@
 
     <!-- Main JS -->
     <script src="/static/admin/assets/js/main.js"></script>
+
+    <!-- * user, alert script -->
+    <script src="/static/admin/scripts/alert.js"></script>
     <script src="/static/admin/scripts/user.js"></script>
 
     <!-- Page JS -->

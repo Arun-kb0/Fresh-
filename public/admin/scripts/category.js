@@ -10,7 +10,6 @@ $(function () {
 
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
-
   categoryDropdown.find('.dropdown-item').on("click", handleCategoryDropdown)
 
   // * drop down
