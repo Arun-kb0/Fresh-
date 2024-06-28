@@ -1,8 +1,8 @@
 
 
 const adminCheck = (req, res, next) => {
-  console.log("admin check")
-  console.log(req.session)
+  // console.log("admin check")
+  // console.log(req.session)
   try {
     if (req?.session?.user?.isAdmin || !req?.user?.provider) {
       return next()

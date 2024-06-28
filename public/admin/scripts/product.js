@@ -1,55 +1,17 @@
 $(function () {
 
-  const deleteProductBtn = $(".deleteProductBtn")
   const productForm = $("#formProduct")
   const image = $("#upload")
-
   const imageContainer = $(".imageContainer")
-  const imageOuterContainer = $("#imageOuterContainer")
-  const bsAlert = $("#bsAlert")
-
-  const showCategoryDropdown = $("#showCategoriesDropdownBtn")
-  const categoryDropdown = $("#categoryDropdown")
   const deleteImageBtn = $(".deleteImageBtn")
-
-  // * pagination btns
-  const prevBtn = $("#prevBtn")
-  const nextBtn = $("#nextBtn")
+  const imageOuterContainer = $("#imageOuterContainer")
+  const categoryDropdown = $("#categoryDropdown")
 
 
-
-  deleteProductBtn.on("click", deleteProductHelper)
   productForm.on("submit", CreateOrEditProductHelper)
   image.on("input", handleImageView)
   deleteImageBtn.on("click", handleImageDelete)
-
-  nextBtn.on("click", handleNext)
-  prevBtn.on("click", handlePrev)
-
-
-  let { page, numberOfPages } = pageDetails
-  if (numberOfPages === page) {
-    nextBtn.prop("disabled", true)
-  }
-  if (1 === page) {
-    prevBtn.prop("disabled", true)
-  }
-
-  function handleNext() {
-    if (numberOfPages > page) {
-      page++
-      console.log(page)
-      window.location.href = `/admin/products?page=${page}`
-    }
-  }
-
-  function handlePrev() {
-    if (1 < page) {
-      page--
-      console.log(page)
-      window.location.href = `/admin/products?page=${page}`
-    }
-  }
+  
 
   // * delete image
   function handleImageDelete() {
@@ -150,35 +112,5 @@ $(function () {
       }
     })
   }
-
-  function deleteProductHelper() {
-    const productId = this.getAttribute("data-item")
-    console.log(productId)
-    $.ajax({
-      url: `/admin/product/edit?productId=${productId}`,
-      method: "DELETE",
-      success: function (data) {
-        console.log(data)
-        showAlert(data.message)
-      },
-      error: function (xhr, status, error) {
-        const res = JSON.parse(xhr.responseText)
-        showAlert(res.message)
-        console.log(error)
-      }
-    })
-  }
-
-  function showAlert(message) {
-    bsAlert
-      .removeClass('d-none')
-      .text(message)
-
-    setTimeout(() => {
-      bsAlert.addClass('d-none')
-    }, 10000 * 1)
-  }
-
-
 
 })

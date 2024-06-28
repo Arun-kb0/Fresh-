@@ -141,7 +141,7 @@
 				<li>
 					<div class="flex">
 						<h5 class="priceTextColor">
-							₹ <%= product.price %>
+							₹ <%= product.finalPrice %>
 						</h5>
 						<h5>
 							<%= product?.offer %>
@@ -149,7 +149,7 @@
 					</div>
 				</li>
 				<li>
-					<p> MRP ₹<%= product.finalPrice %> (including all taxes)</p>
+					<p> MRP ₹<%= product.price %> (including all taxes)</p>
 				</li>
 				<li>
 					<div class="w-100 bg-secondary divider"></div>
@@ -293,11 +293,11 @@
 							<h6>
 								<%= item.name %>
 							</h6>
-							<h5 class="priceTextColor">₹<%= item.finalPrice %>
+							<h5 class="priceTextColor">₹<%= item.price %>
 							</h5>
 							<div class="d-flex justify-content-center ">
 								<p class=" text-secondary px-3 textLineTrough">
-									₹<%= item.price %>
+									₹<%= item.finalPrice %>
 								</p>
 								<p class="text-success px-3">20%</p>
 							</div>

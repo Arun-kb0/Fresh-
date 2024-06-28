@@ -63,6 +63,7 @@ const getCategoriesController = async (req, res, next) => {
 // * edit category
 const getEditCategoryController = async (req, res, next) => {
   const { categoryId, subcategory } = req.query
+  console.log(categoryId,subcategory)
   try {
     const categoryObjectId = mongoose.Types.ObjectId.createFromHexString(categoryId)
     if (subcategory) {
@@ -100,8 +101,13 @@ const getEditCategoryController = async (req, res, next) => {
         }
       }
     ])
-    console.log(categories[0])
-    res.render('admin/category/editCategory', { isEdit: true, ...viewAdminPage, category: category[0] })
+    const categories = await categoryModel.find({ isDeleted: false })
+    res.render('admin/category/editCategory', {
+      isEdit: true,
+      ...viewAdminPage,
+      category: category[0],
+      categories,
+    })
   } catch (error) {
     next(error)
   }

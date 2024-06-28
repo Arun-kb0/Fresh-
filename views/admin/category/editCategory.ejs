@@ -152,7 +152,7 @@
                             type="text"
                             name="subCategory" id="subCategory" 
                             value= "<%= isEdit 
-                            ? category?.subCategories?.map((item)=> item.name)+", "
+                            ? category?.subCategories?.map((item)=> item.name)+','
                             : undefined %>"
                             />
                           </div>
@@ -161,7 +161,7 @@
                             <input class="form-control" type="text" 
                             name="id"
                              id="id"
-                              value=<%= isEdit ? category?._id : "" %>
+                              value="<%= isEdit ? category?._id : '' %>"
                             />
                           </div>
                           <div class="mb-3 col-md-6">
@@ -204,7 +204,7 @@
                               class="form-control"
                               id="slug"
                               name="slug"
-                              placeholder= <%= isEdit ? category?.slug : "" %>
+                              placeholder= "<%= isEdit ? category?.slug : '' %>"
                             />
                           </div>
                           
@@ -298,6 +298,7 @@
     <script src="/static/admin/assets/js/pages-account-settings-account.js"></script>
 
     <!-- * category script -->
+    <script src="/static/admin/scripts/alert.js"></script>
     <script src="/static/admin/scripts/category.js"></script>
 
 

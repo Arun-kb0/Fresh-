@@ -105,7 +105,7 @@ const getSignUpPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/signup', { isAuthPage: true })
+    res.render('auth/signup', { isAuthPage: true, isAdmin:false })
   } catch (error) {
     next(error)
   }
@@ -138,7 +138,7 @@ const signUpController = async (req, res, next) => {
 // * otp controllers
 const getVerifyPageController = async (req, res, next) => {
   try {
-    res.render('auth/verifyOtp', { isAuthPage: true })
+    res.render('auth/verifyOtp', { isAuthPage: true ,isAdmin:false})
   } catch (error) {
     next(error)
   }

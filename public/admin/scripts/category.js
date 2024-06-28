@@ -1,58 +1,17 @@
 $(function () {
-  const deleteCategoryBtn = $(".deleteCategoryBtn")
-  const deleteSubCategoryBtn = $(".deleteSubCategoryBtn")
   const formCategory = $("#formCategory")
   const image = $("#upload")
 
   const imageContainer = $(".imageContainer")
   const imageOuterContainer = $("#imageOuterContainer")
-  const bsAlert = $("#bsAlert")
   const showCategoryDropdown = $("#showCategoriesDropdownBtn")
   const categoryDropdown = $("#categoryDropdown")
 
 
-  // * pagination btns
-  const prevBtn = $("#prevBtn")
-  const nextBtn = $("#nextBtn")
-
-
-  deleteCategoryBtn.on("click", deleteCategoryHelper)
-  deleteSubCategoryBtn.on("click", deleteCategoryHelper)
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
 
   categoryDropdown.find('.dropdown-item').on("click", handleCategoryDropdown)
-
-
-  nextBtn.on("click", handleNext)
-  prevBtn.on("click", handlePrev)
-
-  // * pagination
-  let { page, numberOfPages } = pageDetails
-  if (numberOfPages === page) {
-    nextBtn.prop("disabled", true)
-  }
-  if (1 === page) {
-    prevBtn.prop("disabled", true)
-  }
-
-  function handleNext() {
-    if (numberOfPages > page) {
-      page++
-      console.log(page)
-      window.location.href = `/admin/categories?page=${page}`
-    }
-  }
-
-  function handlePrev() {
-    if (1 < page) {
-      page--
-      console.log(page)
-      window.location.href = `/admin/categories?page=${page}`
-    }
-  }
-  // * pagination end
-
 
   // * drop down
   function handleCategoryDropdown() {
@@ -62,9 +21,8 @@ $(function () {
     $('#showCategoriesDropdownBtn').text("");
     $('#showCategoriesDropdownBtn').text(selectedCategory);
     $("#parentId").val(selectedCategoryId)
+    $("#Name").val(selectedCategory.trim())
   };
-
-
 
   // * image preview
   function handleImageView() {
@@ -80,10 +38,8 @@ $(function () {
     }
   }
 
-
   // * update or create
   function updateOrCreateCategory(e) {
-
     console.log(image)
 
     e.preventDefault()
@@ -128,41 +84,5 @@ $(function () {
       }
     })
   }
-
-  function deleteCategoryHelper() {
-    const categoryId = this.getAttribute("data-item")
-    console.log(categoryId)
-    $.ajax({
-      url: `/admin/category/edit?categoryId=${categoryId}`,
-      method: "DELETE",
-      success: function (data) {
-        console.log(data)
-        showAlert(data.message)
-        // alert(data.message)
-      },
-      error: function (xhr, status, error) {
-        const res = JSON.parse(xhr.responseText)
-        showAlert(res.message)
-        console.log(error)
-        // alert(res.message)
-      }
-    })
-  }
-
-  // * show alert function
-  function showAlert(message) {
-    bsAlert
-      .removeClass('d-none')
-      .text(message)
-
-    setTimeout(() => {
-      bsAlert.addClass('d-none')
-    }, 10000 * 1)
-  }
-
-
-
-
-
 
 })

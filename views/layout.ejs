@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <% if(!isAdmin) { %>
+      <link rel="stylesheet" href="/static/user/css/style.css">
+
+  <% } else { %>
+
+  <% } %>
 </head>
 
 <body>
@@ -23,10 +29,11 @@
   <% if(!isAdmin) {%>
     <script src="/static/admin/assets/vendor/js/bootstrap.js"></script>
     <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
+    <% } else { %>
+
     <% } %>
     <!-- * auth scripts -->
     <script src="/static/auth/scripts/logoutScript.js"></script>
-
 </body>
 
 </html>

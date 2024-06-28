@@ -35,7 +35,7 @@ const oauthGoogleCreateOrCheckUser = async (profile) => {
 
 const oauthFacebookCreateOrCheckUser = async (profile) => {
   try {
-    console.log(profile)
+    // console.log(profile)
     const { id, photos, displayName } = profile
     let user = await userModel.findOne({ userId: id })
     if (!user) {
@@ -60,11 +60,6 @@ const oauthFacebookCreateOrCheckUser = async (profile) => {
   }
 }
 
-// _json: {
-//   id: '122157406718091971',
-//     name: 'Arun Kb',
-//       picture: { data: [Object] }
-// }
 
 module.exports = {
   oauthGoogleCreateOrCheckUser,
