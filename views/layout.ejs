@@ -5,25 +5,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+
+  <!-- * COMMON -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- * USER  -->
   <% if(!isAdmin && !isAuthPage) { %>
+    <!-- * CSS -->
+    <link rel="shortcut icon" type="image/png" href="/static/user/assets/img/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/user/assets/css/all.min.css">
+    <link rel="stylesheet" href="/static/user/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/user/assets/css/owl.carousel.css">
+    <link rel="stylesheet" href="/static/user/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="/static/user/assets/css/animate.css">
+    <link rel="stylesheet" href="/static/user/assets/css/meanmenu.min.css">
+    <link rel="stylesheet" href="/static/user/assets/css/main.css">
+    <link rel="stylesheet" href="/static/user/assets/css/responsive.css">
     <link rel="stylesheet" href="/static/user/css/style.css">
 
-  <% } else if(isAdmin  || isAuthPage) { %>
-      <script> console.log("serving css admin")</script>
-      <!-- Favicon -->
+    <!-- * SCRIPTS -->
+     <!-- * new bootstrap and popper -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+      integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+      integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <!-- * new bootstrap and popper  end-->
+
+    <script src="/static/user/assets/js/jquery-1.11.3.min.js"></script>
+    <!-- <script defer src="/static/user/assets/bootstrap/js/bootstrap.min.js"></script> -->
+   
+    <script defer src="/static/user/assets/js/jquery.countdown.js"></script>
+    <script defer src="/static/user/assets/js/jquery.isotope-3.0.6.min.js"></script>
+    <script defer src="/static/user/assets/js/waypoints.js"></script>
+	  <script defer src="/static/user/assets/js/owl.carousel.min.js"></script>
+    <script defer src="/static/user/assets/js/jquery.magnific-popup.min.js"></script>
+    <script defer src="/static/user/assets/js/jquery.meanmenu.min.js"></script>
+    <script defer src="/static/user/assets/js/sticker.js"></script>
+    <script defer src="/static/user/assets/js/main.js"></script>
+    <!-- * scroll script  -->
+    <script src="/static/user/scripts/scrollCards.js"></script>
+
+
+    <!-- * ADMIN AND AUTH  -->
+    <% } else if(isAdmin || isAuthPage) { %>
+      <!-- * CSS -->
       <link rel="icon" type="image/x-icon" href="/static/admin/assets/img/favicon/favicon.ico" />
-      <!-- Fonts -->
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
-      <!-- Icons. Uncomment required icon fonts -->
       <link rel="stylesheet" href="/static/admin/assets/vendor/fonts/boxicons.css" />
-      <!-- Core CSS -->
       <link rel="stylesheet" href="/static/admin/assets/vendor/css/core.css" class="template-customizer-core-css" />
       <link rel="stylesheet" href="/static/admin/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
       <link rel="stylesheet" href="/static/admin/assets/css/demo.css" />
-      <!-- Vendors CSS -->
       <link rel="stylesheet" href="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
       <script src="/static/admin/assets/vendor/js/helpers.js"></script>
       <script src="/static/admin/assets/js/config.js"></script>
@@ -31,46 +66,37 @@
       <link rel="stylesheet" href="/static/admin/css/style.css"></link>
 
       <!-- * SCRIPTS -->
-      <!-- Core JS -->
       <script src="/static/admin/assets/vendor/libs/jquery/jquery.js"></script>
       <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
-      <script  defer src="/static/admin/assets/vendor/js/bootstrap.js"></script>
-      <script  defer src="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-  
-      <!-- Main JS -->
+      <script defer src="/static/admin/assets/vendor/js/bootstrap.js"></script>
+      <script defer src="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
       <script defer src="/static/admin/assets/vendor/js/menu.js"></script>
       <script defer src="/static/admin/assets/js/main.js"></script>
-
       <script defer src="/static/admin/scripts/alert.js"></script>
       <script async defer src="https://buttons.github.io/buttons.js"></script>
+      
     <% } %>
 
 
 </head>
 
-<body>
+<body >
 
   <% if(!isAuthPage && isAdmin) {%>
-      <%- include('admin/components/adminNavbar') %>
-      <%- include('admin/components/adminSidebar') %>
+    <%- include('admin/components/adminNavbar') %>
+    <%- include('admin/components/adminSidebar') %>
     <% } else if(!isAuthPage && !isAdmin ){ %>
-      <%- include('user/components/navbar') %>
-    <% } %>
+    <%- include('user/components/navbar') %>
+  <% } %>
 
 
   <%- body%>
 
-  <% if(!isAdmin) {%>
-    <script src="/static/admin/assets/vendor/js/bootstrap.js"></script>
-    <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
-  <% } else { %>
-    
-  <% } %>
 
-  <!-- * auth scripts -->
+
   <script src="/static/auth/scripts/logoutScript.js"></script>
 
-  <%- scriptBlock  %>
+  <%- scriptBlock %>
 </body>
 
 </html>
