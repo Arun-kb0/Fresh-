@@ -14,63 +14,20 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
-
-    <title>Tables - Basic Tables | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
-
+    <title>User table</title>
     <meta name="description" content="" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/static/admin/assets/img/favicon/favicon.ico" />
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" href="/static/admin/assets/vendor/fonts/boxicons.css" />
-
-    <!-- Core CSS -->
-    <link rel="stylesheet" href="/static/admin/assets/vendor/css/core.css" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="/static/admin/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
-    <link rel="stylesheet" href="/static/admin/assets/css/demo.css" />
-
-    <!-- Vendors CSS -->
-    <link rel="stylesheet" href="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-
-    <!-- Page CSS -->
-
-    <!-- Helpers -->
-    <script src="/static/admin/assets/vendor/js/helpers.js"></script>
-
-    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="/static/admin/assets/js/config.js"></script>
-  <!-- * css style  -->
-  <link rel="stylesheet" href="/static/admin/css/style.css"> </link>
 
   </head>
 
   <body>
-
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
-        
-
         <!-- Layout container -->
         <div class="layout-page">
-          
-
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
-
-            
-
             <div class="container-xxl flex-grow-1 container-p-y">
                     <!-- * alert -->
                     <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
@@ -248,35 +205,17 @@
     </div>
     <!-- / Layout wrapper -->
 
-   <script>
+  <script>
     const pageDetails = {
       page: parseInt("<%= page %>"),
       numberOfPages: parseInt("<%= numberOfPages %>"),
     } 
   </script>
-
-    <!-- Core JS -->
-    <!-- build:js assets/vendor/js/core.js -->
-    <script src="/static/admin/assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="/static/admin/assets/vendor/libs/popper/popper.js"></script>
-    <script src="/static/admin/assets/vendor/js/bootstrap.js"></script>
-    <script src="/static/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
-    <script src="/static/admin/assets/vendor/js/menu.js"></script>
-    <!-- endbuild -->
-
-    <!-- Vendors JS -->
-
-    <!-- Main JS -->
-    <script src="/static/admin/assets/js/main.js"></script>
-
+      
     <!-- * user, alert script -->
-    <script src="/static/admin/scripts/alert.js"></script>
-    <script src="/static/admin/scripts/user.js"></script>
-
-    <!-- Page JS -->
-
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-  </body>
+    <% scriptBlock= `
+      <script src='/static/admin/scripts/user.js'> </script>
+      `
+    %>
+    </body>
 </html>
