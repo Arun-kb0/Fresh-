@@ -6,8 +6,8 @@ const userModel = require('../../model/userModel')
 const otpVerificationModal = require('../../model/otpVerificationModal')
 const { sendOtpToEmail } = require('../../helpers/sendOtp')
 const passport = require('passport')
-
-
+const {v4 : uuid} = require('uuid')
+const mongoose = require('mongoose')
 
 // * auth check
 const authenticate = async (username, password, modal) => {
@@ -146,22 +146,21 @@ const getVerifyPageController = async (req, res, next) => {
 
 // * verify otp
 const verifyEmailController = async (req, res, next) => {
-  const { username, otp } = req.body
+  const { username, otp, _id } = req.body
   console.log(username, otp)
   try {
-    if (typeof username !== 'string' || typeof otp !== 'string' || otp.length !== 4) {
-      throw new CustomError("invalid otp or userId", BAD_REQUEST)
+    if (!mongoose.isObjectIdOrHexString(_id)|| typeof otp !== 'string' || otp.length !== 4) {
+      throw new CustomError("invalid otp or email", BAD_REQUEST)
     }
-    const otpUserVerificationRecord = await otpVerificationModal.findOne({ username })
+    const otpUserVerificationRecord = await otpVerificationModal.findOne({ _id })
     if (!otpUserVerificationRecord || otpUserVerificationRecord.length === 0) {
-      const message = "user has been verified already please sign up again"
+      const message = "user has been verified already or otp doc notfound please sign up again"
       throw new CustomError(message, NOT_FOUND)
     }
     const { expiresAt } = otpUserVerificationRecord
     const hashedOtp = otpUserVerificationRecord.otp
     const { name, password } = otpUserVerificationRecord
     if (expiresAt < Date.now()) {
-      await otpVerificationModal.deleteMany({ username })
       throw new CustomError("OTP has expired please request again", GONE)
     }
 
@@ -171,12 +170,13 @@ const verifyEmailController = async (req, res, next) => {
     }
 
     const user = await userModel.create({
+      userId: uuid(),
       name,
       username,
       password,
       isVerified: true
     })
-    await otpVerificationModal.deleteMany({ username })
+    await otpVerificationModal.deleteMany({ _id })
     req.session.user = {
       name: name,
       username: username,
@@ -193,12 +193,12 @@ const verifyEmailController = async (req, res, next) => {
 
 const resendOtpController = async (req, res, next) => {
   try {
-    const { email } = req.body
-    if (typeof email !== 'string' || email.length <= 1) {
+    const { email,_id } = req.body
+    console.log(_id)
+    if (!mongoose.isObjectIdOrHexString(_id)) {
       throw new CustomError("empty user details are not allowed", BAD_REQUEST)
     }
-    const otpRecord = await otpVerificationModal.findOne({ username: email })
-    await otpVerificationModal.deleteMany({ username: email })
+    const otpRecord = await otpVerificationModal.findOne({ _id })
     if (!otpRecord) {
       throw new CustomError("not user details found", BAD_REQUEST)
     }

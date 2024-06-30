@@ -5,7 +5,7 @@ const { nodeMailerTransporter } = require('../config/nodeMailerConfig')
 
 
 // * send otp function
-const sendOtpToEmail = async ({ email,name,password }) => {
+const sendOtpToEmail = async ({ email, name, password }) => {
   try {
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`
     const html = `
@@ -31,13 +31,15 @@ const sendOtpToEmail = async ({ email,name,password }) => {
       password,
       otp: hashedOtp,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 3 * 60 * 1000
+      expiresAt: Date.now() + 1 * 60 * 1000
     })
+    
     await nodeMailerTransporter.sendMail(mailOptions)
     return ({
       status: "pending",
       message: "Verify otp in email",
       data: {
+        _id: newOtpVerification._id,
         username: email,
       }
     })

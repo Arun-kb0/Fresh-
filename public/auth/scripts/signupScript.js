@@ -34,7 +34,7 @@ $(function () {
     if (!resendOtp.hasClass("disabled")) {
       resendOtp.addClass("disabled")
     }
-    let timeLeft = 3 * 60
+    let timeLeft = 1 * 60
     updateTimer()
     const timerInterval = setInterval(updateTimer, 1000)
     function updateTimer() {
@@ -56,6 +56,7 @@ $(function () {
     startTimer()
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
+      _id: otpData._id,
       email: otpData.username,
     }
 
@@ -66,18 +67,20 @@ $(function () {
       contentType: "application/json",
       success: function (resData) {
         console.log(resData)
-        if (resData) {
-          alert('otp send to email')
+        if (resData?.data) {
+          localStorage.removeItem("otpVerificationData")
+          localStorage.setItem("otpVerificationData", JSON.stringify(resData.data))
+          showAlert('otp send to email')
+        } else {
+          window.location.href = "/auth/signup"
         }
-        // window.location.href = "/"
       },
       error: function (xhr, status, error) {
         if (xhr.status === 400) {
-          window.location.href = "/auth/signup"
-          return
+          window.location.href = '/auth/signup'
         }
         const res = JSON.parse(xhr.responseText)
-        alert(res.message)
+        showAlert(res.message)
         console.log(error)
       }
     })
@@ -90,11 +93,12 @@ $(function () {
     console.log("otp")
 
     if (!checkOtp()) {
-      alert("invalid otp")
+      showAlert("invalid otp")
       return
     }
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
     const data = {
+      _id: otpData._id,
       username: otpData?.username,
       otp: otp.val().trim()
     }
@@ -123,7 +127,7 @@ $(function () {
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
         setErrorFor(otp, "invalid otp ")
-        // alert(res.message)
+        console.log(res.message)
         console.log(error)
       }
     })
@@ -134,7 +138,6 @@ $(function () {
   function handleSignup(e) {
     e.preventDefault()
     if (!checkEmail() || !checkPassword() || !checkName() || !checkConfirmPassword()) {
-      console.log("invalid email or password")
       return
     }
     const data = {
@@ -175,7 +178,6 @@ $(function () {
   // * otp check
   function checkOtp() {
     const otpValue = otp.val().trim()
-    console.log(otpValue)
     if (otpValue === '') {
       setErrorFor(otp, "cannot be empty")
       return false
@@ -191,7 +193,6 @@ $(function () {
   // * check inputs functions
   function checkName() {
     const nameValue = name.val().trim()
-    console.log(nameValue)
     if (nameValue === '') {
       setErrorFor(name, "cannot be empty")
       return false
@@ -235,7 +236,6 @@ $(function () {
 
   function checkConfirmPassword() {
     const confirmPasswordValue = confirmPassword.val()
-    console.log(confirmPasswordValue)
     if (confirmPasswordValue === "") {
       setErrorFor(confirmPassword, "cannot be empty")
       return false

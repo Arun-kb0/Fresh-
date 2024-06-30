@@ -8,7 +8,7 @@ const UserOtpVerificationSchema = new Schema({
   password: { type: String, required: true },
   otp: { type: String, required: true },
   createdAt: { type: Date, required: true },
-  expiresAt: { type: Date, required: true, expires: 30 },
+  expiresAt: { type: Date, required: true, expires: 10 * 60 },
 })
 
 module.exports = mongoose.model(
