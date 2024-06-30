@@ -41,10 +41,15 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <% if(isEdit) {%>
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Edit category</h4>
-                <% }else { %>
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Create category</h4>
-                  <% } %>
+                <% if(category?.parentId) {%>
+                  <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sub categories /</span> Edit subcategory</h4>
+                <% } else { %>
+                  <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Edit category</h4>
+                <% } %>
+              <% }else { %>
+                  <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Categories /</span> Create category</h4>
+              <% } %>
+
               <div class="row">
                   <div class="card mb-4">
                     <h5 class="card-header">Category Details</h5>
@@ -113,24 +118,28 @@
                               value= "<%= isEdit ? category?.name : "" %>"
                               autofocus
                             />
+                            <span id="small" class="opacity-0" ></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="subCategory" class="form-label">SubCategory</label>
                             <input class="form-control" 
                             type="text"
-                            name="subCategory" id="subCategory" 
+                            name="subCategory" 
+                            id="subCategory" 
                             value= "<%= isEdit 
                             ? category?.subCategories?.map((item)=> item.name)+','
                             : undefined %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="id" class="form-label">Id</label>
                             <input class="form-control" type="text" 
                             name="id"
-                             id="id"
-                              value="<%= isEdit ? category?._id : '' %>"
+                            id="id"
+                            value="<%= isEdit ? category?._id : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="parentId" class="form-label">ParentId</label>
@@ -144,8 +153,11 @@
                                 value = "<%= category?.parentId ? category?.parentId  : undefined %>"
                                 <% } %>
                              />
+                            <span id="small" class="opacity-0"></span>
                           </div>
+
                           <div class="mb-3 col-md-6">
+                          <% if((!isEdit && categories)) {%>
                           <div class="dropdown">
                             <button 
                               id="showCategoriesDropdownBtn"
@@ -164,6 +176,7 @@
                                 <% } %>
                             </ul>
                           </div>
+                          <% } %>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="slug" class="form-label">Slug</label>
@@ -174,16 +187,16 @@
                               name="slug"
                               placeholder= "<%= isEdit ? category?.slug : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           
                          
                           
                         <div class="mt-2">
                           <% if(isEdit) {%>
-                            <button type="submit" class="btn btn-primary me-2"> Save changes</button>
-                            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                            <button id="submitBtn" type="submit" class="btn btn-primary me-2"> Save changes</button>
                           <% } else {%>
-                            <button type="submit" class="btn btn-primary me-2"> Create new category</button>
+                            <button id="submitBtn" type="submit" class="btn btn-primary me-2"> Create new category</button>
                           <% } %>
                         </div>
                       </form>

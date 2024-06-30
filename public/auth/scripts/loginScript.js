@@ -17,7 +17,7 @@ $(function () {
   function handleLogin(e) {
     e.preventDefault()
     if (!checkEmail() || !checkPassword()) {
-      alert("invalid email or password")
+      showAlert("invalid email or password")
       return
     }
     const data = {
@@ -58,7 +58,6 @@ $(function () {
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
         setErrorFromServer(res.message)
-        // alert(res.message)
         console.log(error)
       }
     })

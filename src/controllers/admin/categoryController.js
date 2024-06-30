@@ -196,7 +196,7 @@ const createCategoryController = async (req, res, next) => {
 
     const name = category.name.toLowerCase().trim()
     const isCategoryExists = await categoryModel.findOne({ name: name, isDeleted: false })
-    if (isCategoryExists) {
+    if (!category.parentId && isCategoryExists ) {
       const message = "category already exists"
       throw new CustomError(message, CONFLICT)
     }

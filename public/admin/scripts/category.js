@@ -1,6 +1,13 @@
+
 $(function () {
   const formCategory = $("#formCategory")
   const image = $("#upload")
+  const name = $("#Name")
+  const slug = $("#slug")
+  const id = $("#id")
+  const parentId = $("#parentId")
+  const subCategoryName = $("#subCategory")
+  const submitBtn = $("#submitBtn")
 
   const imageContainer = $(".imageContainer")
   const imageOuterContainer = $("#imageOuterContainer")
@@ -8,9 +15,95 @@ $(function () {
   const categoryDropdown = $("#categoryDropdown")
 
 
+  name.on("input", checkName)
+  subCategoryName.on("input",checkSubCategoryName)
+  slug.on("input", checkSlug)
+  id.on("input", checkId)
+  parentId.on("input", checkParentId)
   formCategory.on("submit", updateOrCreateCategory)
   image.on("input", handleImageView)
   categoryDropdown.find('.dropdown-item').on("click", handleCategoryDropdown)
+
+
+  function checkId() {
+    const idValue = id.val().trim()
+    console.log(idValue.length)
+    if (idValue.length === 0) {
+      setSuccessFor(id)
+      return true
+    } else if (idValue.length !== 24) {
+      setErrorFor(id, "invalid id")
+      return false
+    } else {
+      setSuccessFor(id)
+      return true
+    }
+  }
+
+
+  function checkParentId() {
+    const parentIdValue = parentId.val().trim()
+    console.log(parentIdValue.length)
+    if (parentIdValue.length === 0) {
+      setSuccessFor(parentId)
+      return true
+    }else if (parentIdValue.length!==24) {
+      setErrorFor(parentId,"invalid parentId")
+      return false
+    } else {
+      setSuccessFor(parentId)
+      return true
+    }
+  }
+
+  function checkSlug() {
+    const slugValue = slug.val().trim()
+    console.log(slugValue.length)
+    if (slugValue.length === 0) {
+      setSuccessFor(slug)
+      return true
+    }else if (!isSlug(slugValue)) {
+      setErrorFor(slug, "invalid slug name")
+      return false
+    } else {
+      setSuccessFor(slug)
+      return true
+    }
+  }
+
+  function checkName() {
+    console.log(name.val())
+    const nameValue = name.val().trim()
+    if (name === "") {
+      setErrorFor(name, "cannot be empty")
+      return false
+    } else if (!isName(nameValue)) {
+      setErrorFor(name, "invalid category name")
+      return false
+    } else {
+      setSuccessFor(name)
+      return true
+    }
+  }
+
+  function checkSubCategoryName() {
+    const subCategoryNameValue = subCategoryName.val().trim()
+    const parentIdValue = parentId.val().trim()
+    if (parentIdValue.length !== 24) {
+      setSuccessFor(subCategoryName)
+      return true
+    }else if (subCategoryName === "") {
+      setErrorFor(subCategoryName, "cannot be empty")
+      return false
+    } else if (!isName(subCategoryNameValue)) {
+      setErrorFor(subCategoryName, "invalid category subCategoryName")
+      return false
+    } else {
+      setSuccessFor(subCategoryName)
+      return true
+    }
+  }
+
 
   // * drop down
   function handleCategoryDropdown() {
@@ -39,6 +132,9 @@ $(function () {
 
   // * update or create
   function updateOrCreateCategory(e) {
+    if (!checkName() || !checkId() || !checkParentId() || !checkSlug()) {
+      setErrorFor("invalid fields")
+    }
     console.log(image)
 
     e.preventDefault()
@@ -83,5 +179,52 @@ $(function () {
       }
     })
   }
+
+
+
+  // * validation error function
+  function setErrorFor(input, msg) {
+    console.log(input.val())
+    let parent
+    if (input.attr("name") === "password") {
+      parent = input.parent().parent()
+    } else {
+      parent = input.parent()
+    }
+    const small = parent.find("#small")
+    small.removeClass()
+    small.addClass("text-danger opacity-1")
+    small.text(msg)
+    submitBtn.prop("disabled", true)
+  }
+
+  // * validation success function
+  function setSuccessFor(input) {
+    let parent
+    if (input.attr("name") === "password") {
+      parent = input.parent().parent()
+    } else {
+      parent = input.parent()
+    }
+    const small = parent.find("#small")
+    small.text("")
+    small.removeClass()
+    small.addClass("opacity-0")
+    submitBtn.prop("disabled", false)
+    console.log(` validation success`)
+  }
+
+
+  // * regex functions
+  function isName(name) {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    return nameRegex.test(name)
+  }
+
+  function isSlug(slug) {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    return nameRegex.test(slug)
+  }
+
 
 })
