@@ -6,8 +6,9 @@ const userModel = require('../../model/userModel')
 const otpVerificationModal = require('../../model/otpVerificationModal')
 const { sendOtpToEmail } = require('../../helpers/sendOtp')
 const passport = require('passport')
-const {v4 : uuid} = require('uuid')
+const { v4: uuid } = require('uuid')
 const mongoose = require('mongoose')
+const { sessionCookieMaxAge } = require('../../config/sessionConfig')
 
 // * auth check
 const authenticate = async (username, password, modal) => {
@@ -83,13 +84,19 @@ const loginController = async (req, res, next) => {
   const { username, password } = req.body
   try {
     const user = await authenticate(username, password, userModel)
-    req.session.user = {
+    const sessionUser = {
       name: user.name,
       username: user.username,
       isAdmin: false,
       provider: null
     }
+    req.session.user = sessionUser
     req.session.isAuthorized = true
+    res.cookie(
+      'user',
+      JSON.stringify(sessionUser),
+      { maxAge: sessionCookieMaxAge }
+    )
     res.status(OK).json({ message: "login success", user })
   } catch (error) {
     next(error)
@@ -105,7 +112,7 @@ const getSignUpPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/signup', { isAuthPage: true, isAdmin:false })
+    res.render('auth/signup', { isAuthPage: true, isAdmin: false })
   } catch (error) {
     next(error)
   }
@@ -138,7 +145,7 @@ const signUpController = async (req, res, next) => {
 // * otp controllers
 const getVerifyPageController = async (req, res, next) => {
   try {
-    res.render('auth/verifyOtp', { isAuthPage: true ,isAdmin:false})
+    res.render('auth/verifyOtp', { isAuthPage: true, isAdmin: false })
   } catch (error) {
     next(error)
   }
@@ -149,7 +156,7 @@ const verifyEmailController = async (req, res, next) => {
   const { username, otp, _id } = req.body
   console.log(username, otp)
   try {
-    if (!mongoose.isObjectIdOrHexString(_id)|| typeof otp !== 'string' || otp.length !== 4) {
+    if (!mongoose.isObjectIdOrHexString(_id) || typeof otp !== 'string' || otp.length !== 4) {
       throw new CustomError("invalid otp or email", BAD_REQUEST)
     }
     const otpUserVerificationRecord = await otpVerificationModal.findOne({ _id })
@@ -177,13 +184,19 @@ const verifyEmailController = async (req, res, next) => {
       isVerified: true
     })
     await otpVerificationModal.deleteMany({ _id })
-    req.session.user = {
+    const sessionUser = {
       name: name,
       username: username,
       isAdmin: false,
       provider: null
     }
+    req.session.user = sessionUser 
     req.session.isAuthorized = true
+    res.cookie(
+      'user',
+      JSON.stringify(sessionUser),
+      { maxAge: sessionCookieMaxAge }
+    )
     res.status(OK).json({ message: "email verified", user })
   } catch (error) {
     console.error(error)
@@ -193,7 +206,7 @@ const verifyEmailController = async (req, res, next) => {
 
 const resendOtpController = async (req, res, next) => {
   try {
-    const { email,_id } = req.body
+    const { email, _id } = req.body
     console.log(_id)
     if (!mongoose.isObjectIdOrHexString(_id)) {
       throw new CustomError("empty user details are not allowed", BAD_REQUEST)
@@ -218,6 +231,7 @@ const logoutController = async (req, res) => {
       ? true : false
     await req.session.destroy()
     res.clearCookie('connect.sid')
+    res.clearCookie('user')
     console.log("logout success")
     res.status(OK).json({ message: "logout success", isAdmin })
   } catch (error) {
@@ -229,10 +243,16 @@ const logoutController = async (req, res) => {
 const oauthSuccessController = async (req, res, next) => {
   try {
     const user = req.user
-    console.log(req.user)
-    console.log(req?.Session)
-    const query = new URLSearchParams(user).toString()
-    res.redirect(`/?${query}`)
+    console.log("cookie max age value", parseInt(process.env.SESSION_COOKIE_MAX_AGE))
+
+    // console.log(req.user)
+    // console.log(req?.Session)
+    res.cookie(
+      'user',
+      JSON.stringify(user),
+      { maxAge: sessionCookieMaxAge}
+    )
+    res.redirect('/')
   } catch (error) {
     next(error)
   }

@@ -1,38 +1,35 @@
 $(function () {
 
+  const cookieUser = getCookie('user');
+  if (cookieUser) {
+    try {
+      const decodedCookieUser = decodeURIComponent(cookieUser);
+      const userData = JSON.parse(decodedCookieUser);
+      console.log("User cookie:", userData);
+      localStorage.setItem('user', JSON.stringify(userData))
 
-  // * storing user data
-  const urlParams = new URLSearchParams(window.location.search)
-  console.log(urlParams)
-  let sessionUser
-  if (urlParams.size > 1 && urlParams.get('userId')) {
-    sessionUser = {
-      _id: urlParams.get('_id'),
-      userId: urlParams.get('userId'),
-      name: urlParams.get('name'),
-      username: urlParams.get('username'),
-      isAdmin: urlParams.get('isAdmin'),
-      provider: urlParams.get('provider')
+    } catch (error) {
+      console.error("Error parsing cookie:", error);
     }
-    console.log(sessionUser)
-    localStorage.setItem('user', JSON.stringify(sessionUser))
+  } else {
+    console.log("No user cookie found");
   }
 
 
   const $navUserDropdownToggle = $("#navUserDropdownToggle");
   const $loginSection = $("#loginSection");
   const $userSection = $("#userSection");
-  const $userImage = $("#userImage");
+  const $userName = $("#userName");
   const $logoutBtn = $("#logoutBtn");
   const $logoutBtn2 = $("#logoutBtn2");
 
   const user = JSON.parse(localStorage.getItem("user"))
-  console.log(user)
+  // console.log(user)
   if (user) {
     $loginSection.hide();
     $userSection.show();
 
-    $userImage.html('<p>' + user.name + "</p>");
+    $userName.html(`<span>${user.name}<span/>`);
 
     $logoutBtn.hide(); // Example: If you have two logout buttons, you might want to hide one
     $logoutBtn2.show();
@@ -41,16 +38,16 @@ $(function () {
     $userSection.hide();
   }
 
-  // $logoutBtn.on("click", function () {
-  //   localStorage.removeItem("user");
-  //   window.location.href = "/"; 
-  // });
 
-  // $logoutBtn2.on("click", function () {
-  //   localStorage.removeItem("user");
-  //   window.location.href = "/"; // Redirect to home page or login page after logout
-  // });
-
-
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    } else {
+      console.error("Cookie not found");
+      return null;
+    }
+  }
 
 })

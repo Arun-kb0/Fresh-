@@ -2,20 +2,24 @@ const session = require("express-session")
 const mongoStore = require('connect-mongo')
 
 
-const maxAgeOfCookie = 60 * 1000 * 60
+const sessionCookieMaxAge = 1000 * 60 * 60
 
-const sessionConfig =session({
+const sessionConfig = session({
   secret: process.env.SESSION_SECRET,
   saveUninitialized: false,
   resave: true,
   store: mongoStore.create({
     mongoUrl: process.env.DATABASE_URI,
-    ttl: maxAgeOfCookie
+    ttl: sessionCookieMaxAge
   }),
   cookie: {
     sameSite: 'strict',
-    maxAge: maxAgeOfCookie
+    maxAge: sessionCookieMaxAge
   }
 })
 
-module.exports = sessionConfig
+
+module.exports = {
+  sessionConfig,
+  sessionCookieMaxAge
+}

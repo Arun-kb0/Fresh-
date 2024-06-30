@@ -9,7 +9,7 @@ const passport = require('passport')
 const flash = require('connect-flash')
 
 const connectDB = require('./src/config/dbConnection')
-const sessionConfig = require('./src/config/sessionConfig')
+const {sessionConfig} = require('./src/config/sessionConfig')
 const authRouter = require('./src/routes/auth/authRoutes')
 const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
