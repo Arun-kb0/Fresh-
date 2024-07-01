@@ -215,7 +215,7 @@ const editProductController = async (req, res, next) => {
 }
 
 // * create
-const getCreateProductController = async (req, res) => {
+const getCreateProductController = async (req, res,next) => {
   try {
     const subCategory = await subCategoryModel.find({ isDeleted: false })
     res.render('admin/products/editProduct', { isEdit: false, ...viewAdminPage, subCategory })

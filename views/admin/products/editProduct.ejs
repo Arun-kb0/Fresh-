@@ -16,7 +16,7 @@
     />
 
     <title>product</title>
-    <meta name="description" content="" />
+    <meta name="description" content='' />
   </head>
 
   <body>
@@ -133,25 +133,29 @@
                               type="text"
                               id="Name"
                               name="name"
-                              value= "<%= isEdit ? product?.name : "" %>"
+                              value= "<%= isEdit ? product?.name : '' %>"
                               autofocus
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="subCategory" class="form-label">SubCategory</label>
                             <input class="form-control" 
                             type="text"
                             name="subCategory" id="subCategory" 
-                            value= "<%= isEdit ? product?.subcategory?.name  : "" %>"
+                            value= "<%= isEdit ? product?.subcategory?.name  : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="subCategoryId" class="form-label">subcategory Id</label>
                             <input class="form-control" 
                             type="text"
-                            name="subCategoryId" id="subCategoryId" 
-                            value= "<%= isEdit ? product?.subcategory?._id  : "" %>"
+                            name="subCategoryId" 
+                            id="subCategoryId" 
+                            value= "<%= isEdit ? product?.subcategory?._id  : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <div class="dropdown">
@@ -173,8 +177,9 @@
                             <input class="form-control" type="text" 
                             name="id"
                              id="id"
-                              value="<%= isEdit ? product?._id : "" %>"
+                              value="<%= isEdit ? product?._id : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="price" class="form-label">Price</label>
@@ -185,9 +190,10 @@
                               name="price"
                               <% if (isEdit) {%>
                                 placeholder="enter original price"
-                                value = "<%= isEdit ? product?.price  : "" %>"
+                                value = "<%= isEdit ? product?.price  : '' %>"
                                 <% } %>
                              />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="finalPrice" class="form-label">Final Price</label>
@@ -196,24 +202,27 @@
                               class="form-control"
                               id="finalPrice"
                               name="finalPrice"
-                              value= "<%= isEdit ? product?.finalPrice : "" %>"
+                              value= "<%= isEdit ? product?.finalPrice : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="rating class="form-label">rating</label>
                             <input type="text" class="form-control" 
                             id="rating" 
                             name='rating'
-                            value="<%=isEdit ? product?.rating : "" %>"
+                            value="<%=isEdit ? product?.rating : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="peopleRated class="form-label">peopleRated</label>
                             <input type="text" class="form-control" 
                             id="peopleRated" 
                             name='peopleRated'
-                            value="<%=isEdit ? product?.peopleRated : "" %>"
+                            value="<%=isEdit ? product?.peopleRated : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="stock class="form-label">stock</label>
@@ -221,8 +230,9 @@
                             class="form-control" 
                             id="stock" 
                             name='stock'
-                            value= "<%= isEdit ? product?.stock : "" %>"
+                            value= "<%= isEdit ? product?.stock : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="description class="form-label">description</label>
@@ -230,8 +240,9 @@
                             class="form-control" 
                             id="description" 
                             name='description'
-                            value="<%= isEdit ? product?.productInfo?.description : "" %>"
+                            value="<%= isEdit ? product?.productInfo?.description : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="featuresAndDetails class="form-label">featuresAndDetails</label>
@@ -239,8 +250,9 @@
                             class="form-control" 
                             id="featuresAndDetails" 
                             name='featuresAndDetails'
-                            value="<%= isEdit ? product?.productInfo?.featuresAndDetails : "" %>"
+                            value="<%= isEdit ? product?.productInfo?.featuresAndDetails : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="brand class="form-label">brand</label>
@@ -248,8 +260,9 @@
                             class="form-control" 
                             id="brand" 
                             name='brand'
-                            value="<%= isEdit ? product?.productInfo?.brand : "" %>"
+                            value="<%= isEdit ? product?.productInfo?.brand : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="soldBy class="form-label">soldBy</label>
@@ -257,8 +270,9 @@
                             class="form-control" 
                             id="soldBy" 
                             name='soldBy'
-                            value="<%= isEdit ? product?.productInfo?.soldBy : "" %>"
+                            value="<%= isEdit ? product?.productInfo?.soldBy : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
                           <div class="mb-3 col-md-6">
                             <label for="location class="form-label">location</label>
@@ -266,8 +280,9 @@
                             class="form-control" 
                             id="location" 
                             name='location'
-                            value="<%= isEdit ? product?.productInfo?.location : "" %>"
+                            value="<%= isEdit ? product?.productInfo?.location : '' %>"
                             />
+                            <span id="small" class="opacity-0"></span>
                           </div>
 
 
@@ -277,10 +292,10 @@
                           
                         <div class="mt-2">
                           <% if(isEdit) {%>
-                            <button type="submit" class="btn btn-primary me-2"> Save changes</button>
+                            <button id="submitBtn" type="submit" class="btn btn-primary me-2"> Save changes</button>
                           <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                           <% } else {%>
-                            <button type="submit" class="btn btn-primary me-2"> Create new product</button>
+                            <button id="submitBtn" type="submit" class="btn btn-primary me-2"> Create new product</button>
                           <% } %>
                         </div>
                       </form>

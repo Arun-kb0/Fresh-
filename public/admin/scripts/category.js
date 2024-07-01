@@ -134,6 +134,7 @@ $(function () {
   function updateOrCreateCategory(e) {
     if (!checkName() || !checkId() || !checkParentId() || !checkSlug()) {
       setErrorFor("invalid fields")
+      return
     }
     console.log(image)
 
