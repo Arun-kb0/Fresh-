@@ -7,13 +7,14 @@ const topBrandsBtnContainer = $(".topBrandsBtnContainer")
 const favFoodContainer = $(".scrollContainer.favFood")
 const favFoodBtnContainer = $(".favFoodContainer")
 
-// * SINGLE PRODUCT
+// * SINGLE PRODUCT AND PROFILE SUGGESTIONS
 const suggestionsContainer = $(".scrollContainer.suggestionsContainer")
 const suggestionsBtnContainer = $(".suggestionsBtnContainer")
 
 // ************ INTI END ***************
 
-
+// suggestionsBtnContainer.find("#scroll-left")
+//   .on("click", function(){console.log("scroll left")})
 
 // * FUNCTION CALLS 
 

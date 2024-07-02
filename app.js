@@ -19,6 +19,7 @@ const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMid
 const { logger } = require('./src/middleware/loggerMiddleware')
 require('./src/config/passportGoogleConfig')
 require('./src/config/passportFacebookConfig')
+const profileRouter  = require('./src/routes/user/profileRoutes')
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -61,7 +62,8 @@ app.use('/admin', auth, adminCheck, adminRouter)
 
 // * user routes
 // app.use('/', userCheck, productRouter)
-app.use('/', userCheck,  productRouter)
+app.use('/', userCheck, productRouter)
+app.use('/profile', profileRouter)
 
 
 

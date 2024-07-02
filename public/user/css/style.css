@@ -118,7 +118,9 @@
   position: sticky;
 }
 
-.singleProductContainer {
+.singleProductContainer ,
+.profileContainer
+{
   position: relative !important;
   min-height: 100vh;
   justify-content: center;
@@ -148,4 +150,14 @@
   top: 150px;
   left: 0;
   align-self: flex-start;
+}
+
+/* * profile */
+.userBtnCard {
+  background-color: #F0F2F2;
+  width: 350px;
+}
+
+.btnTitle{
+  line-height: 0.5rem;
 }
