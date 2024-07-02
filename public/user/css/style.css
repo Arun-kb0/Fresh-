@@ -161,3 +161,8 @@
 .btnTitle{
   line-height: 0.5rem;
 }
+
+/* * address add card */
+.addAddressCard{
+  background-color: #F0F2F2;
+}

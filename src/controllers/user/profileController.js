@@ -1,5 +1,5 @@
 const CustomError = require("../../constants/CustomError")
-const { OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
+const { OK, NOT_FOUND, BAD_REQUEST } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const addressModel = require("../../model/addressModel")
 const productModel = require("../../model/productModel")
@@ -72,8 +72,8 @@ const getAddressController = async (req, res, next) => {
     if (!address) {
       throw new CustomError('no address for user', NOT_FOUND)
     }
-    res.status(OK).json({ address: address })
-    // res.render('user/profile/address', {...viewUsersPage, address})
+    // res.status(OK).json({ address: address })
+    res.render('user/profile/address', { ...viewUsersPage, address })
   } catch (error) {
     next(error)
   }
@@ -96,15 +96,22 @@ const createAddressController = async (req, res, next) => {
 }
 
 const editAddressController = async (req, res, next) => {
-  const { _id, ...address } = req.body
+  const { addressId, ...address } = req.body
   try {
-    const newAddress = await addressModel.findOneAndUpdate(
-      { _id },
+    // console.log(addressId)
+    if (!addressId) {
+      throw new CustomError("invalid id ", BAD_REQUEST)
+    }
+    const updatedAddress = await addressModel.findOneAndUpdate(
+      { _id: addressId },
       { ...address },
       { new: true }
     )
+    if (!updatedAddress) {
+      throw new CustomError("address not found ", NOT_FOUND)
+    }
 
-    res.status(OK).json({ message: "address updated", address: newAddress })
+    res.status(OK).json({ message: "address updated", address: updatedAddress })
   } catch (error) {
     next(error)
   }
@@ -123,6 +130,20 @@ const deleteAddressController = async (req, res, next) => {
   }
 }
 
+const getSingleAddressController = async (req, res, next) => {
+  const { addressId } = req.query
+  try {
+    console.log(addressId)
+    const address = await addressModel.findOne({ _id: addressId })
+    if (!address) {
+      throw new CustomError("address not found", NOT_FOUND)
+    }
+    res.status(OK).json({ message: "get single order success", address })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 
 module.exports = {
@@ -130,5 +151,6 @@ module.exports = {
   getAddressController,
   createAddressController,
   editAddressController,
-  deleteAddressController
+  deleteAddressController,
+  getSingleAddressController
 }

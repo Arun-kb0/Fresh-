@@ -5,6 +5,7 @@ const {
   createAddressController,
   editAddressController,
   deleteAddressController,
+  getSingleAddressController,
   
  } = require('../../controllers/user/profileController')
 const router = express.Router()
@@ -18,5 +19,6 @@ router.route('/address')
   .patch(editAddressController)
   .delete(deleteAddressController)
 
+router.get('/singleaddress', getSingleAddressController)
 
 module.exports = router
