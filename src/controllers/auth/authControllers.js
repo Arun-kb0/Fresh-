@@ -85,6 +85,7 @@ const loginController = async (req, res, next) => {
   try {
     const user = await authenticate(username, password, userModel)
     const sessionUser = {
+      userId:user.userId,
       name: user.name,
       username: user.username,
       isAdmin: false,
@@ -185,6 +186,7 @@ const verifyEmailController = async (req, res, next) => {
     })
     await otpVerificationModal.deleteMany({ _id })
     const sessionUser = {
+      userId: user.userId,
       name: name,
       username: username,
       isAdmin: false,
