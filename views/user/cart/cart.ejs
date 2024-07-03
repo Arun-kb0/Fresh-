@@ -71,37 +71,41 @@
 						</a>
 					</div>
 
-					<img class="cartImage shadow-sm rounded-3 m-2" src="<%= item.image[0] %>" class="card-img-top"
-						alt="...">
+					<img class="cartImage shadow-sm rounded-3 m-2" src="<%= item.image[0] %>" class="card-img-top" alt="...">
 					<div class="card-body">
-						<h5 class="card-title">
+						<h5 class="card-title" id="name">
 							<%= item.name %>
 						</h5>
 						<% if(item.stock> 0) {%>
-							<small class="text-secondary">In stock</small>
+							<small class="text-secondary" id="stock" >In stock</small>
 							<% } else { %>
-								<small class="text-danger">out of stock</small>
+								<small class="text-danger" id="stock">out of stock</small>
 								<% } %>
 									<p class="text-secondary">sold by <span>
 											<%= item?.soldBy %>
 										</span>
 									</p>
 
-									<h5 class="priceTextColor">₹<%= item.price %>
+									<h5 class="priceTextColor" id="price">₹<%= item.price %>
 									</h5>
 
 									<div class="d-flex flex-wrap ">
 										<div class="dropdown ">
-											<a class="btn btn-outline-secondary rounded-pill dropdown-toggle m-1" href="#" role="button"
-												id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+											<a class="btn btn-outline-secondary rounded-pill dropdown-toggle m-1 dropdownQuantityBtn"
+												role="button" id="dropdownQuantityBtn" data-bs-toggle="dropdown" aria-expanded="false">
 												<%= item.quantity %>
 											</a>
 
 											<ul id="qtyDropDownUl" class="dropdown-menu overflow-scroll " aria-labelledby="dropdownMenuLink">
-												<% for(let i=1;i<15;i++){ %>
-													<li><a class="dropdown-item">
-															<%= i %>
-														</a></li>
+												<% for(let i=1;i<= 15;i++){ %>
+													<li>
+														<a class="dropdown-item dropdownNumber" data-quantity="<%= i %>"
+															data-productId=<%=item.productId %>
+															data-currentQuantity = <%= item.quantity %>
+																>
+																<%= i %>
+														</a>
+													</li>
 													<% } %>
 											</ul>
 										</div>
@@ -120,7 +124,7 @@
 									</div>
 					</div>
 				</div>
-			<% } %>
+				<% } %>
 		</section>
 
 		<!-- * price details -->

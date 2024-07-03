@@ -9,25 +9,19 @@ $(function () {
 
   function handleAddToCart() {
     const productId = $(this).attr("data-id")
-    const productPrice = parseFloat($(this).attr("data-price"))
-
-    if (localStorage.getItem('cart')) {
-      const cart = JSON.parse(localStorage.getItem('cart'))
-      cart[productId] = {
-        productId,
-        quantity: cart[productId]?.quantity ? cart[productId].quantity+ 1 : 1,
-        price:  cart[productId]?.price ? parseFloat(cart[productId].price) + productPrice : productPrice,
+    $.ajax({
+      url: '/cart/',
+      method: 'PATCH',
+      data: {productId},
+      success: function (data) {
+        console.log(data)
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
       }
-      localStorage.setItem('cart', JSON.stringify(cart))
-    } else {
-      const newCart = {}
-      newCart[productId] = {
-        productId,
-        quantity: 1,
-        price: productPrice,
-      }
-      localStorage.setItem('cart',JSON.stringify(newCart))
-    }
+    })
 
   }
 
