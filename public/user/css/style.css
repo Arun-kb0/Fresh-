@@ -166,3 +166,24 @@
 .addAddressCard{
   background-color: #F0F2F2;
 }
+
+/* * cart  */
+.cartImage{
+  width: 160px;
+    height: 160;
+    padding: 12px;
+    object-fit: cover;
+    overflow: hidden,
+}
+
+#qtyDropDownUl{
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
+#priceDetails{
+  max-height: 200px;
+  overflow: auto;
+}
+
+

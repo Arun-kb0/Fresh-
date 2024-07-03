@@ -48,7 +48,7 @@
 		</div>
 	</div>
 	<!-- end search arewa -->
-
+<!-- * product details -->
 	<div class="container d-sm-flex flex-sm-row flex-cloumn col-12 my-5 singleProductContainer">
 		<!-- * image -->
 		<section class="d-flex col-4 py-5 productImageSection">
@@ -67,7 +67,14 @@
 					<div id="magnifier"></div>
 				</div>
 				<div class="d-flex justify-content-center">
-					<button class="btn btn-outline-primary rounded-pill w-100 px-3"> add to cart</button>
+					<button
+					 class="btn btn-outline-primary rounded-pill w-100 px-3 addToCart" 
+					data-id="<%= product._id %>"
+					data-price = "<%= product.finalPrice %>"
+					data-name = "<%= product.name %>"
+					data-stock = "<%= product.stock %>"
+					data-soldBy = "<%= product.productInfo?.soldBy %>"
+					> add to cart</button>
 				</div>
 			</div>
 			<!-- * zoom content end -->
@@ -239,6 +246,7 @@
 		</section>
 		<!-- *end  details -->
 	</div>
+<!-- * product details -->
 
 
 	<!-- * suggestions -->
@@ -290,7 +298,14 @@
 									<%= item.peopleRated %>
 								</span>
 							</div>
-							<button class="btn btn-outline-secondary rounded-pill">
+							<button 
+							class="btn btn-outline-secondary rounded-pill addToCartBtn"
+								data-id="<%= item._id %>"
+								data-price = "<%= item.finalPrice %>"
+								data-name = "<%= item.name %>"
+								data-stock = "<%= item.stock %>"
+								data-soldBy = "<%= item.productInfo?.soldBy %>"
+							 >
 								<span>Add</span>
 							</button>
 						</div>
@@ -301,7 +316,6 @@
 			</div>
 		</section>
 	</div>
-
 	<!-- * suggestions end -->
 
 

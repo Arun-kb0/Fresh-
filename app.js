@@ -20,6 +20,7 @@ const { logger } = require('./src/middleware/loggerMiddleware')
 require('./src/config/passportGoogleConfig')
 require('./src/config/passportFacebookConfig')
 const profileRouter  = require('./src/routes/user/profileRoutes')
+const cartRouter = require('./src/routes/user/cartRoutes')
 
 const PORT = process.env.PORT || 3000
 const app = express()
@@ -64,7 +65,7 @@ app.use('/admin', auth, adminCheck, adminRouter)
 // app.use('/', userCheck, productRouter)
 app.use('/', userCheck, productRouter)
 app.use('/profile', profileRouter)
-
+app.use('/cart',cartRouter)
 
 
 

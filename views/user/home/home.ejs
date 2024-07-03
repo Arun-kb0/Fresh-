@@ -92,10 +92,13 @@
 										<%= item.peopleRated %>
 									</span>
 								</div>
-								<button class="btn btn-outline-secondary rounded-pill">
+								<button  class="btn btn-outline-secondary rounded-pill addToCartBtn"   
+									data-id="<%= item._id %>"
+								 	data-price = "<%= item.finalPrice %>"
+								 >
 									<span>Add</span>
 								</button>
-							</div>
+						</div>
 						</div>
 						<!-- * end card -->
 						<% } %>
@@ -150,7 +153,11 @@
 										<%= item.peopleRated %>
 									</span>
 								</div>
-								<button class="btn btn-outline-secondary rounded-pill">
+								<button 
+									class="btn btn-outline-secondary rounded-pill addToCartBtn" 
+									data-id="<%= item._id %>"
+									data-price = "<%= item.finalPrice %>"
+									>
 									<span>Add</span>
 								</button>
 							</div>
