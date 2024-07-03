@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description"
+		content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
+	<title>Single Product</title>
+
+	<!-- * product zoom css -->
+</head>
+
+<body class="marginTopForBody">
+
+	<!--PreLoader-->
+	<div class="loader">
+		<div class="loader-inner">
+			<div class="circle"></div>
+		</div>
+	</div>
+	<!--PreLoader Ends-->
+
+	<!-- * breadcrumbs -->
+	<div class="container">
+		<h3>My profile /<span class="orangeTextColor"> Edit user </span></h3>
+	</div>
+	<!-- * end breadcrumbs -->
+
+
+
+
+	<!-- search area -->
+	<div class="search-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="close-btn"><i class="fas fa-window-close"></i></span>
+					<div class="search-bar">
+						<div class="search-bar-tablecell">
+							<h3>Search For:</h3>
+							<input type="text" placeholder="Keywords">
+							<button type="submit">Search <i class="fas fa-search"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end search arewa -->
+
+	<!-- * user buttons -->
+	<div class=" container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
+
+
+		<section class="container">
+
+			<!-- * user datails -->
+			<div class="col-8 p-2 px-4 shadow rounded-3 mb-3">
+
+				<div class="d-flex justify-content-end">
+					<button id="editUserModalBtn" data-item="<%= user.userId %>" data-bs-toggle="modal"
+						data-bs-target="#editModal" class="editAddressModelBtn btn btn-outline-primary">
+						<i class="fa-solid fa-pen-to-square"></i>
+					</button>
+				</div>
+
+				<div class="mt-5">
+					<p>Name</p>
+					<h5>
+						<%= user.name %>
+					</h5>
+				</div>
+				<hr />
+				<div class=" ">
+					<p>email</p>
+					<h5>
+						<%= user.username %>
+					</h5>
+				</div>
+				<hr />
+
+			</div>
+
+
+
+
+			<!-- * edit model -->
+			<div class=" modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+				aria-labelledby="editModal" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-scrollable position-relative">
+
+					<!-- * alert -->
+					<div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+						<div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+						</div>
+					</div>
+					<!-- * alert end -->
+
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="staticBackdropLabel">Edit user</h5>
+							<button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+
+						<div class="modal-body">
+							<form id="editForm" method="POST" onsubmit="return false">
+								<div class="row d-felx flex-column align-content-center ">
+									<div class="mb-3 col-10">
+										<label for="Name" class="form-label">Name</label>
+										<input class="form-control" type="text" id="Name" name="name" value="" autofocus />
+										<span id="small" class="opacity-0"></span>
+									</div>
+
+									<% if(user?.provider!=='google' ) {%>
+										<div class="mb-3 col-10">
+											<label for="username" class="form-label">email</label>
+											<input class="form-control" type="text" id="username" name="username" value="" autofocus />
+											<span id="small" class="opacity-0"></span>
+										</div>
+										<% } %>
+											<hr />
+
+											<% if(!user.provider) {%>
+												<h5>change password</h5>
+												<div class="mb-3 col-10">
+													<label for="password" class="form-label">password</label>
+													<input class="form-control" type="text" id="password" name="password" value="" autofocus />
+													<span id="small" class="opacity-0"></span>
+												</div>
+												<div class="mb-3 col-10">
+													<label for="confirmPassword" class="form-label">confirm password</label>
+													<input class="form-control" type="text" id="confirmPassword" name="confirmPassword" value=""
+														autofocus />
+													<span id="small" class="opacity-0"></span>
+												</div>
+												<% } %>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
+							<button id="editUserBtn" type="submit" class="btn btn-primary">update address</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- * edit modal end -->
+
+
+		</section>
+	</div>
+	<!-- * user buttons -->
+
+
+
+	<!-- footer -->
+	<div class="footer-area">
+		<div class="container">
+
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box about-widget">
+					<h2 class="widget-title">About us</h2>
+					<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+						laudantium, totam rem aperiam, eaque ipsa quae.</p>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box get-in-touch">
+					<h2 class="widget-title">Get in Touch</h2>
+					<ul>
+						<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+						<li>support@fruitkha.com</li>
+						<li>+00 111 222 3333</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box pages">
+					<h2 class="widget-title">Pages</h2>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="about.html">About</a></li>
+						<li><a href="services.html">Shop</a></li>
+						<li><a href="news.html">News</a></li>
+						<li><a href="contact.html">Contact</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box subscribe">
+					<h2 class="widget-title">Subscribe</h2>
+					<p>Subscribe to our mailing list to get the latest updates.</p>
+					<form action="index.html">
+						<input type="email" placeholder="Email">
+						<button type="submit"><i class="fas fa-paper-plane"></i></button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<!-- end footer -->
+
+	<!-- copyright -->
+	<div class="copyright">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-12">
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.<br>
+						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
+					</p>
+				</div>
+				<div class="col-lg-6 text-right col-md-12">
+					<div class="social-icons">
+						<ul>
+							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<% scriptBlock=` <script src="/static/user/scripts/user.js">
+		</script>
+		<script src="/static/user/scripts/EditProfile.js"></script>
+		`
+		%>
+
+</body>
+
+</html>

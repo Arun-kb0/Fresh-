@@ -1,9 +1,11 @@
+const { sessionCookieMaxAge } = require("../../config/sessionConfig")
 const CustomError = require("../../constants/CustomError")
 const { OK, NOT_FOUND, BAD_REQUEST } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const addressModel = require("../../model/addressModel")
 const productModel = require("../../model/productModel")
-
+const userModel = require("../../model/userModel")
+const bcrypt = require('bcrypt')
 
 const getProfileController = async (req, res, next) => {
   const { page = 1 } = req.query
@@ -144,6 +146,62 @@ const getSingleAddressController = async (req, res, next) => {
   }
 }
 
+// * edit profile
+const getUserDetailsPageController = async (req, res, next) => {
+  try {
+    const cookieUser = JSON.parse(req.cookies?.user)
+    const user = await userModel.findOne({ userId: cookieUser.userId})
+    res.render('user/profile/editUser', { ...viewUsersPage, user: user })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getUserDetailsController = async (req, res, next) => {
+  try {
+    const cookieUser = JSON.parse(req.cookies?.user)
+    const user = await userModel.findOne({ userId: cookieUser.userId })
+    res.status(OK).json({message:"get user details success", user: user })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const editUserController = async (req, res, next) => {
+  const { userId, name, username, password } = req.body
+  try {
+    let updateField={}
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10)
+      updateField.password = hashedPassword
+    }
+    if(name) updateField.name = name
+    if (username) updateField.username = username
+    
+    const editedUser = await userModel.findOneAndUpdate(
+      { userId },
+      {...updateField},
+      { new: true }
+    )
+
+    const sessionUser = {
+      userId: editedUser.userId,
+      name: editedUser.name,
+      username: editedUser.username,
+      isAdmin: false,
+      provider: null
+    }
+    res.cookie(
+      'user',
+      JSON.stringify(sessionUser),
+      { maxAge: sessionCookieMaxAge }
+    )
+    
+    res.status(OK).json({ message: "edit user success", user: editedUser })
+  } catch (error) {
+    next(error)
+  }
+}
 
 
 module.exports = {
@@ -152,5 +210,9 @@ module.exports = {
   createAddressController,
   editAddressController,
   deleteAddressController,
-  getSingleAddressController
+  getSingleAddressController,
+
+  editUserController,
+  getUserDetailsController,
+  getUserDetailsPageController
 }

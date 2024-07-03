@@ -172,7 +172,7 @@ $(function () {
   // * db operations functions end
 
 
-  // * set edit input values
+  // * set input values
   function setEditInputs(address) {
     $('#editForm input').each(function () {
       const input = $(this);
@@ -180,7 +180,7 @@ $(function () {
       input.val(address[inputName])
     });
   }
-  // * get create inputs values
+  // * get inputs values
   function getFromInputs(formInputs) {
     const data = {}
     formInputs.each(function () {

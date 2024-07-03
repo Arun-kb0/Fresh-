@@ -6,6 +6,9 @@ const {
   editAddressController,
   deleteAddressController,
   getSingleAddressController,
+  getUserDetailsController,
+  editUserController,
+  getUserDetailsPageController,
   
  } = require('../../controllers/user/profileController')
 const router = express.Router()
@@ -20,5 +23,11 @@ router.route('/address')
   .delete(deleteAddressController)
 
 router.get('/singleaddress', getSingleAddressController)
+
+// * edit profile
+router.route("/user")
+  .get(getUserDetailsPageController)
+  .patch(editUserController)
+router.get('/userdetails', getUserDetailsController)
 
 module.exports = router
