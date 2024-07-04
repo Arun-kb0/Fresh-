@@ -4,11 +4,13 @@ const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
 const CustomError = require('../../constants/CustomError')
 
+
 const getCartPageController = async (req, res, next) => {
   try {
     // const cartItems = await productModel.findOne({ _id: "667e9da58819d87666e99ae5" })
     const user = JSON.parse(req.cookies.user)
 
+    const deliveryFee = 10
     const cartWithDetails = await cartModel.aggregate([
       { $match: { userId: user.userId } },
       { $unwind: "$products" },
@@ -30,7 +32,8 @@ const getCartPageController = async (req, res, next) => {
           productName: "$productDetails.name",
           image: "$productDetails.image.path", // Extract single image path
           soldBy: "$productDetails.productInfo.soldBy", // Extract soldBy
-          stock: "$productDetails.stock"
+          stock: "$productDetails.stock",
+          productTotalPrice: { $multiply: ["$products.quantity", "$products.price"] }
         }
       },
       {
@@ -46,11 +49,22 @@ const getCartPageController = async (req, res, next) => {
               soldBy: "$soldBy",
               stock: "$stock"
             }
-          }
+          },
+          totalItems: { $sum: 1 },
+          totalQuantity: { $sum: "$products.quantity" },
+          totalPrice: { $sum: "$productTotalPrice" } 
+        }
+      },
+      {
+        $addFields: {
+          totalItems: "$totalItems",
+          totalQuantity: "$totalQuantity",
+          subTotalPrice: "$totalPrice",
+          deliveryFee: deliveryFee,
+          totalPrice: { $add: ["$totalPrice", deliveryFee] }
         }
       }
     ]);
-
 
     // res.status(OK).json({ cart: cartWithDetails[0] })
     res.render('user/cart/cart', { ...viewUsersPage, cart: cartWithDetails[0] })

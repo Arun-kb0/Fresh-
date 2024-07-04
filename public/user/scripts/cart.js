@@ -1,6 +1,8 @@
 $(function () {
 
   const dropDownNumber = $(".dropdownNumber")
+  const priceDetails = $("#priceDetails")
+
 
   dropDownNumber.on("click", handleCartItemQty)
 
@@ -19,7 +21,20 @@ $(function () {
     const price = cardBody.find('#price')
     const dropDownBtn = dropDown.find("#dropdownQuantityBtn")
 
-    let cart = {}
+    const totalItems = priceDetails.find("#totalItems")
+    const subTotal = priceDetails.find("#subTotal")
+    const total = priceDetails.find("#total")
+    const deliveryFee = priceDetails.find("#deliveryFee")
+
+    // let totalItemsValue = parseInt(totalItems.text())
+    // let subTotalValue = parseInt(subTotal.text())
+    let deliveryFeeValue = parseInt(deliveryFee.text())
+    let totalValue = parseInt(total.text())
+
+    console.log(totalValue)
+    console.log(total.html())
+    console.log(deliveryFeeValue)
+
     $.ajax({
       url: '/cart/updateqty',
       method: 'PATCH',
@@ -27,11 +42,18 @@ $(function () {
       success: function (data) {
         if (data?.cart) {
           dropDownBtn.text(quantity)
+          let totalItemsValue=0
+          let subTotalValue =0
           for (const product of data.cart.products) {
             if (product.productId === productId) {
               price.text(`₹${product.price}`)
             }
+            totalItemsValue += 1
+            subTotalValue+= product.price
           }
+          totalItems.text(totalItemsValue)
+          subTotal.text(subTotalValue)
+          total.text(deliveryFeeValue + subTotalValue)
         } else {
           console.log("data no found")
         }

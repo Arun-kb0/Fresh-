@@ -19,7 +19,7 @@ passport.deserializeUser(async (userId, done) => {
       done(new Error("user id missing"), null)
     }
   } catch (error) {
-    done(err, null)
+    done(error, null)
   }
 })
 
@@ -42,12 +42,5 @@ passport.use(new GoogleStrategy({
 ));
 
 
-// passport.serializeUser((user, done) => {
-//   done(null, user)
-// })
-
-// passport.deserializeUser((user, done) => {
-//   done(null, user)
-// })
 
 module.exports = passport

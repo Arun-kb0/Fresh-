@@ -131,9 +131,10 @@
 		<section id="priceDetails"
 			class="position-sticky d-flex flex-column justify-content-between p-2 mx-2 shadow rounded-3 col-2">
 			<div class="p-3">
-				<p class="fs-5">total count</p>
-				<p class="fs-5">sub total count</p>
-				<p class="fs-5">total price</p>
+				<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems"><%=cart.totalItems %></span></h6>
+				<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal"><%=cart.subTotalPrice %></span></h6>
+				<h6 class="text-secondary">Delivery Fee :  ₹<span class="fs-5" id="deliveryFee"><%= cart.deliveryFee %></span></h6>
+				<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total" ><%=cart.totalPrice %></span></h5>
 			</div>
 			<button class="btn btn-info rounded-pill">proceed to buy</button>
 		</section>
