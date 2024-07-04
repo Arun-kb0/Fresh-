@@ -192,10 +192,105 @@ const deleteItemFromCartController = async (req, res, next) => {
 }
 
 
+const getCheckoutPageController = async (req, res, next) => {
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const deliveryFee = 10
+
+    const cartWithDetails = await cartModel.aggregate([
+      { $match: { userId: user.userId } },
+      { $unwind: "$products" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productId",
+          foreignField: "_id",
+          as: "productDetails"
+        }
+      },
+      { $unwind: "$productDetails" },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          "products.quantity": 1,
+          "products.productId": 1,
+          productName: "$productDetails.name",
+          image: { $arrayElemAt: ["$productDetails.image.path", 0] },
+          soldBy: "$productDetails.productInfo.soldBy", 
+          stock: "$productDetails.stock",
+          productTotalPrice: { $multiply: ["$products.quantity", "$products.price"] }
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          products: {
+            $push: {
+              productId: "$products.productId",
+              name: "$productName",
+              quantity: "$products.quantity",
+              price: "$products.price",
+              image: "$image",
+              soldBy: "$soldBy",
+              stock: "$stock"
+            }
+          },
+          totalItems: { $sum: 1 },
+          totalQuantity: { $sum: "$products.quantity" },
+          subTotalPrice: { $sum: "$productTotalPrice" }
+        }
+      },
+      {
+        $addFields: {
+          deliveryFee: deliveryFee,
+          totalPrice: { $add: ["$subTotalPrice", deliveryFee] }
+        }
+      },
+      {
+        $lookup: {
+          from: "addresses",
+          localField: "userId",
+          foreignField: "userId",
+          as: "addresses"
+        }
+      },
+      {
+        $project: {
+          totalItems: 1,
+          totalQuantity: 1,
+          subTotalPrice: 1,
+          deliveryFee: 1,
+          totalPrice: 1,
+          addresses: {
+            $filter: {
+              input: "$addresses",
+              as: "address",
+              cond: { $eq: ["$$address.isDeleted", false] }
+            }
+          }
+        }
+      }
+    ]);
+
+    // console.log(cartWithDetails);
+
+    // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
+    res.render('user/cart/checkout', {
+      ...viewUsersPage,
+      checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
+    }) 
+  } catch (error) {
+    next(error)
+  }
+} 
+
 
 module.exports = {
   getCartPageController,
   addToCartController,
   updateQuantityController,
-  deleteItemFromCartController
+  deleteItemFromCartController,
+  getCheckoutPageController
 }

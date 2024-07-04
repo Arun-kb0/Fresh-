@@ -23,7 +23,7 @@
 
 	<!-- * breadcrumbs -->
 	<div class="container">
-		<h3><span class="orangeTextColor"> Cart </span></h3>
+		<h3>Cart /<span class="orangeTextColor"> checkout </span></h3>
 	</div>
 	<!-- * end breadcrumbs -->
 
@@ -57,105 +57,130 @@
 	</div>
 	<!-- * alert end -->
 
-	<% if(cart) {%>
 
 	<!-- * user cart -->
 	<div class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 ">
 
-		<!-- * card section -->
-		<section class="col-7 ">
-			<% for(const item of cart.products) {%>
+		<div class="col-7">
+			<!-- * addresses -->
+			<section class="col-12 form-check">
+				<h4 class="addressTitle rounded-top p-2 text-center text-info">Your addresses</h4>
+				<% let i=1 %>
+					<% for(const item of checkoutCart.addresses){ %>
+						<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+
+							<div class="card-body mx-3 d-flex flex-column ">
+								<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+								<label class="form-check-label h6 mx-3 mt-1" for="flexRadioDefault2">
+									Address <%= i++ %>
+								</label>
+
+								<span class="text-secondary fs-5 ">
+									<%= item.name %>
+								</span>
+								<span class="text-secondary fs-5 ">
+									<%= item.flatNo %>
+								</span>
+								<span class="text-secondary fs-5 ">
+									<%= item.phone %>
+								</span>
+								<span class="text-secondary fs-5 ">
+									<%= item.email %>
+								</span>
+								<span class="text-secondary fs-5 ">
+									<%= item.place %> ,
+										<%= item.city %> ,
+											<%= item.state %> ,
+												<%= item.country %> ,
+								</span>
+								<span class="text-secondary">
+									<%= item.pinCode %>
+								</span>
+
+							</div>
+						</div>
+						<% } %>
+
+			</section>
+			<!-- * addresses end -->
+
+			<!-- * payment -->
+			<section class="col-12 my-5 form-check">
+				<h4 class="addressTitle rounded-top p-2 text-center text-info">Payment</h4>
 				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
-
-					<div class="d-flex mx-2 align-items-center justify-content-center">
-						<a class="btn btn-outline-info active">
-							<i class="fa-solid fa-check"></i>
-						</a>
-					</div>
-
-					<img class="cartImage shadow-sm rounded-3 m-2" src="<%= item.image[0] %>" class="card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title" id="name">
-							<%= item.name %>
-						</h5>
-						<% if(item.stock> 0) {%>
-							<small class="text-secondary" id="stock" >In stock</small>
-							<% } else { %>
-								<small class="text-danger" id="stock">out of stock</small>
-								<% } %>
-									<p class="text-secondary">sold by <span>
-											<%= item?.soldBy %>
-										</span>
-									</p>
-
-									<h5 class="priceTextColor" id="price">₹<%= item.price %>
-									</h5>
-
-									<div class="d-flex flex-wrap ">
-										<div class="dropdown ">
-											<a class="btn btn-outline-secondary rounded-pill dropdown-toggle m-1 dropdownQuantityBtn"
-												role="button" id="dropdownQuantityBtn" data-bs-toggle="dropdown" aria-expanded="false">
-												<%= item.quantity %>
-											</a>
-
-											<ul id="qtyDropDownUl" class="dropdown-menu overflow-scroll " aria-labelledby="dropdownMenuLink">
-												<% for(let i=1;i<= 15;i++){ %>
-													<li>
-														<a class="dropdown-item dropdownNumber" data-quantity="<%= i %>"
-															data-productId=<%=item.productId %>
-															data-currentQuantity = <%= item.quantity %>
-																>
-																<%= i %>
-														</a>
-													</li>
-													<% } %>
-											</ul>
-										</div>
-
-										<a  class="btn btn-outline-danger rounded-circle m-1 deleteCartItemBtn" data-productId =<%= item.productId  %> >
-											<i class="fa-solid fa-trash"></i>
-										</a>
-										<a href="#" class="btn btn-outline-info rounded-circle m-1">
-											<i class="fa-solid fa-bookmark"></i>
-										</a>
-										<a href="#" class="btn btn-outline-info rounded-pill m-1">See more like this</a>
-										<a href="#" class="btn btn-outline-info rounded-circle m-1">
-											<i class="fa-solid fa-share-nodes"></i>
-										</a>
-
-									</div>
+					<div class="card-body mx-3 d-flex flex-column">
+						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn" checked>
+						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn">
+							wallet
+						</label>
+						<span class="text-secondary h6 mx-2">
+							Available amount : ₹2000
+						</span>
 					</div>
 				</div>
-				<% } %>
-		</section>
+				<hr class="my-1">
+
+				<h5>Other payment methods</h5>
+				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+					<div class="card-body mx-3 d-flex flex-column">
+						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn" checked>
+						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn">
+							Razor pay
+						</label>
+						<span class="text-info h6 mx-2">
+							<i class="fa-brands fa-cc-mastercard fa-2x "></i>
+							<i class="fa-solid fa-credit-card fa-2x ml-1"></i>
+							<i class="fa-brands fa-google-pay fa-2x ml-1"></i>
+							<i class="fa-brands fa-amazon-pay fa-2x ml-1"></i>
+							<i class="fa-brands fa-apple-pay fa-2x ml-1"></i>
+						</span>
+					</div>
+				</div>
+
+				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+					<div class="card-body mx-3 d-flex flex-column">
+						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn" checked>
+						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn">
+							Pay on delivery / Cash on delivery
+						</label>
+						<span class="text-secondary h6 mx-2">
+							Cash , upi and cards accepted
+						</span>
+					</div>
+				</div>
+
+			</section>
+			<!-- * payment end -->
+
+			<div class="d-flex justify-content-center">
+				<button class="btn btn-info btn-lg rounded-pill px-3 p-1">Place order</button>
+			</div>
+		</div>
+
 
 		<!-- * price details -->
 		<section id="priceDetails"
-			class="position-sticky d-flex flex-column justify-content-between p-2 mx-2 shadow rounded-3 col-2">
+			class="position-sticky mt-3 d-flex flex-column justify-content-between p-2 mx-2 shadow rounded-3 col-2">
 			<div class="p-3">
-				<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems"><%=cart.totalItems %></span></h6>
-				<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal"><%=cart.subTotalPrice %></span></h6>
-				<h6 class="text-secondary">Delivery Fee :  ₹<span class="fs-5" id="deliveryFee"><%= cart.deliveryFee %></span></h6>
-				<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total" ><%=cart.totalPrice %></span></h5>
+				<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
+						<%=checkoutCart.totalItems %>
+					</span></h6>
+				<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
+						<%=checkoutCart.subTotalPrice %>
+					</span></h6>
+				<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
+						<%= checkoutCart.deliveryFee %>
+					</span></h6>
+				<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total">
+						<%=checkoutCart.totalPrice %>
+					</span></h5>
 			</div>
-			<a href="/cart/checkout" class="btn btn-info rounded-pill" >checkout</a>
+			<button class="btn btn-info rounded-pill">Place order</button>
 		</section>
 
 	</div>
 
-	<% } else{ %>
-		<!-- * cart empty section -->
-		<section class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 ">
-			<div>
-				<h3 class="text-secondary" > your cart is empty</h3>
-				<div class="d-flex justify-content-center">
-					<a href="/"  class="btn btn-outline-info shadow rounded-pill"> Add items </a>
-				</div>
-			</div>
-		</section>
-		<!-- * cart empty section end-->
 
-	<% } %>
 
 
 

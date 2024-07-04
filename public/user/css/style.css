@@ -5,6 +5,7 @@
 .navbarColor {
   background-color: #051922
 }
+
 /* 
 .categoryBar{
   height: auto;
@@ -118,9 +119,8 @@
   position: sticky;
 }
 
-.singleProductContainer ,
-.profileContainer
-{
+.singleProductContainer,
+.profileContainer {
   position: relative !important;
   min-height: 100vh;
   justify-content: center;
@@ -158,32 +158,41 @@
   width: 350px;
 }
 
-.btnTitle{
+.btnTitle {
   line-height: 0.5rem;
 }
 
 /* * address add card */
-.addAddressCard{
+.addAddressCard {
   background-color: #F0F2F2;
 }
 
 /* * cart  */
-.cartImage{
+.cartImage {
   width: 160px;
-    height: 160;
-    padding: 12px;
-    object-fit: cover;
-    overflow: hidden,
+  height: 160;
+  padding: 12px;
+  object-fit: cover;
+  overflow: hidden,
 }
 
-#qtyDropDownUl{
+#qtyDropDownUl {
   max-height: 150px;
   overflow-y: scroll;
 }
 
-#priceDetails{
+#priceDetails {
   max-height: 225px;
   overflow: auto;
 }
 
+/* * checkout  */
 
+.addressTitle {
+  background-color: #F0F2F2;
+}
+
+.form-check-input{
+  width: 20px;
+  height: 20px;
+}
