@@ -3,14 +3,13 @@ const { viewUsersPage } = require("../../constants/pageConfid")
 const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
 const CustomError = require('../../constants/CustomError')
-
+const mongoose = require('mongoose')
 
 const getCartPageController = async (req, res, next) => {
   try {
-    // const cartItems = await productModel.findOne({ _id: "667e9da58819d87666e99ae5" })
     const user = JSON.parse(req.cookies.user)
-
     const deliveryFee = 10
+
     const cartWithDetails = await cartModel.aggregate([
       { $match: { userId: user.userId } },
       { $unwind: "$products" },
@@ -52,7 +51,7 @@ const getCartPageController = async (req, res, next) => {
           },
           totalItems: { $sum: 1 },
           totalQuantity: { $sum: "$products.quantity" },
-          totalPrice: { $sum: "$productTotalPrice" } 
+          totalPrice: { $sum: "$productTotalPrice" }
         }
       },
       {
@@ -67,7 +66,10 @@ const getCartPageController = async (req, res, next) => {
     ]);
 
     // res.status(OK).json({ cart: cartWithDetails[0] })
-    res.render('user/cart/cart', { ...viewUsersPage, cart: cartWithDetails[0] })
+    res.render('user/cart/cart', {
+      ...viewUsersPage,
+      cart: cartWithDetails.length>0 ? cartWithDetails[0] : null
+     }) 
   } catch (error) {
     next(error)
   }
@@ -170,10 +172,30 @@ const updateQuantityController = async (req, res, next) => {
   }
 }
 
+const deleteItemFromCartController = async (req, res, next) => {
+  const { productId } = req.body
+  try {
+    if (!mongoose.isObjectIdOrHexString(productId)) {
+      throw new CustomError('invalid productId', BAD_REQUEST)
+    }
+    const user = JSON.parse(req.cookies.user)
+    updatedCart = await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $pull: { products: { productId: productId } } },
+      { new: true }
+    ).populate('products.productId', 'image productInfo.soldBy stock');
+
+    res.status(OK).json({ message: "item deleted from cart", cart: updatedCart })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 
 module.exports = {
   getCartPageController,
   addToCartController,
-  updateQuantityController
+  updateQuantityController,
+  deleteItemFromCartController
 }

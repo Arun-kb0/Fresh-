@@ -57,6 +57,8 @@
 	</div>
 	<!-- * alert end -->
 
+	<% if(cart) {%>
+
 	<!-- * user cart -->
 	<div class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 ">
 
@@ -110,7 +112,7 @@
 											</ul>
 										</div>
 
-										<a href="#" class="btn btn-outline-danger rounded-circle m-1 ">
+										<a  class="btn btn-outline-danger rounded-circle m-1 deleteCartItemBtn" data-productId =<%= item.productId  %> >
 											<i class="fa-solid fa-trash"></i>
 										</a>
 										<a href="#" class="btn btn-outline-info rounded-circle m-1">
@@ -141,6 +143,19 @@
 
 	</div>
 
+	<% } else{ %>
+		<!-- * cart empty section -->
+		<section class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 ">
+			<div>
+				<h3 class="text-secondary" > your cart is empty</h3>
+				<div class="d-flex justify-content-center">
+					<a href="/"  class="btn btn-outline-info shadow rounded-pill"> Add items </a>
+				</div>
+			</div>
+		</section>
+		<!-- * cart empty section end-->
+
+	<% } %>
 
 
 

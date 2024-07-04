@@ -2,7 +2,8 @@ const express = require('express')
 const {
   getCartPageController,
   addToCartController,
-  updateQuantityController
+  updateQuantityController,
+  deleteItemFromCartController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -12,6 +13,7 @@ router.route('/')
   .patch(addToCartController)
 
 router.patch('/updateqty', updateQuantityController)
+router.delete('/deleteitem', deleteItemFromCartController)
 
 
 module.exports = router
