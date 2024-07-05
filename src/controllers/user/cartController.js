@@ -1,9 +1,11 @@
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/httpStatusCodes")
+const { OK, BAD_REQUEST, NOT_FOUND, CREATED } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
 const CustomError = require('../../constants/CustomError')
 const mongoose = require('mongoose')
+const addressModel = require("../../model/addressModel")
+const orderModel = require("../../model/orderModel")
 
 const getCartPageController = async (req, res, next) => {
   try {
@@ -68,8 +70,8 @@ const getCartPageController = async (req, res, next) => {
     // res.status(OK).json({ cart: cartWithDetails[0] })
     res.render('user/cart/cart', {
       ...viewUsersPage,
-      cart: cartWithDetails.length>0 ? cartWithDetails[0] : null
-     }) 
+      cart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
+    })
   } catch (error) {
     next(error)
   }
@@ -217,7 +219,7 @@ const getCheckoutPageController = async (req, res, next) => {
           "products.productId": 1,
           productName: "$productDetails.name",
           image: { $arrayElemAt: ["$productDetails.image.path", 0] },
-          soldBy: "$productDetails.productInfo.soldBy", 
+          soldBy: "$productDetails.productInfo.soldBy",
           stock: "$productDetails.stock",
           productTotalPrice: { $multiply: ["$products.quantity", "$products.price"] }
         }
@@ -274,17 +276,57 @@ const getCheckoutPageController = async (req, res, next) => {
       }
     ]);
 
-    // console.log(cartWithDetails);
+    // console.log(cartWithDetails[0].addresses);
 
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
     res.render('user/cart/checkout', {
       ...viewUsersPage,
       checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
-    }) 
+    })
   } catch (error) {
     next(error)
   }
-} 
+}
+
+
+const orderUsingCodController = async (req, res, next) => {
+  const { addressId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+
+    if (!mongoose.isObjectIdOrHexString(addressId)) {
+      throw new CustomError("invalid address id", BAD_REQUEST)
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      throw new CustomError('Address not found', BAD_REQUEST);
+    }
+
+    const cart = await cartModel.findOne({ userId: user.userId });
+    if (!cart || cart.products.length === 0) {
+      throw new CustomError('Cart is empty', BAD_REQUEST);
+    }
+
+    const total = cart.products.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const newOrder = await orderModel.create({
+      addressId: address._id,
+      OrderStatus: 'Pending',
+      products: cart.products,
+      total: total,
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Pending',
+      userId: user.userId
+    });
+
+    await cartModel.findOneAndUpdate({ userId: user.userId }, { products: [] });
+
+    res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    next(error)
+  }
+}
 
 
 module.exports = {
@@ -292,5 +334,6 @@ module.exports = {
   addToCartController,
   updateQuantityController,
   deleteItemFromCartController,
-  getCheckoutPageController
+  getCheckoutPageController,
+  orderUsingCodController
 }

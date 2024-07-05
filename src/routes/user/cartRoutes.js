@@ -4,7 +4,8 @@ const {
   addToCartController,
   updateQuantityController,
   deleteItemFromCartController,
-  getCheckoutPageController
+  getCheckoutPageController,
+  orderUsingCodController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -16,8 +17,9 @@ router.route('/')
 router.patch('/updateqty', updateQuantityController)
 router.delete('/deleteitem', deleteItemFromCartController)
 
-router.route('/checkout')
-  .get(getCheckoutPageController)
+router.get('/checkout', getCheckoutPageController)
+
+router.post('/placeordercod',orderUsingCodController)
 
 
 module.exports = router
