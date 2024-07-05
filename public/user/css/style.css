@@ -196,3 +196,14 @@
   width: 20px;
   height: 20px;
 }
+
+/* * profile orders page */
+.imageCollection {
+  width: 100px;
+  height: 100px;
+}
+
+.imageCollection img{
+  width: 50%;
+  height: 50%;
+}

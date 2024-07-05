@@ -312,10 +312,10 @@ const orderUsingCodController = async (req, res, next) => {
 
     const newOrder = await orderModel.create({
       addressId: address._id,
-      OrderStatus: 'Pending',
+      orderStatus: 'Pending',
       products: cart.products,
       total: total,
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'cod',
       paymentStatus: 'Pending',
       userId: user.userId
     });

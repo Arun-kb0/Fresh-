@@ -9,6 +9,7 @@ const {
   getUserDetailsController,
   editUserController,
   getUserDetailsPageController,
+  getAllOrdersPageController,
   
  } = require('../../controllers/user/profileController')
 const router = express.Router()
@@ -29,5 +30,7 @@ router.route("/user")
   .get(getUserDetailsPageController)
   .patch(editUserController)
 router.get('/userdetails', getUserDetailsController)
+
+router.get('/orders', getAllOrdersPageController)
 
 module.exports = router

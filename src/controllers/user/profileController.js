@@ -6,6 +6,8 @@ const addressModel = require("../../model/addressModel")
 const productModel = require("../../model/productModel")
 const userModel = require("../../model/userModel")
 const bcrypt = require('bcrypt')
+const orderModel = require('../../model/orderModel')
+const mongoose  = require("mongoose")
 
 const getProfileController = async (req, res, next) => {
   const { page = 1 } = req.query
@@ -150,7 +152,7 @@ const getSingleAddressController = async (req, res, next) => {
 const getUserDetailsPageController = async (req, res, next) => {
   try {
     const cookieUser = JSON.parse(req.cookies?.user)
-    const user = await userModel.findOne({ userId: cookieUser.userId})
+    const user = await userModel.findOne({ userId: cookieUser.userId })
     res.render('user/profile/editUser', { ...viewUsersPage, user: user })
   } catch (error) {
     next(error)
@@ -161,7 +163,7 @@ const getUserDetailsController = async (req, res, next) => {
   try {
     const cookieUser = JSON.parse(req.cookies?.user)
     const user = await userModel.findOne({ userId: cookieUser.userId })
-    res.status(OK).json({message:"get user details success", user: user })
+    res.status(OK).json({ message: "get user details success", user: user })
   } catch (error) {
     next(error)
   }
@@ -170,17 +172,17 @@ const getUserDetailsController = async (req, res, next) => {
 const editUserController = async (req, res, next) => {
   const { userId, name, username, password } = req.body
   try {
-    let updateField={}
+    let updateField = {}
     if (password) {
       hashedPassword = await bcrypt.hash(password, 10)
       updateField.password = hashedPassword
     }
-    if(name) updateField.name = name
+    if (name) updateField.name = name
     if (username) updateField.username = username
-    
+
     const editedUser = await userModel.findOneAndUpdate(
       { userId },
-      {...updateField},
+      { ...updateField },
       { new: true }
     )
 
@@ -196,8 +198,65 @@ const editUserController = async (req, res, next) => {
       JSON.stringify(sessionUser),
       { maxAge: sessionCookieMaxAge }
     )
-    
+
     res.status(OK).json({ message: "edit user success", user: editedUser })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+const getAllOrdersPageController = async (req, res, next) => {
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const ordersWithProducts  = await orderModel.aggregate([
+      {
+        $match: {
+          userId: user.userId
+        }
+      },
+      {
+        $unwind: '$products'
+      },
+      {
+        $lookup: {
+          from: 'products', // collection name of products
+          localField: 'products.productId',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {
+        $set: {
+          'products.name': { $arrayElemAt: ['$productDetails.name', 0] },
+          'products.image': { $arrayElemAt: ['$productDetails.image', 0] }
+        }
+      },
+      {
+        $unset: 'productDetails'
+      },
+      {
+        $group: {
+          _id: '$_id',
+          userId: { $first: '$userId' },
+          addressId: { $first: '$addressId' },
+          orderStatus: { $first: '$orderStatus' },
+          total: { $first: '$total' },
+          paymentMethod: { $first: '$paymentMethod' },
+          coupon: { $first: '$coupon' },
+          paymentStatus: { $first: '$paymentStatus' },
+          products: { $push: '$products' },
+          createdAt: {$first: "$createdAt" }
+        }
+      },
+      {
+        $sort : { createdAt:-1}
+      }
+    ])
+
+    // res.status(OK).json({ orders:ordersWithProducts[0] })
+    
+    res.render('user/profile/orders', { orders: ordersWithProducts, ...viewUsersPage })
   } catch (error) {
     next(error)
   }
@@ -214,5 +273,7 @@ module.exports = {
 
   editUserController,
   getUserDetailsController,
-  getUserDetailsPageController
+  getUserDetailsPageController,
+
+  getAllOrdersPageController
 }
