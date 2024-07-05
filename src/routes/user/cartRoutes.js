@@ -19,7 +19,9 @@ router.delete('/deleteitem', deleteItemFromCartController)
 
 router.get('/checkout', getCheckoutPageController)
 
-router.post('/placeordercod',orderUsingCodController)
+router.post('/placeordercod', orderUsingCodController)
+
+
 
 
 module.exports = router

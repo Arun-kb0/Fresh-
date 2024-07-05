@@ -207,3 +207,9 @@
   width: 50%;
   height: 50%;
 }
+
+/* * order details */
+.orderDetailsImage{
+  width: 200px;
+  height: 200px;
+}

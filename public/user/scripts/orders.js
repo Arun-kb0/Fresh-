@@ -70,6 +70,7 @@ $(function () {
   })
   // * style order and payment states end
 
+  // * createdAt to readable date string
   createdAt.each(function () {
     const element = $(this)
     const elementValue = element.text().trim()
