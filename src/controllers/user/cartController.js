@@ -222,7 +222,7 @@ const getCheckoutPageController = async (req, res, next) => {
           image: { $arrayElemAt: ["$productDetails.image.path", 0] },
           soldBy: "$productDetails.productInfo.soldBy",
           stock: "$productDetails.stock",
-          productTotalPrice: { $multiply: ["$products.quantity", "$products.price"] }
+          productTotalPrice: "$products.price"
         }
       },
       {
@@ -277,7 +277,7 @@ const getCheckoutPageController = async (req, res, next) => {
       }
     ]);
 
-    // console.log(cartWithDetails[0].addresses);
+    // console.log(cartWithDetails[0]);
 
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
     res.render('user/cart/checkout', {
@@ -294,6 +294,8 @@ const orderUsingCodController = async (req, res, next) => {
   const { addressId } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
+    const deliveryFee = 10
+
 
     if (!mongoose.isObjectIdOrHexString(addressId)) {
       throw new CustomError("invalid address id", BAD_REQUEST)
@@ -309,7 +311,7 @@ const orderUsingCodController = async (req, res, next) => {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
 
-    const total = cart.products.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cart.products.reduce((sum, item) => sum + item.price , 0)+ deliveryFee
 
     // * decreasing stock
     for (const item of cart.products) {
