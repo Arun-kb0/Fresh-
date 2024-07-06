@@ -19,6 +19,7 @@ const {
   getAllCategoriesForDropDown
 } = require('../../controllers/admin/categoryController')
 const multer = require("multer")
+const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController } = require('../../controllers/admin/orderController')
 
 
 const router = express.Router()
@@ -68,6 +69,10 @@ router.route('/category/create')
   .post(upload.single("filename"),createCategoryController)
 
 
+router.route('/orders')
+  .get(getAllOrdersAdminPageController)
+router.patch('/order/orderstatus', changeOrderStatusController)
+router.patch('/order/paymentstatus', changePaymentStatusController)
 
 
 
