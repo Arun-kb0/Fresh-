@@ -1,4 +1,4 @@
-const { OK, BAD_REQUEST, NOT_FOUND, CREATED } = require("../../constants/httpStatusCodes")
+const { OK, BAD_REQUEST, NOT_FOUND, CREATED, CONFLICT } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
@@ -328,6 +328,37 @@ const orderUsingCodController = async (req, res, next) => {
   }
 }
 
+const cancelOrderController = async (req, res, next) => {
+  const { orderId } = req.body
+  try {
+    if (!mongoose.isObjectIdOrHexString(orderId)) {
+      throw new CustomError("invalid orderId", BAD_REQUEST)
+    }
+    const order = await orderModel.findOne({ _id: orderId })
+    if (order.orderStatus ==='Delivered') {
+      throw new CustomError("cannot cancel delivered order",BAD_REQUEST)
+    }
+    if (order.orderStatus ==='Cancelled') {
+      throw new CustomError("order already cancelled",CONFLICT)
+    }
+    console.log(order)
+    const cancelledOrder = await orderModel.findOneAndUpdate(
+      { _id: orderId },
+      {
+        $set: {
+          orderStatus: 'Cancelled',
+          paymentStatus: "Failed"
+        }
+      },
+      { new: true }
+    )
+    // console.log(cancelledOrder)
+    res.status(OK).json({ message: "order cancelled", order: cancelledOrder })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 module.exports = {
   getCartPageController,
@@ -335,5 +366,6 @@ module.exports = {
   updateQuantityController,
   deleteItemFromCartController,
   getCheckoutPageController,
-  orderUsingCodController
+  orderUsingCodController,
+  cancelOrderController
 }
