@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const addressModel = require("../../model/addressModel")
 const orderModel = require("../../model/orderModel")
 
+
 const getCartPageController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
@@ -310,6 +311,19 @@ const orderUsingCodController = async (req, res, next) => {
 
     const total = cart.products.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    // * decreasing stock
+    for (const item of cart.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError('Product not found', BAD_REQUEST);
+      }
+      if (product.stock < item.quantity) {
+        throw new CustomError(`Insufficient stock for product: ${product.name}`, BAD_REQUEST);
+      }
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
     const newOrder = await orderModel.create({
       addressId: address._id,
       orderStatus: 'Pending',
@@ -341,7 +355,17 @@ const cancelOrderController = async (req, res, next) => {
     if (order.orderStatus ==='Cancelled') {
       throw new CustomError("order already cancelled",CONFLICT)
     }
-    console.log(order)
+    
+    // * increasing stock
+    for (const item of order.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError(`Product not found for ID: ${item.productId}`, NOT_FOUND);
+      }
+      product.stock += item.quantity;
+      await product.save();
+    }
+
     const cancelledOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
       {
