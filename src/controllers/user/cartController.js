@@ -35,7 +35,7 @@ const getCartPageController = async (req, res, next) => {
           image: "$productDetails.image.path", // Extract single image path
           soldBy: "$productDetails.productInfo.soldBy", // Extract soldBy
           stock: "$productDetails.stock",
-          productTotalPrice: { $multiply: ["$products.quantity", "$products.price"] }
+          productTotalPrice: "$products.price" 
         }
       },
       {
