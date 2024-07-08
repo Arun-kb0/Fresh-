@@ -1,0 +1,34 @@
+<div class="col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke">
+  <div class="d-flex flex-column align-content-center">
+    <div class="d-flex justify-content-center">
+      <a class="cardImage" href="/product?productId=-itemIdValue">
+        <img src="-itemImagePath" alt="-itemOriginalImageName">
+      </a>
+    </div>
+    <h6> -itemNameValue </h6>
+    <h5 class="priceTextColor">₹ -itemFinalPrice
+    </h5>
+    <div class="d-flex justify-content-center">
+      <p class="text-secondary px-3 textLineTrough">₹ -itemPriceValue</p>
+      <p class="text-success px-3">20%</p>
+    </div>
+    <div class="d-flex align-items-baseline">
+      <div class="d-flex pb-3 px-3">
+        <% for(let i=0; i<5; i++) { %>
+          <% if(i < "-itemRatingValue") { %>
+            <i class="fa-solid fa-star fa-lg text-warning"></i>
+            <% } else { %>
+              <i class="fa-regular fa-star fa-lg text-warning"></i>
+              <% } %>
+                <% } %>
+      </div>
+      <span class="text-secondary">
+        -
+      </span>
+    </div>
+    <button class="btn btn-outline-secondary rounded-pill addToCartBtn" data-id="-itemIdValue"
+      data-price="-itemFinalPrice">
+      <span>Add</span>
+    </button>
+  </div>
+</div>

@@ -1,5 +1,9 @@
 $(function () {
 
+  // * event delegation for dynamically added btn
+  $(document).on('click', '.addToCartBtn', handleAddToCart);
+
+
   // * add to cart btn 
   const addToCartBtn = $(".addToCartBtn")
 
@@ -96,11 +100,13 @@ $(function () {
 
 
 // * add to cart btn 
-  function handleAddToCart() {
+  function handleAddToCart(event) {
     const productId = $(this).attr("data-id")
+    console.log(productId)
+    console.log(event)
     $.ajax({
       url: '/cart/',
-      method: 'PATCH',
+      method: 'PATCH',   
       data: { productId },
       success: function (data) {
         console.log(data)
