@@ -6,10 +6,20 @@ const objectId = mongoose.Schema.Types.ObjectId
 
 const ordersSchema = new Schema({
   userId: { type: String, required: true },
-  addressId: { type: objectId, required:true},
+  addressId: { type: objectId, required: true },
   orderStatus: {
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+    enum: [
+      'Pending',
+      'Processing',
+      'Shipped',
+      'Delivered',
+      'Cancelled',
+      'Returned',
+      'Return Requested',
+      'Return Approved',
+      'Returned',
+    ],
     required: true
   },
   products: [{
@@ -29,7 +39,7 @@ const ordersSchema = new Schema({
     enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
     required: true
   }
-},{timestamps:true})
+}, { timestamps: true })
 
 const orderModel = mongoose.model('orders', ordersSchema)
 module.exports = orderModel

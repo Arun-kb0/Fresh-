@@ -19,7 +19,7 @@ $(function () {
 
     console.log(orderId)
     $.ajax({
-      url: '/cart/cancelorder',
+      url: '/cart/order/cancel',
       method: "PATCH",
       data: { orderId },
       success: function (data) {
@@ -49,6 +49,40 @@ $(function () {
 
   function handleReturnOrder() {
     const orderId = $(this).attr("data-orderId")
+    const button = $(this)
+    const parent = button.parent().parent()
+    const orderStatus = parent.find('.orderStatus')
+    const paymentStatus = parent.find('.paymentStatus')
+    const cancelBtn = parent.find(".orderCancelBtn")
+    console.log(orderId)
+    $.ajax({
+      url: '/cart/order/return',
+      method: "PATCH",
+      data: { orderId },
+      success: function (data) {
+        if (data) {
+          button.hide()
+          cancelBtn.show()
+          orderStatus
+            .text('Return Requested')
+            .removeClass()
+            .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+          paymentStatus
+            .text('Pending')
+            .removeClass()
+            .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+          showAlert(data.message)
+        } else {
+          console.log("invalid data")
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+
+    })
     console.log(orderId)
   }
 
@@ -60,6 +94,7 @@ $(function () {
     const cancelBtn = parent.find('.orderCancelBtn')
     const returnBtn = parent.find('.orderReturnBtn')
     returnBtn.hide()
+
     switch (elementValue) {
       case 'Pending':
         element
@@ -89,6 +124,25 @@ $(function () {
           .addClass("px-3 rounded-pill text-white orderStatus bg-danger")
         cancelBtn.hide()
         break;
+      case 'Return Requested':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+        cancelBtn.show()
+        break
+      case 'Return Approved':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white orderStatus bg-info")
+        returnBtn.show()
+        break
+      case 'Returned':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white orderStatus bg-primary")
+        returnBtn.hide()
+        cancelBtn.hide()
+        break
       default:
         console.log("invalid order status value")
     }

@@ -6,7 +6,8 @@ const {
   deleteItemFromCartController,
   getCheckoutPageController,
   orderUsingCodController,
-  cancelOrderController
+  cancelOrderController,
+  returnOrderController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -20,8 +21,9 @@ router.delete('/deleteitem', deleteItemFromCartController)
 
 router.get('/checkout', getCheckoutPageController)
 
-router.post('/placeordercod', orderUsingCodController)
-router.patch('/cancelorder',cancelOrderController)
+router.post('/order/cod', orderUsingCodController)
+router.patch('/order/cancel',cancelOrderController)
+router.patch('/order/return',returnOrderController)
 
 
 

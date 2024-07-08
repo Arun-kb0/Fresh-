@@ -88,26 +88,6 @@
 										</h5>
 
 										<div class="d-flex flex-wrap justify-content-between align-items-center">
-											<!-- <div class="dropdown ">
-											<a class="btn btn-outline-secondary rounded-pill dropdown-toggle m-1 dropdownQuantityBtn"
-												role="button" id="dropdownQuantityBtn" data-bs-toggle="dropdown" aria-expanded="false">
-												<%= item.quantity %>
-											</a>
-
-											<ul id="qtyDropDownUl" class="dropdown-menu overflow-scroll " aria-labelledby="dropdownMenuLink">
-												<% for(let i=1;i<= 15;i++){ %>
-													<li>
-														<a class="dropdown-item dropdownNumber" data-quantity="<%= i %>"
-															data-productId=<%=item.productId %>
-															data-currentQuantity = <%= item.quantity %>
-																>
-																<%= i %>
-														</a>
-													</li>
-													<% } %>
-											</ul>
-										</div> -->
-
 											<div class="h-25">
 												<a class="btn btn-outline-info rounded-circle m-1 incQtyBtn" name="incQtyBtn">
 													<i class="fa-solid fa-plus"></i>
@@ -121,7 +101,6 @@
 											</div>
 
 											<div>
-
 												<a class="btn btn-outline-danger rounded-circle m-1 deleteCartItemBtn"
 													data-productId=<%=item.productId %> >
 													<i class="fa-solid fa-trash"></i>

@@ -385,6 +385,46 @@ const cancelOrderController = async (req, res, next) => {
   }
 }
 
+const returnOrderController = async (req, res, next) => {
+  const { orderId } = req.body
+  try {
+    if (!mongoose.isObjectIdOrHexString(orderId)) {
+      throw new CustomError("invalid orderId", BAD_REQUEST)
+    }
+    const order = await orderModel.findOne({ _id: orderId })
+    if (order.orderStatus !== 'Delivered') {
+      throw new CustomError("cannot return the order thats not delivered",BAD_REQUEST)
+    }
+    
+    // * increasing stock
+    for (const item of order.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError(`Product not found for ID: ${item.productId}`, NOT_FOUND);
+      }
+      product.stock += item.quantity;
+      await product.save();
+    }
+
+    const cancelledOrder = await orderModel.findOneAndUpdate(
+      { _id: orderId },
+      {
+        $set: {
+          orderStatus: 'Return Requested',
+          paymentStatus: "Pending"
+        }
+      },
+      { new: true }
+    )
+    res.status(OK).json({ message: "order return request", order: cancelledOrder })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+
+
 
 module.exports = {
   getCartPageController,
@@ -392,6 +432,8 @@ module.exports = {
   updateQuantityController,
   deleteItemFromCartController,
   getCheckoutPageController,
+
   orderUsingCodController,
-  cancelOrderController
+  cancelOrderController,
+  returnOrderController
 }

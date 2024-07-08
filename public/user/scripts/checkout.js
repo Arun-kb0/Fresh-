@@ -53,7 +53,7 @@ $(function () {
   // * order functions
   function placeOrderUsingCod(addressId) {
     $.ajax({
-      url: '/cart/placeordercod',
+      url: '/cart/order/cod',
       method: 'POST',
       data: { addressId },
       success: function (data) {
