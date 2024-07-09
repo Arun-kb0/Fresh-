@@ -6,6 +6,7 @@ $(function () {
   const password = $("#password")
   const confirmPassword = $("#confirmPassword")
   const editUserBtn = $("#editUserBtn")
+  const viewPasswordBtn = $('#viewPassword')
 
 
 
@@ -14,9 +15,28 @@ $(function () {
   password.on("input", checkPassword)
   confirmPassword.on("input", checkConfirmPassword)
 
+
   editUserModalBtn.on("click", handleModalUser)
   editUserBtn.on("click", handleEditUser)
   let userId = ""
+
+
+  viewPasswordBtn.on("click", function () {
+    const parent = $(this).parent().parent()
+    const password = parent.find('#password')
+    const cnfPassword = parent.find('#confirmPassword')
+    console.log(cnfPassword)
+    console.log(password)
+
+    if (password.attr('type') === 'password') {
+      password.attr('type','text')
+      cnfPassword.attr('type','text')
+    } else {
+      password.attr('type', 'password')
+      cnfPassword.attr('type', 'password')
+    }
+  })
+
 
   function handleEditUser() {
     const sessionUser = JSON.stringify(localStorage.getItem('user'))
@@ -77,7 +97,6 @@ $(function () {
 
   // * set edit input values
   function setEditInputs(user) {
-    console.log(user)
     $('#editForm input').each(function () {
       const input = $(this);
       const inputName = input.attr('name');
@@ -200,7 +219,6 @@ $(function () {
   function setErrorFor(input, msg) {
     try {
       if (!input) return
-      console.log(input.val())
       let parent = input.parent()
       const small = parent.find("#small")
       small.removeClass()
