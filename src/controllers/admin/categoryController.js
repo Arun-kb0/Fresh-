@@ -1,11 +1,13 @@
 const CustomError = require("../../constants/CustomError")
 const { BAD_REQUEST,
   OK, CONFLICT, NOT_FOUND,
-  NOT_MODIFIED
+  NOT_MODIFIED,
+  METHOD_NOT_ALLOWED
 } = require('../../constants/httpStatusCodes')
 const { viewAdminPage } = require("../../constants/pageConfid")
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const categoryModel = require("../../model/categoryModel")
+const productModel = require("../../model/productModel")
 const subCategoryModel = require("../../model/subCategoryModel")
 const mongoose = require('mongoose')
 
@@ -269,7 +271,14 @@ const deleteCategoryController = async (req, res, next) => {
     }
 
     const isParent = await categoryModel.findOne({ _id: categoryId, isDeleted: false })
+    
     if (isParent) {
+      const subcategory = await subCategoryModel.find({ parentId: isParent._id, isDeleted: false })
+      console.log(subcategory)
+      if (subcategory?.length!==0) {
+        throw new CustomError('there are subcategories under this category ', METHOD_NOT_ALLOWED)
+      }
+
       const parentRes = await categoryModel.updateOne(
         { _id: categoryId, isDeleted: false },
         { isDeleted: true }
@@ -285,6 +294,17 @@ const deleteCategoryController = async (req, res, next) => {
       console.log(parentRes)
       res.status(OK).json({ message: `deleted parent category` })
       return
+    }
+
+    const subcategory = await subCategoryModel.find({ _id: categoryId , isDeleted:false })
+    if (!subcategory) {
+      throw new CustomError('category not found', BAD_REQUEST)
+    }
+    const subCategoryIds = subcategory.map(subCat => subCat._id);
+    const products = await productModel.find({ categoryId: { $in: subCategoryIds }, isDeleted: false })
+    
+    if (products.length !== 0) {
+      throw new CustomError('there are products under this subcategory ', METHOD_NOT_ALLOWED)
     }
 
     const childRes = await subCategoryModel.updateMany(
