@@ -63,9 +63,9 @@ app.use('/admin', auth, adminCheck, adminRouter)
 
 // * user routes
 // app.use('/', userCheck, productRouter)
-app.use('/', userCheck, productRouter)
-app.use('/profile', profileRouter)
-app.use('/cart',cartRouter)
+app.use('/', productRouter)
+app.use('/profile', auth, userCheck, profileRouter)
+app.use('/cart', auth, userCheck, cartRouter)
 
 
 

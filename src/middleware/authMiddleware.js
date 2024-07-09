@@ -1,9 +1,10 @@
 
 const auth = (req, res, next) => {
   console.log("auth middleware")
-  console.log(req?.user?.provider)
-  console.log(req?.user)
-  console.log(req?.session)
+  // console.log(req?.user?.provider)
+  // console.log(req?.user)
+  // console.log(req?.session)
+  console.log(req.cookies.user)
   
   
   try {

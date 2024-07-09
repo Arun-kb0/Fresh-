@@ -18,11 +18,6 @@ $(function () {
     const paymentStatus = parent.find('.paymentStatus')
     const returnBtn = parent.find(".orderReturnBtn")
 
-
-    console.log(returnBtn.html())
-    console.log(orderStatus.html())
-    console.log(paymentStatus.html())
-
     console.log(orderId)
     $.ajax({
       url: '/cart/order/cancel',
@@ -32,14 +27,14 @@ $(function () {
         console.log(data)
         if (data?.order) {
           button.hide()
-
+          returnBtn.hide()
           let orderStatusClassValue = "px-3 rounded-pill text-white orderStatus bg-danger"
           let paymentStatusClassValue = "px-3 rounded-pill text-white paymentStatus bg-danger"
           if (data.order.orderStatus === 'Delivered') {
             orderStatusClassValue = "px-3 rounded-pill text-white orderStatus bg-success"
             paymentStatusClassValue = "px-3 rounded-pill text-white paymentStatus bg-success"
+            returnBtn.show()
           }
-
           orderStatus
             .text(data.order.orderStatus)
             .removeClass()
@@ -50,7 +45,6 @@ $(function () {
             .addClass(paymentStatusClassValue)
           showAlert(data.message)
 
-          returnBtn.show()
 
         } else {
           console.log("invalid data")
