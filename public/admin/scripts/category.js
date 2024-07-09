@@ -113,7 +113,7 @@ $(function () {
     $('#showCategoriesDropdownBtn').text("");
     $('#showCategoriesDropdownBtn').text(selectedCategory);
     $("#parentId").val(selectedCategoryId)
-    $("#Name").val(selectedCategory.trim())
+    // $("#Name").val(selectedCategory.trim())
   };
 
   // * image preview

@@ -45,7 +45,7 @@
 
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Users /</span> Categories and sub categories</h4>
               <a class="btn btn-primary my-2" href="/admin/category/create"> Create category</a>
-              <!-- category Table rows -->
+              <!--* category Table rows -->
               <div class="card">
                 <div class="table-responsive text-nowrap">
                   <table class="table table-hover">
@@ -54,8 +54,6 @@
                         <th>Image</th>
                         <th>category </th>
                         <th>Sub categories</th>
-                        <th>Id</th>
-                        <th>Parent Id</th>
                         <th>Slug</th>
                         <th>Actions</th>
                       </tr>
@@ -86,22 +84,6 @@
                                 <% } %>
                               </td>
                               <% } %>
-
-                         
-                          <% if(item.subCategories.length===0) {%>
-                            <td> </td>
-                            <% } else {%>
-                              <td class="" >
-                                <% for (subItem of item.subCategories){ %>
-                                  <div>
-                                    <%= subItem._id %>
-                                  </div>
-                                  <% } %>
-                                </td>
-                          <% } %>
-                        <td>
-                          <%= item._id %>
-                        </td>
                         <td>
                           <%= item.slug %>
                         </td>
@@ -124,7 +106,7 @@
                   </table>
                 </div>
               </div>
-              <!--/ category Table rows -->
+              <!--* / category Table rows -->
 
               <!-- *pagination  -->
               <div class="d-flex justify-content-center align-items-center p-2 ">
@@ -155,8 +137,6 @@
                               <tr>
                                 <th>Image</th>
                                 <th>Sub category </th>
-                                <th>Id</th>
-                                <th>Parent Id</th>
                                 <th>Slug</th>
                                 <th>Actions</th>
                               </tr>
@@ -181,12 +161,6 @@
                                     <strong>
                                       <%= item.name %>
                                     </strong>
-                                  </td>
-                                  <td>
-                                    <%= item._id %>
-                                  </td>
-                                  <td>
-                                    <%= parentItem._id %>
                                   </td>
                                   <td>
                                     <%= item.slug %>
@@ -216,7 +190,7 @@
                           </table>
                         </div>
                       </div>
-                      <!--/ sub category Table rows -->
+                      <!--* / sub category Table rows -->
 
             </div>
             <!-- / Content -->

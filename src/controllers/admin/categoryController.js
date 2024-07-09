@@ -116,12 +116,15 @@ const getEditCategoryController = async (req, res, next) => {
 
 const editCategoryController = async (req, res, next) => {
   const category = req.body
+  const file = req.file
   try {
     console.log(category)
     if (typeof category.id !== "string" || category.id.length !== 24) {
       const message = "category id is required for editing"
       throw new CustomError(message, BAD_REQUEST)
     }
+
+    
 
     const name = category.name.toLowerCase().trim()
     const _id = category.id
@@ -141,11 +144,16 @@ const editCategoryController = async (req, res, next) => {
         const message = "no subcategory exists"
         throw new CustomError(message, NOT_FOUND)
       }
+      let image = isSubCategoryExists.image
+      if (file) {
+        image = await uploadImageToFirebase(file, 'category')
+      }
       const updatedSubCategory = await subCategoryModel.findOneAndUpdate(
         { _id, isDeleted: false },
         {
           ...category,
           name: name,
+          image,
         },
         { new: true }
       )
@@ -159,11 +167,16 @@ const editCategoryController = async (req, res, next) => {
       const message = "no category exists"
       throw new CustomError(message, NOT_FOUND)
     }
+    let image = isCategoryExists.image
+    if (file) {
+      image = await uploadImageToFirebase(file, 'category')
+    }
     const newCategory = await categoryModel.findOneAndUpdate(
       { _id, isDeleted: false },
       {
         ...category,
         name: name,
+        image
       },
       { new: true }
     )
