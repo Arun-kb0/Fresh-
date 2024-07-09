@@ -76,7 +76,6 @@
                         <th>Email </th>
                         <th>Provider </th>
                         <th>userId </th>
-                        <th>mongodb id</th>
                         <th>Block or unblock</th>
                       </tr>
                     </thead>
@@ -104,7 +103,6 @@
                           <td> <%= item.username %> </td>
                           <td>  <%= item.provider %>  </td>
                           <td><%= item.userId %> </td>
-                          <td><%= item?._id %> </td>
                           <td>
                             <%  if(item?.isBlocked){ %>
                               <button 
