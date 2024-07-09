@@ -6,7 +6,7 @@ const CustomError = require('../../constants/CustomError')
 const mongoose = require('mongoose')
 const addressModel = require("../../model/addressModel")
 const orderModel = require("../../model/orderModel")
-
+const {validateOrderStatusTransactions ,orderStatusValues, paymentStatusValues} = require('../../constants/statusValues')
 
 const getCartPageController = async (req, res, next) => {
   try {
@@ -351,12 +351,26 @@ const cancelOrderController = async (req, res, next) => {
       throw new CustomError("invalid orderId", BAD_REQUEST)
     }
     const order = await orderModel.findOne({ _id: orderId })
-    if (order.orderStatus ==='Delivered') {
+    if (order.orderStatus ===orderStatusValues.Delivered) {
       throw new CustomError("cannot cancel delivered order",BAD_REQUEST)
     }
-    if (order.orderStatus ==='Cancelled') {
+    if (order.orderStatus ===orderStatusValues.Cancelled) {
       throw new CustomError("order already cancelled",CONFLICT)
     }
+
+    let paymentStatus = paymentStatusValues.Failed
+    let orderStatus = orderStatusValues.Cancelled
+    if (order.orderStatus === orderStatusValues.ReturnRequested) {
+      paymentStatus = paymentStatusValues.Completed
+      orderStatus = orderStatusValues.Delivered
+    }
+    console.log("paymentStatus ", paymentStatus)
+
+
+    if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.Cancelled)) {
+      throw new CustomError('already cancelled or returned',BAD_REQUEST)
+    }
+
     
     // * increasing stock
     for (const item of order.products) {
@@ -372,8 +386,8 @@ const cancelOrderController = async (req, res, next) => {
       { _id: orderId },
       {
         $set: {
-          orderStatus: 'Cancelled',
-          paymentStatus: "Failed"
+          orderStatus,
+          paymentStatus
         }
       },
       { new: true }
@@ -392,8 +406,12 @@ const returnOrderController = async (req, res, next) => {
       throw new CustomError("invalid orderId", BAD_REQUEST)
     }
     const order = await orderModel.findOne({ _id: orderId })
-    if (order.orderStatus !== 'Delivered') {
+    if (order.orderStatus !== orderStatusValues.Delivered) {
       throw new CustomError("cannot return the order thats not delivered",BAD_REQUEST)
+    }
+
+    if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.ReturnRequested)) {
+      throw new CustomError('already cancelled or returned', BAD_REQUEST)
     }
     
     // * increasing stock
@@ -411,7 +429,6 @@ const returnOrderController = async (req, res, next) => {
       {
         $set: {
           orderStatus: 'Return Requested',
-          paymentStatus: "Pending"
         }
       },
       { new: true }

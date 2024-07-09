@@ -11,11 +11,9 @@ const ordersSchema = new Schema({
     type: String,
     enum: [
       'Pending',
-      'Processing',
       'Shipped',
       'Delivered',
       'Cancelled',
-      'Returned',
       'Return Requested',
       'Return Approved',
       'Returned',

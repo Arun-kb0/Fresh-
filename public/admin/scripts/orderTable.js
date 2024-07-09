@@ -67,7 +67,6 @@ $(function () {
     const orderId = $(this).attr("data-orderId")
     const value = $(this).text().trim()
     const btnSpanElement = parent.find(".paymentStatus")
-    btnSpanElement.empty()
 
     const data = {
       orderId,
@@ -79,6 +78,7 @@ $(function () {
       data: data,
       success: function (data) {
         if (data) {
+          btnSpanElement.empty()
           btnSpanElement.text(value)
           console.log(data)
           window.location.reload()
@@ -219,6 +219,23 @@ $(function () {
           .removeClass()
           .addClass("btn btn-sm dropdown-toggle text-white orderStatus bg-danger")
         break;
+      case 'Return Requested':
+        element
+          .removeClass()
+          .addClass("btn btn-sm dropdown-toggle text-white orderStatus bg-warning")
+        break;
+      case 'Return Approved':
+        element
+          .removeClass()
+          .addClass("btn btn-sm dropdown-toggle text-white orderStatus bg-warning")
+        break;
+      case 'Returned':
+        element
+          .removeClass()
+          .addClass("btn btn-sm dropdown-toggle text-white orderStatus bg-primary")
+        break;
+      
+      
       default:
         console.log("invalid order status value")
     }

@@ -16,6 +16,12 @@ $(function () {
     const parent = button.parent().parent()
     const orderStatus = parent.find('.orderStatus')
     const paymentStatus = parent.find('.paymentStatus')
+    const returnBtn = parent.find(".orderReturnBtn")
+
+
+    console.log(returnBtn.html())
+    console.log(orderStatus.html())
+    console.log(paymentStatus.html())
 
     console.log(orderId)
     $.ajax({
@@ -23,17 +29,29 @@ $(function () {
       method: "PATCH",
       data: { orderId },
       success: function (data) {
-        if (data) {
+        console.log(data)
+        if (data?.order) {
           button.hide()
+
+          let orderStatusClassValue = "px-3 rounded-pill text-white orderStatus bg-danger"
+          let paymentStatusClassValue = "px-3 rounded-pill text-white paymentStatus bg-danger"
+          if (data.order.orderStatus === 'Delivered') {
+            orderStatusClassValue = "px-3 rounded-pill text-white orderStatus bg-success"
+            paymentStatusClassValue = "px-3 rounded-pill text-white paymentStatus bg-success"
+          }
+
           orderStatus
-            .text('Cancelled')
+            .text(data.order.orderStatus)
             .removeClass()
-            .addClass("px-3 rounded-pill text-white orderStatus bg-danger")
+            .addClass(orderStatusClassValue)
           paymentStatus
-            .text('Failed')
+            .text(data.order.paymentStatus)
             .removeClass()
-            .addClass("px-3 rounded-pill text-white orderStatus bg-danger")
+            .addClass(paymentStatusClassValue)
           showAlert(data.message)
+
+          returnBtn.show()
+
         } else {
           console.log("invalid data")
         }
@@ -60,17 +78,23 @@ $(function () {
       method: "PATCH",
       data: { orderId },
       success: function (data) {
-        if (data) {
+        if (data?.order) {
           button.hide()
           cancelBtn.show()
+          let paymentStatusClassValue = 'px-3 rounded-pill text-white paymentStatus bg-warning'
+          if (data.order.paymentStatus === 'Completed') {
+            paymentStatusClassValue = 'px-3 rounded-pill text-white paymentStatus bg-success'
+          }
+
           orderStatus
-            .text('Return Requested')
+            .text(data.order.orderStatus)
             .removeClass()
             .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+          
           paymentStatus
-            .text('Pending')
+            .text(data.order.paymentStatus)
             .removeClass()
-            .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+            .addClass(paymentStatusClassValue)
           showAlert(data.message)
         } else {
           console.log("invalid data")
@@ -133,8 +157,9 @@ $(function () {
       case 'Return Approved':
         element
           .removeClass()
-          .addClass("px-3 rounded-pill text-white orderStatus bg-info")
-        returnBtn.show()
+          .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
+        returnBtn.hide()
+        cancelBtn.hide()
         break
       case 'Returned':
         element
