@@ -1,11 +1,34 @@
-
-
 .smallBtn {
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
 }
 
-.orderImageCollection{
+.orderImageCollection {
   width: 100px;
-  
+
+}
+
+/* * cropper  */
+#imageContainerCropper {
+  max-width: 90%;
+  max-height: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+#imageContainerCropper img ,
+#imageContainerCropperResult img
+{
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+#imageContainerCropperResult{
+    max-width: 50%;
+    max-height: 300px;
+    position: relative;
+    overflow: hidden;
 }

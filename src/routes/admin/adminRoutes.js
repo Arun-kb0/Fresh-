@@ -20,6 +20,7 @@ const {
 } = require('../../controllers/admin/categoryController')
 const multer = require("multer")
 const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController } = require('../../controllers/admin/orderController')
+const { getCropperController } = require('../../controllers/admin/cropController')
 
 
 const router = express.Router()
@@ -37,6 +38,9 @@ const upload = multer({
 
 router.route('/')
   .get(getAdminHomeController)
+
+// * crop image
+router.get('/image/crop',getCropperController )
 
 // * user
 router.get('/users', getUsersController)

@@ -1,4 +1,6 @@
 $(function () {
+  // * event delegation for dynamically added btn
+  $(document).on('click', '.imageSelected', handleImageCropping);
 
   const name = $("#Name")
   const subCategory = $("#subCategory")
@@ -23,6 +25,8 @@ $(function () {
   const imageOuterContainer = $("#imageOuterContainer")
   const categoryDropdown = $("#categoryDropdown")
 
+  const imageSelected = $(".imageSelected")
+
 
   peopleRated.on("input", checkPeopleRated)
   rating.on("input", checkRating)
@@ -39,11 +43,19 @@ $(function () {
   location.on("input", checkProductInfo)
 
 
+  imageSelected.on("click", handleImageCropping)
   productForm.on("submit", CreateOrEditProductHelper)
   image.on("input", handleImageView)
   deleteImageBtn.on("click", handleImageDelete)
 
 
+  function handleImageCropping() {
+    console.log('image click')
+    const filename = $(this).attr('data-name')
+    window.localStorage.setItem('filename', JSON.stringify(filename))
+    console.log(filename)
+    window.location.href = `/admin/image/crop`
+  }
 
 
   // * validations
@@ -242,134 +254,165 @@ $(function () {
       for (let i = 0; i < this.files.length; i++) {
         if (i > 4) break
         const imageUrl = URL.createObjectURL(this.files[i])
-        const img = $('<img>')
-          .attr('src', imageUrl)
-          .addClass('d-block shadow p-1 mx-1 rounded')
-          .css({ height: '100px', width: '100px' });
-        imageOuterContainer.append(img);
+        const file = this.files[i]
+        const reader = new FileReader();
+
+
+        // ! test 
+        reader.onload = (function (file) {
+          return function (e) {
+            const base64String = e.target.result;
+            const fileData = {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              data: base64String
+            };
+            localStorage.setItem(file.name, JSON.stringify(fileData));
+            const img = $('<img>')
+              .attr('src', base64String)
+              .attr('data-name', file.name)
+              .addClass('d-block shadow p-1 mx-1 rounded imageSelected')
+              .css({ height: '100px', width: '100px' });
+
+            imageOuterContainer.append(img);
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+
+
+        // ! working code 
+        // window.localStorage.setItem(file.name, JSON.stringify(file));
+        //   const img = $('<img>')
+        //     .attr('src', imageUrl)
+        //     .attr('data-name', file.name)
+        //     .addClass('d-block shadow p-1 mx-1 rounded imageSelected')
+        //     .css({ height: '100px', width: '100px' });
+        //   imageOuterContainer.append(img);
+        }
+    }
+    }
+
+
+    function CreateOrEditProductHelper(e) {
+      e.preventDefault()
+      if (
+        !checkNameAndSubCategory(name) || !checkNameAndSubCategory(subCategory)
+        || !checkRating(rating) || !checkPeopleRated(peopleRated)
+        || !checkPriceAndFinalPrice(price) || !checkPriceAndFinalPrice(finalPrice)
+        || !checkProductInfo(brand) || !checkProductInfo(featuresAndDetails)
+        || !checkProductInfo(soldBy) || !checkProductInfo(location)
+        || !checkPriceAndFinalPrice(stock)
+      ) {
+        showAlert('invalid fields')
+        return
       }
-    }
-  }
 
-
-  function CreateOrEditProductHelper(e) {
-    e.preventDefault()
-    if (
-      !checkNameAndSubCategory(name) || !checkNameAndSubCategory(subCategory)
-      || !checkRating(rating) || !checkPeopleRated(peopleRated)
-      || !checkPriceAndFinalPrice(price) || !checkPriceAndFinalPrice(finalPrice)
-      || !checkProductInfo(brand) || !checkProductInfo(featuresAndDetails) 
-      || !checkProductInfo(soldBy) || !checkProductInfo(location)
-      || !checkPriceAndFinalPrice(stock)
-    ) {
-      showAlert('invalid fields')
-      return
-    }
-
-    const formData = $(this).serializeArray()
-    let formObject = {}
-    formData.forEach((item) => {
-      if (item.value !== "") {
-        formObject[item.name] = item.value.trim()
+      const formData = $(this).serializeArray()
+      let formObject = {}
+      formData.forEach((item) => {
+        if (item.value !== "") {
+          formObject[item.name] = item.value.trim()
+        }
+      })
+      // const file = image.files[0]
+      const formDataObject = new FormData()
+      for (const key in formObject) {
+        formDataObject.append(key, formObject[key]);
       }
-    })
-    // const file = image.files[0]
-    const formDataObject = new FormData()
-    for (const key in formObject) {
-      formDataObject.append(key, formObject[key]);
-    }
-    // formDataObject.append("filename", file)
+      // formDataObject.append("filename", file)
 
-    const files = image[0].files
-    for (const file of files) {
-      formDataObject.append('filename', file)
-    }
-    console.log(formDataObject)
+      const files = image[0].files
+      for (const file of files) {
+        formDataObject.append('filename', file)
+      }
+      console.log(formDataObject)
 
-    let url, method
-    if (isEdit) {
-      url = '/admin/product/edit'
-      method = 'PATCH'
-    } else {
-      url = '/admin/product/create'
-      method = "POST"
+      let url, method
+      if (isEdit) {
+        url = '/admin/product/edit'
+        method = 'PATCH'
+      } else {
+        url = '/admin/product/create'
+        method = "POST"
+      }
+
+      $.ajax({
+        url: url,
+        method: method,
+        data: formDataObject,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          console.log(data)
+          showAlert(data.message)
+        },
+        error: function (xhr, status, error) {
+          const res = JSON.parse(xhr.responseText)
+          showAlert(res.message)
+          console.log(error)
+        }
+      })
     }
 
-    $.ajax({
-      url: url,
-      method: method,
-      data: formDataObject,
-      processData: false,
-      contentType: false,
-      success: function (data) {
-        console.log(data)
-        showAlert(data.message)
-      },
-      error: function (xhr, status, error) {
-        const res = JSON.parse(xhr.responseText)
-        showAlert(res.message)
+
+
+    // * validation error function
+    function setErrorFor(input, msg) {
+      try {
+        if (!input) return
+        console.log(input.val())
+        let parent = input.parent()
+        const small = parent.find("#small")
+        small.removeClass()
+        small.addClass("text-danger opacity-1")
+        small.text(msg)
+        submitBtn.prop("disabled", true)
+      } catch (error) {
         console.log(error)
       }
-    })
-  }
-
-
-
-  // * validation error function
-  function setErrorFor(input, msg) {
-    try {
-      if (!input) return
-      console.log(input.val())
-      let parent = input.parent()
-      const small = parent.find("#small")
-      small.removeClass()
-      small.addClass("text-danger opacity-1")
-      small.text(msg)
-      submitBtn.prop("disabled", true)
-    } catch (error) {
-      console.log(error)
     }
-  }
 
-  // * validation success function
-  function setSuccessFor(input) {
-    try {
-      if (!input) return
-      let parent = input.parent()
-      const small = parent.find("#small")
-      small.text("")
-      small.removeClass()
-      small.addClass("opacity-0")
-      submitBtn.prop("disabled", false)
-      console.log(` validation success`)
-    } catch (error) {
-      console.log(error)
+    // * validation success function
+    function setSuccessFor(input) {
+      try {
+        if (!input) return
+        let parent = input.parent()
+        const small = parent.find("#small")
+        small.text("")
+        small.removeClass()
+        small.addClass("opacity-0")
+        submitBtn.prop("disabled", false)
+        console.log(` validation success`)
+      } catch (error) {
+        console.log(error)
+      }
     }
-  }
 
 
 
-  // * regex functions
-  function isName(name) {
-    const nameRegex = /^[A-Za-z\s]+$/;
-    return nameRegex.test(name)
-  }
+    // * regex functions
+    function isName(name) {
+      const nameRegex = /^[A-Za-z\s]+$/;
+      return nameRegex.test(name)
+    }
 
-  function isPrice(price) {
-    const priceRegex = /^[1-9][0-9]*$/;
-    return priceRegex.test(price)
-  }
+    function isPrice(price) {
+      const priceRegex = /^[1-9][0-9]*$/;
+      return priceRegex.test(price)
+    }
 
-  function isPeopleRated(count) {
-    const countRegex = /^[0-9]+$/
-    return countRegex.test(count)
-  }
+    function isPeopleRated(count) {
+      const countRegex = /^[0-9]+$/
+      return countRegex.test(count)
+    }
 
-  function isRating(rating) {
-    const ratingRegex = /^[0-5]$/;
-    return ratingRegex.test(rating)
-  }
+    function isRating(rating) {
+      const ratingRegex = /^[0-5]$/;
+      return ratingRegex.test(rating)
+    }
 
 
 
-})
+  })
