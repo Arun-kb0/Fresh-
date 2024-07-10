@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<!-- beautify ignore:start -->
+<html
+  lang="en"
+  class="light-style layout-menu-fixed"
+  dir="ltr"
+  data-theme="theme-default"
+  data-template="vertical-menu-template-free"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+
+    <title>Category table</title>
+    <meta name="description" content="" />
+
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            <div class="container-xxl flex-grow-1 container-p-y">
+
+              <!-- * alert -->
+              <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+                <div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+                </div>
+              </div>
+              <!-- * alert end -->
+
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">offers /</span> coupons list </h4>
+              <a class="btn btn-primary my-2" href="/admin/coupon/create"> Create coupon</a>
+              <!--* category Table rows -->
+              <div class="card">
+                <div class="table-responsive text-nowrap">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Code </th>
+                        <th>discount value</th>
+                        <th>min amount</th>
+                        <th>start date</th>
+                        <th>end date</th>
+                        <th>usage limit</th>
+                        <th>used count</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+
+
+                      <% for (const item of coupons){%>
+                        <tr>
+
+                          <td>
+                            <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                              <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up"
+                                title= "<%= item.code %>">
+                                <img src="<%= item?.image?.path %>" alt="<%= item?.image?.fileName %>" class="rounded-circle" />
+                              </li>
+                            </ul>
+                          </td>
+
+                          <td>
+                            <strong> <%= item.code %> </strong>
+                          </td>
+                        <td>
+                          <%= item.discountValue %>
+                        </td>
+                        <td>
+                          <%= item.minCartAmount %>
+                        </td>
+                        <td class="startDateTd">
+                          <%= item.startDate %>
+                        </td>
+                        <td class="endDateTd">
+                          <%= item.endDate %>
+                        </td>
+                        <td>
+                          <%= item.usageLimit %>
+                        </td>
+                        <td>
+                          <%= item.usedCount %>
+                        </td>
+                          <td>
+                            <div class="dropdown">
+                              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded"></i>
+                              </button>
+                              <div class="dropdown-menu" style="margin: 50px;" >
+                                <a class="dropdown-item" id="getEditCategoryBtn" href="/admin/category/edit?categoryId=<%= item._id %>" ><i class="bx bx-edit-alt me-1"></i> Edit</a>                                         
+                                <a class="dropdown-item deleteCategoryBtn" href="javascript:void(0);" data-item="<%= item._id %>" ><i class="bx bx-trash me-1"></i> Delete</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <% } %>
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!--* / category Table rows -->
+
+              <!-- *pagination  -->
+              <div class="d-flex justify-content-center align-items-center p-2 ">
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
+                  <i class="fa-solid fa-chevron-left fa-xs"></i>
+                </button>
+                <div id="pageInfoContainer">
+                  <span>
+                    <%= page %> out of
+                  </span>
+                  <span>
+                    <%= numberOfPages %>
+                  </span>
+                </div>
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+              <!-- *pagination end -->
+              <hr class="my-5" />
+
+            </div>
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                <div class="mb-2 mb-md-0">
+                  ©
+                  <script>
+                    document.write(new Date().getFullYear());
+                  </script>
+                  , made with ❤️ by
+                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                </div>
+                <div>
+                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
+
+                  <a
+                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Documentation</a
+                  >
+
+                  <a
+                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Support</a
+                  >
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+   <!-- * variable  -->
+  <script>
+    const pageDetails = {
+      page: parseInt("<%= page %>"),
+      numberOfPages: parseInt("<%= numberOfPages %>"),
+    } 
+  </script>
+
+    <% scriptBlock= `
+      <script src="/static/admin/scripts/couponTable.js"></script>`
+    %>
+  </body>
+</html>

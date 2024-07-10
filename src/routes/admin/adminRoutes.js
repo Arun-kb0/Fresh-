@@ -7,8 +7,8 @@ const {
   getCreateProductController,
   createProductController,
   editProductController,
-  deleteProductController, 
-  deleteImageController} = require('../../controllers/admin/productController')
+  deleteProductController,
+  deleteImageController } = require('../../controllers/admin/productController')
 const {
   getEditCategoryController,
   getCreateCategoryController,
@@ -21,6 +21,10 @@ const {
 const multer = require("multer")
 const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController } = require('../../controllers/admin/orderController')
 const { getCropperController } = require('../../controllers/admin/cropController')
+const { createCouponController,
+  deleteCouponController,
+  getCreateCouponPageController, 
+  getCouponsPageController} = require('../../controllers/admin/couponController')
 
 
 const router = express.Router()
@@ -28,8 +32,8 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     files: 5,
-    fileSize : 1024 * 1024 * 2
-   }
+    fileSize: 1024 * 1024 * 2
+  }
 })
 
 
@@ -40,7 +44,7 @@ router.route('/')
   .get(getAdminHomeController)
 
 // * crop image
-router.get('/image/crop',getCropperController )
+router.get('/image/crop', getCropperController)
 
 // * user
 router.get('/users', getUsersController)
@@ -50,7 +54,7 @@ router.patch('/user/block', blockUserController)
 router.get('/products', getProductController)
 router.route('/product/edit')
   .get(getEditProductController)
-  .patch(upload.array("filename",5), editProductController)
+  .patch(upload.array("filename", 5), editProductController)
   .delete(deleteProductController)
 
 router.delete('/product/image', deleteImageController)
@@ -58,7 +62,7 @@ router.delete('/product/image', deleteImageController)
 
 router.route('/product/create')
   .get(getCreateProductController)
-  .post(upload.array("filename",5), createProductController)
+  .post(upload.array("filename", 5), createProductController)
 
 // * category
 router.get('/categories', getCategoriesController)
@@ -70,7 +74,7 @@ router.route('/category/edit')
 
 router.route('/category/create')
   .get(getCreateCategoryController)
-  .post(upload.single("filename"),createCategoryController)
+  .post(upload.single("filename"), createCategoryController)
 
 
 router.route('/orders')
@@ -79,6 +83,14 @@ router.patch('/order/orderstatus', changeOrderStatusController)
 router.patch('/order/paymentstatus', changePaymentStatusController)
 
 
+// * coupons
+router.route('/coupon')
+  .get(getCouponsPageController)
+  .delete(deleteCouponController)
+
+router.route('/coupon/create')
+  .get(getCreateCouponPageController)
+  .post(upload.single("filename"), createCouponController)
 
 
 module.exports = router
