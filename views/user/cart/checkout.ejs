@@ -175,22 +175,38 @@
 
 		<!-- * price details -->
 		<section id="priceDetails"
-			class="position-sticky mt-3 d-flex flex-column justify-content-between p-2 mx-2 shadow rounded-3 col-2">
-			<div class="p-3">
+			class="position-relative mt-3 d-flex flex-column justify-content-start p-2 mx-2 col-2">
+			<div class="position-sticky top-0 p-3 shadow rounded-3">
 				<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
 						<%=checkoutCart.totalItems %>
-					</span></h6>
+					</span>
+				</h6>
 				<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
 						<%=checkoutCart.subTotalPrice %>
-					</span></h6>
+					</span>
+				</h6>
 				<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
 						<%= checkoutCart.deliveryFee %>
-					</span></h6>
-				<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total">
+					</span>
+				</h6>
+				<h6 class=" d-none">Coupon : <span class="fs-5 text-success" id="coupon">
+					</span>
+				</h6>
+				<h6 class="d-none text-secondary text-decoration-line-through ">₹<span class="fs-5v " id="prevTotal">
+					</span>
+				</h6>
+
+				<h5 class="priceTextColor ">Total : ₹<span class="fs-5" id="total">
 						<%=checkoutCart.totalPrice %>
-					</span></h5>
+					</span>
+				</h5>
+				<div class="d-flex justify-content-between my-1 mb-3">
+					<input class="form-control mr-1 w-75" type="text" placeholder="coupon code" />
+					<button class="btn btn-primary rounded-pill" id="applyCouponBtn">Apply</button>
+				</div>
+				<button class="btn btn-info rounded-pill w-100 paymentBtn">Place order</button>
 			</div>
-			<button class="btn btn-info rounded-pill paymentBtn">Place order</button>
+
 		</section>
 
 	</div>

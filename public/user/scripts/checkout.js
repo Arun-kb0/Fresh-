@@ -8,7 +8,11 @@ $(function () {
   const selectAddressBtn = $("#selectAddressBtn")
   const paymentBtn = $(".paymentBtn")
 
+  const applyCouponBtn = $("#applyCouponBtn")
+
+  applyCouponBtn.on("click", handleCoupon)
   paymentBtn.on("click", handlePayment)
+
 
   let addressId = ''
   let paymentMethod = ''
@@ -27,7 +31,46 @@ $(function () {
     console.log(addressId)
   })
 
-// * cod, wallet .online payment check
+
+  function handleCoupon() {
+    const input = $(this).parent().find('input')
+    const code = input.val().trim()
+    console.log(code)
+    const total = $('#total')
+    const coupon = $('#coupon')
+    const prevTotal = $("#prevTotal")
+    const totalValue = parseFloat(total.text().trim())
+
+    $.ajax({
+      url: "/cart/checkout",
+      method: 'POST',
+      data: { code, total: totalValue },
+      success: function (data) {
+        if (data) {
+          showAlert(data.message)
+          total.text(`${data.finalTotal}`)
+          coupon.parent().removeClass('d-none')
+          const couponValue =  (data.coupon.discountType === 'percentage') 
+            ? `${data.coupon.discountValue}% OFF`
+            : `₹${data.coupon.discountValue} OFF`
+          coupon.text(couponValue)
+
+          prevTotal.parent().removeClass('d-none')
+          prevTotal.text(totalValue)
+
+        } else {
+          console.log('apply coupon no data found')
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
+
+  // * cod, wallet .online payment check
   function handlePayment() {
 
     if (!addressId || !paymentMethod) {
@@ -46,7 +89,7 @@ $(function () {
         // placeOrderUsingCod()
         break
       default:
-        console.log("invalid payment option value")      
+        console.log("invalid payment option value")
     }
   }
 

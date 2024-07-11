@@ -25,6 +25,7 @@ const ordersSchema = new Schema({
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
   }],
+  coupon: { type: String ,default:null},
   total: { type: Number, required: true },
   paymentMethod: {
     type: String,

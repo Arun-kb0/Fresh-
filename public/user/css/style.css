@@ -182,8 +182,13 @@
 }
 
 #priceDetails {
-  max-height: 225px;
+  height: auto;
+  max-height: 355px;
   overflow: auto;
+}
+
+#prevTotal{
+  text-decoration: line-through;
 }
 
 /* * checkout  */

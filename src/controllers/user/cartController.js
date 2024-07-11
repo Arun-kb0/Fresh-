@@ -1,4 +1,4 @@
-const { OK, BAD_REQUEST, NOT_FOUND, CREATED, CONFLICT } = require("../../constants/httpStatusCodes")
+const { OK, BAD_REQUEST, NOT_FOUND, CREATED, CONFLICT, GONE } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
@@ -6,7 +6,10 @@ const CustomError = require('../../constants/CustomError')
 const mongoose = require('mongoose')
 const addressModel = require("../../model/addressModel")
 const orderModel = require("../../model/orderModel")
-const {validateOrderStatusTransactions ,orderStatusValues, paymentStatusValues} = require('../../constants/statusValues')
+const couponModel = require("../../model/couponModel")
+const usedCouponsModel = require("../../model/usedCouponsModel")
+
+const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
 
 const getCartPageController = async (req, res, next) => {
   try {
@@ -35,7 +38,7 @@ const getCartPageController = async (req, res, next) => {
           image: "$productDetails.image.path", // Extract single image path
           soldBy: "$productDetails.productInfo.soldBy", // Extract soldBy
           stock: "$productDetails.stock",
-          productTotalPrice: "$products.price" 
+          productTotalPrice: "$products.price"
         }
       },
       {
@@ -311,7 +314,7 @@ const orderUsingCodController = async (req, res, next) => {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
 
-    const total = cart.products.reduce((sum, item) => sum + item.price , 0)+ deliveryFee
+    const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
 
     // * decreasing stock
     for (const item of cart.products) {
@@ -330,13 +333,27 @@ const orderUsingCodController = async (req, res, next) => {
       addressId: address._id,
       orderStatus: 'Pending',
       products: cart.products,
-      total: total,
+      total: cart.total,
       paymentMethod: 'cod',
       paymentStatus: 'Pending',
-      userId: user.userId
+      userId: user.userId,
+      coupon:cart?.coupon
     });
 
+
     await cartModel.findOneAndUpdate({ userId: user.userId }, { products: [] });
+    await usedCouponsModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        userId: user.userId,
+        $addToSet: {
+          coupons: cart.couponId
+        } 
+      },
+      {
+        upsert: true,
+      }
+    )
 
     res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
@@ -351,11 +368,11 @@ const cancelOrderController = async (req, res, next) => {
       throw new CustomError("invalid orderId", BAD_REQUEST)
     }
     const order = await orderModel.findOne({ _id: orderId })
-    if (order.orderStatus ===orderStatusValues.Delivered) {
-      throw new CustomError("cannot cancel delivered order",BAD_REQUEST)
+    if (order.orderStatus === orderStatusValues.Delivered) {
+      throw new CustomError("cannot cancel delivered order", BAD_REQUEST)
     }
-    if (order.orderStatus ===orderStatusValues.Cancelled) {
-      throw new CustomError("order already cancelled",CONFLICT)
+    if (order.orderStatus === orderStatusValues.Cancelled) {
+      throw new CustomError("order already cancelled", CONFLICT)
     }
 
     let paymentStatus = paymentStatusValues.Failed
@@ -368,10 +385,10 @@ const cancelOrderController = async (req, res, next) => {
 
 
     if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.Cancelled)) {
-      throw new CustomError('already cancelled or returned',BAD_REQUEST)
+      throw new CustomError('already cancelled or returned', BAD_REQUEST)
     }
 
-    
+
     // * increasing stock
     for (const item of order.products) {
       const product = await productModel.findById(item.productId);
@@ -407,13 +424,13 @@ const returnOrderController = async (req, res, next) => {
     }
     const order = await orderModel.findOne({ _id: orderId })
     if (order.orderStatus !== orderStatusValues.Delivered) {
-      throw new CustomError("cannot return the order thats not delivered",BAD_REQUEST)
+      throw new CustomError("cannot return the order thats not delivered", BAD_REQUEST)
     }
 
     if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.ReturnRequested)) {
       throw new CustomError('already cancelled or returned', BAD_REQUEST)
     }
-    
+
     // * increasing stock
     for (const item of order.products) {
       const product = await productModel.findById(item.productId);
@@ -440,6 +457,51 @@ const returnOrderController = async (req, res, next) => {
 }
 
 
+const applyCouponController = async (req, res, next) => {
+  const { code, total } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const coupon = await couponModel.findOne({ code })
+    if (!coupon) {
+      throw new CustomError('invalid coupon code', BAD_REQUEST)
+    }
+    const currentDate = new Date()
+    if (coupon.endDate < currentDate) {
+      throw new CustomError('coupon expired', GONE)
+    }
+
+    if (total < coupon.minCartAmount) {
+      throw new CustomError(`${coupon.minCartAmount} is required to apply this coupon`, BAD_REQUEST)
+    }
+
+    let finalTotal = total
+    if (coupon.discountType === 'percentage') {
+      const discount = (total * coupon.discountValue) / 100;
+      finalTotal = total - discount;
+    } else if (coupon.discountType === 'amount') {
+      finalTotal = total - coupon.discountValue
+    }
+
+
+    const cart = await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          coupon: coupon.code,
+          couponId:coupon._id,
+          total: finalTotal,
+        }
+      },
+      { new: true }
+    )
+
+    res.status(OK).json({ message: 'coupon applied', coupon, finalTotal })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 
 
 
@@ -452,5 +514,7 @@ module.exports = {
 
   orderUsingCodController,
   cancelOrderController,
-  returnOrderController
+  returnOrderController,
+
+  applyCouponController
 }

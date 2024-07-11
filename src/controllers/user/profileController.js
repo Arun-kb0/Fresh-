@@ -353,6 +353,7 @@ const getOrderDetailsPageController = async (req, res, next) => {
 const getCouponsPageController = async (req, res, next) => {
   try {
     const coupons = await couponModel.find({ isDeleted: false })
+    
     res.render('user/profile/coupons',{...viewUsersPage, coupons})
   } catch (error) {
     next(error)

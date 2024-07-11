@@ -10,6 +10,9 @@ const cartSchema = new Schema({
     price: { type: Number, required: true },
   }], 
   userId: { type: String, required: true },
+  coupon: { type: String },
+  couponId: { type: objectId },
+  total:{type : Number},
 }, { timestamps: true })
 
 cartSchema.index({ userId: 1 })

@@ -122,8 +122,8 @@
 
 			<!-- * price details -->
 			<section id="priceDetails"
-				class="position-sticky d-flex flex-column justify-content-between p-2 mx-2 shadow rounded-3 col-2">
-				<div class="p-3">
+				class="position-sticky d-flex flex-column justify-content-start p-2 mx-2  col-2">
+				<div class=" shadow rounded-3 p-3">
 					<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
 							<%=cart.totalItems %>
 						</span></h6>
@@ -136,8 +136,8 @@
 					<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total">
 							<%=cart.totalPrice %>
 						</span></h5>
+						<a href="/cart/checkout" class="btn btn-info rounded-pill">checkout</a>
 				</div>
-				<a href="/cart/checkout" class="btn btn-info rounded-pill">checkout</a>
 			</section>
 
 		</div>
