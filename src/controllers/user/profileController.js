@@ -8,6 +8,9 @@ const userModel = require("../../model/userModel")
 const bcrypt = require('bcrypt')
 const orderModel = require('../../model/orderModel')
 const mongoose = require("mongoose")
+const { find } = require("../../model/cartModel")
+const couponModel = require("../../model/couponModel")
+
 
 const getProfileController = async (req, res, next) => {
   const { page = 1 } = req.query
@@ -347,6 +350,16 @@ const getOrderDetailsPageController = async (req, res, next) => {
 }
 
 
+const getCouponsPageController = async (req, res, next) => {
+  try {
+    const coupons = await couponModel.find({ isDeleted: false })
+    res.render('user/profile/coupons',{...viewUsersPage, coupons})
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 module.exports = {
   getProfileController,
   getAddressController,
@@ -360,5 +373,6 @@ module.exports = {
   getUserDetailsPageController,
 
   getAllOrdersPageController,
-  getOrderDetailsPageController
+  getOrderDetailsPageController,
+  getCouponsPageController
 }
