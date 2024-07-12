@@ -32,3 +32,12 @@
     position: relative;
     overflow: hidden;
 }
+
+/* * offers */
+#productDropdown,
+#subcategoryDropdown,
+#categoryDropdown
+{
+  max-height: 300px;
+  overflow-y: scroll;
+}
