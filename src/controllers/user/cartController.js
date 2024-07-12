@@ -337,7 +337,7 @@ const orderUsingCodController = async (req, res, next) => {
       paymentMethod: 'cod',
       paymentStatus: 'Pending',
       userId: user.userId,
-      coupon:cart?.coupon
+      coupon: cart?.coupon
     });
 
 
@@ -348,11 +348,15 @@ const orderUsingCodController = async (req, res, next) => {
         userId: user.userId,
         $addToSet: {
           coupons: cart.couponId
-        } 
+        }
       },
       {
         upsert: true,
       }
+    )
+    await couponModel.findOneAndUpdate(
+      { _id: cart.couponId },
+      { $inc: { usedCount: 1 } }
     )
 
     res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
@@ -461,7 +465,7 @@ const applyCouponController = async (req, res, next) => {
   const { code, total } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
-    const coupon = await couponModel.findOne({ code })
+    const coupon = await couponModel.findOne({ code, isDeleted: false })
     if (!coupon) {
       throw new CustomError('invalid coupon code', BAD_REQUEST)
     }
@@ -474,6 +478,19 @@ const applyCouponController = async (req, res, next) => {
       throw new CustomError(`${coupon.minCartAmount} is required to apply this coupon`, BAD_REQUEST)
     }
 
+    if (coupon.usedCount >= coupon.usageLimit) {
+      throw new CustomError('coupon limit exceeded',GONE)
+    }
+
+    const usedCoupons = await usedCouponsModel.findOne({
+      userId: user.userId,
+      coupons: { $elemMatch: { $eq: coupon._id } }
+    })
+
+    if (usedCoupons) {
+      throw new CustomError('coupon already used',CONFLICT)
+    }
+
     let finalTotal = total
     if (coupon.discountType === 'percentage') {
       const discount = (total * coupon.discountValue) / 100;
@@ -482,13 +499,12 @@ const applyCouponController = async (req, res, next) => {
       finalTotal = total - coupon.discountValue
     }
 
-
     const cart = await cartModel.findOneAndUpdate(
       { userId: user.userId },
       {
         $set: {
           coupon: coupon.code,
-          couponId:coupon._id,
+          couponId: coupon._id,
           total: finalTotal,
         }
       },

@@ -10,6 +10,7 @@ const orderModel = require('../../model/orderModel')
 const mongoose = require("mongoose")
 const { find } = require("../../model/cartModel")
 const couponModel = require("../../model/couponModel")
+const usedCouponsModel = require("../../model/usedCouponsModel")
 
 
 const getProfileController = async (req, res, next) => {
@@ -352,9 +353,37 @@ const getOrderDetailsPageController = async (req, res, next) => {
 
 const getCouponsPageController = async (req, res, next) => {
   try {
-    const coupons = await couponModel.find({ isDeleted: false })
-    
-    res.render('user/profile/coupons',{...viewUsersPage, coupons})
+    const user = JSON.parse(req.cookies.user)
+    const result = await usedCouponsModel.aggregate([
+      {
+        $match: {
+          userId: user.userId
+        }
+      },
+      {
+        $lookup: {
+          from: "coupons",
+          let: {
+            usedCouponIds: "$coupons"
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $not: {
+                    $in: ["$_id", "$$usedCouponIds"]
+                  }
+                },
+                isDeleted: false
+              }
+            }
+          ],
+          as: "unusedCoupons"
+        }
+      }
+    ])
+
+    res.render('user/profile/coupons', { ...viewUsersPage, coupons: result[0].unusedCoupons })
   } catch (error) {
     next(error)
   }
