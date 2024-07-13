@@ -25,7 +25,7 @@ const { createCouponController,
   deleteCouponController,
   getCreateCouponPageController, 
   getCouponsPageController} = require('../../controllers/admin/couponController')
-const { getAdminOffersTablePageController, getCreateOfferPageController, createOfferController } = require('../../controllers/offferController')
+const { getAdminOffersTablePageController, getCreateOfferPageController, createOfferController, deleteOfferController } = require('../../controllers/offferController')
 
 
 const router = express.Router()
@@ -95,6 +95,7 @@ router.route('/coupon/create')
 
 router.route('/offer')
   .get(getAdminOffersTablePageController)
+  .delete(deleteOfferController)
 
 router.route('/offer/create')
   .get(getCreateOfferPageController)

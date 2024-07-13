@@ -66,7 +66,7 @@
 
 
                       <% for (const item of offers){%>
-                        <tr>
+                        <tr id="<%= item._id  %>">
 
                           <td>
                             <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
@@ -102,7 +102,7 @@
                                 <i class="bx bx-dots-vertical-rounded"></i>
                               </button>
                               <div class="dropdown-menu" style="margin: 50px;" >
-                                <a class="dropdown-item deleteCouponBtn" href="javascript:void(0);" data-item="<%= item.code %>" ><i class="bx bx-trash me-1"></i> Delete</a>
+                                <a class="dropdown-item deleteOfferBtn" href="javascript:void(0);" data-item="<%= item._id %>" ><i class="bx bx-trash me-1"></i> Delete</a>
                               </div>
                             </div>
                           </td>
@@ -193,7 +193,7 @@
   </script>
 
     <% scriptBlock= `
-      <script src="/static/admin/scripts/couponTable.js"></script>`
+      <script src="/static/admin/scripts/offersTable.js"></script>`
     %>
   </body>
 </html>

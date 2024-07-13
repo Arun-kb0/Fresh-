@@ -20,6 +20,7 @@ const offerSchema = new Schema({
   productIds: { type: [objectId], default: [] },
   categoryIds: { type: [objectId], default: [] },
   subcategoryIds: { type: [objectId], default: [] },
+  isDisabled: { type: Boolean, default: true }
 }, { timestamps: true })
 
 const offerModel = mongoose.model('offers', offerSchema)

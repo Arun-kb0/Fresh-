@@ -47,6 +47,9 @@ $(function () {
     let formObject = {}
     formData.forEach((item) => {
       if (item.value !== "") {
+        if (item.name === 'name') {
+          formObject[item.name] = item.value.trim().toLowerCase()
+        }
         formObject[item.name] = item.value.trim()
       }
     })
@@ -144,7 +147,7 @@ $(function () {
       }
       $('#productDropdownBtn').text("");
       $('#productDropdownBtn').text(name);
-      $("#product").val(subcategoryId)
+      $("#product").val(productId)
     });
 
   subcategoryDropdown.find('.dropdown-item').on('click',
