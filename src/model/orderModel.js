@@ -37,6 +37,12 @@ const ordersSchema = new Schema({
     type: String,
     enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
     required: true
+  },
+  paymentDetails: {
+    paymentID: {type:String},
+    payerID: {type:String},
+    orderID: {type:String},
+    paymentSource: {type:String},
   }
 }, { timestamps: true })
 

@@ -134,9 +134,9 @@
 				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
 					<div class="card-body mx-3 d-flex flex-column">
 						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn2" checked>
-						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn2" name="razorPay"
+						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn2" name="paypal"
 							id="paymentRadioBtnLabel2">
-							Razor pay
+							Paypal
 						</label>
 						<span class="text-info h6 mx-2">
 							<i class="fa-brands fa-cc-mastercard fa-2x "></i>
@@ -169,6 +169,12 @@
 			<div class="d-flex justify-content-center">
 				<button class="btn btn-info btn-lg rounded-pill px-3 p-1 paymentBtn">Place order</button>
 			</div>
+
+		<div id="paypalSection" class="d-none justify-content-center" >
+			<div id="paypal-button-container"></div>
+			<p id="result-message"></p>
+		</div>
+
 		</div>
 		<!-- * address and payment end -->
 
@@ -290,11 +296,19 @@
 	</div>
 
 
-	<% scriptBlock=` <script src="/static/user/scripts/user.js">
-		</script>
+	<!-- Initialize the JS-SDK -->
+	<% scriptBlock=` 
+    <script
+      src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
+      data-sdk-integration-source="developer-studio"
+    ></script>
+		<script src="/static/user/scripts/paypal.js"></script>
+		<script src="/static/user/scripts/user.js"></script>
 		<script src="/static/user/scripts/checkout.js"> </script>
 		`
 		%>
+
+		
 
 </body>
 

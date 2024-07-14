@@ -270,7 +270,8 @@ const getAllOrdersPageController = async (req, res, next) => {
         $sort: { createdAt: -1 }
       }
     ])
-
+    console.log('image')
+    console.log(ordersWithProducts[0].products[0]?.image[0])
     // res.status(OK).json({ orders:ordersWithProducts[0] })
     res.render('user/profile/orders', { orders: ordersWithProducts, ...viewUsersPage })
   } catch (error) {

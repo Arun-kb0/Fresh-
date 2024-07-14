@@ -8,8 +8,25 @@ const addressModel = require("../../model/addressModel")
 const orderModel = require("../../model/orderModel")
 const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
-
+const paypal = require('@paypal/checkout-server-sdk')
+const CC = require('currency-converter-lt')
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
+
+let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
+
+
+const Environment =
+  process.env.NODE_ENV === 'prod'
+    ? paypal.core.LiveEnvironment
+    : paypal.core.SandboxEnvironment
+
+const paypalClient = new paypal.core.PayPalHttpClient(
+  new Environment(
+    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_CLIENT_SECRET
+  )
+)
+
 
 const getCartPageController = async (req, res, next) => {
   try {
@@ -285,6 +302,7 @@ const getCheckoutPageController = async (req, res, next) => {
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
     res.render('user/cart/checkout', {
       ...viewUsersPage,
+      paypalClientId: process.env.PAYPAL_CLIENT_ID,
       checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
     })
   } catch (error) {
@@ -298,7 +316,6 @@ const orderUsingCodController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
-
 
     if (!mongoose.isObjectIdOrHexString(addressId)) {
       throw new CustomError("invalid address id", BAD_REQUEST)
@@ -315,7 +332,8 @@ const orderUsingCodController = async (req, res, next) => {
     }
 
     const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
-
+    cart.total = total
+    console.log(cart)
     // * decreasing stock
     for (const item of cart.products) {
       const product = await productModel.findById(item.productId);
@@ -337,7 +355,7 @@ const orderUsingCodController = async (req, res, next) => {
       paymentMethod: 'cod',
       paymentStatus: 'Pending',
       userId: user.userId,
-      coupon: cart?.coupon
+      coupon: cart.coupon ? cart.coupon : null
     });
 
 
@@ -358,6 +376,135 @@ const orderUsingCodController = async (req, res, next) => {
       { _id: cart.couponId },
       { $inc: { usedCount: 1 } }
     )
+
+    res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+const orderUsingPaypalController = async (req, res, next) => {
+  const { addressId } = req.body
+  try {
+    console.log(" addressId ", addressId)
+    const user = JSON.parse(req.cookies.user)
+    const deliveryFee = 10
+
+    if (!mongoose.isObjectIdOrHexString(addressId)) {
+      throw new CustomError("invalid address id", BAD_REQUEST)
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      throw new CustomError('Address not found', BAD_REQUEST);
+    }
+
+
+    let cart = await cartModel.findOneAndUpdate({ userId: user.userId });
+    if (!cart || cart.products.length === 0) {
+      throw new CustomError('Cart is empty', BAD_REQUEST);
+    }
+
+    const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
+    cart = await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $set: { total: total } },
+      { new: true }
+    )
+
+    const request = new paypal.orders.OrdersCreateRequest()
+    let totalInUsd = await currencyConverter.convert(total)
+    totalInUsd = totalInUsd.toFixed(2)
+
+    console.log("totalInUsd ", totalInUsd)
+
+    request.prefer('return=representation')
+    request.requestBody({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: 'USD',
+            value: totalInUsd,
+            breakdown: {
+              currency_code: 'IN',
+              value: totalInUsd
+            }
+          }
+        }
+      ]
+    })
+
+    const order = await paypalClient.execute(request)
+    console.log(order)
+    res.status(OK).json({ id: order.result.id })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const orderSuccessPaypalController = async (req, res, next) => {
+  const { paymentID, payerID, orderID, paymentSource, addressId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const cart = await cartModel.findOne({ userId: user.userId })
+
+    if (!cart) {
+      throw new CustomError('cart not found', NOT_FOUND)
+    }
+
+    // * decreasing stock
+    for (const item of cart.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError('Product not found', BAD_REQUEST);
+      }
+      if (product.stock < item.quantity) {
+        throw new CustomError(`Insufficient stock for product: ${product.name}`, BAD_REQUEST);
+      }
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    const newOrder = await orderModel.create({
+      addressId: addressId,
+      orderStatus: 'Pending',
+      products: cart.products,
+      total: cart.total,
+      paymentMethod: 'online',
+      paymentStatus: 'Completed',
+      userId: user.userId,
+      coupon: cart?.coupon ? cart.coupon : null,
+      paymentDetails: {
+        paymentID,
+        payerID,
+        orderID,
+        paymentSource,
+      }
+    });
+
+    console.log(cart.total)
+    console.log(newOrder.total)
+
+    await cartModel.findOneAndUpdate({ userId: user.userId }, { products: [] });
+
+    if (cart.couponId) {
+      await usedCouponsModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          userId: user.userId,
+          $addToSet: {
+            coupons: cart.couponId
+          }
+        },
+        { upsert: true, }
+      )
+      await couponModel.findOneAndUpdate(
+        { _id: cart.couponId },
+        { $inc: { usedCount: 1 } }
+      )
+    }
 
     res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
@@ -479,7 +626,7 @@ const applyCouponController = async (req, res, next) => {
     }
 
     if (coupon.usedCount >= coupon.usageLimit) {
-      throw new CustomError('coupon limit exceeded',GONE)
+      throw new CustomError('coupon limit exceeded', GONE)
     }
 
     const usedCoupons = await usedCouponsModel.findOne({
@@ -488,7 +635,7 @@ const applyCouponController = async (req, res, next) => {
     })
 
     if (usedCoupons) {
-      throw new CustomError('coupon already used',CONFLICT)
+      throw new CustomError('coupon already used', CONFLICT)
     }
 
     let finalTotal = total
@@ -529,6 +676,9 @@ module.exports = {
   getCheckoutPageController,
 
   orderUsingCodController,
+  orderUsingPaypalController,
+  orderSuccessPaypalController,
+
   cancelOrderController,
   returnOrderController,
 
