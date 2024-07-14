@@ -2,7 +2,8 @@ const CustomError = require("../../constants/CustomError")
 const { NO_CONTENT, OK } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const productModel = require('../../model/productModel')
-
+const categoryModel = require('../../model/categoryModel')
+const subcategoryModel = require('../../model/subCategoryModel')
 
 
 const getProductsAggregation = async ({ sort, skip, limit }) => {
@@ -35,10 +36,6 @@ const getProductsAggregation = async ({ sort, skip, limit }) => {
   ])
   return products
 }
-
-
-
-
 
 const getProductsController = async (req, res, next) => {
   try {
@@ -190,8 +187,8 @@ const getNewProductsController = async (req, res, next) => {
 
     const newProducts = await getProductsAggregation({
       sort: { createdAt: -1 },
-      skip:startIndex,
-      limit:LIMIT,
+      skip: startIndex,
+      limit: LIMIT,
     })
 
     console.log("topBrandProducts[0].length ")
@@ -223,6 +220,34 @@ const getSingleProductController = async (req, res, next) => {
 }
 
 
+const getProductsProductsPageController = async (req, res, next) => {
+  const { page = 1 } = req.body
+  try {
+    const LIMIT = 6
+    const startIndex = (Number(page) - 1) * LIMIT
+    const total = await productModel.countDocuments({ isDeleted: false })
+    const numberOfPages = Math.ceil(total / LIMIT)
+
+
+    const products = await productModel.find({ isDeleted: false })
+      .sort().skip(startIndex).limit(LIMIT)
+
+    const categories = await categoryModel.find({ isDeleted: false })
+    const subcategories = await subcategoryModel.find({ isDeleted: false })
+
+    res.render('user/products/products', {
+      ...viewUsersPage,
+      products,
+      categories,
+      subcategories,
+      page: Number(page),
+      numberOfPages
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 
 
@@ -232,5 +257,6 @@ module.exports = {
   getTopBrandsProductsController,
   getPopularProductsController,
   getTopRatedProductsController,
-  getNewProductsController
+  getNewProductsController,
+  getProductsProductsPageController
 }
