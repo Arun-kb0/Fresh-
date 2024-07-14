@@ -25,7 +25,7 @@
 
 	<!-- * breadcrumbs -->
 	<div class="container">
-		<h3>Home /<span class="orangeTextColor"> All categories </span></h3>
+		<h3>Home /<span class="orangeTextColor text-capitalize"> <%= title %> </span></h3>
 	</div>
 	<!-- * end breadcrumbs -->
 
@@ -58,27 +58,27 @@
 						<h5 class="text-center">Filter</h5>
 					</li>
 					<li class="list-group-item ">
-						<div class="dropdown">
-							<button class="btn w-100 text-capitalize dropdown-toggle" type="button" data-bs-toggle="dropdown"
+						<div class="dropdown" >
+							<button class="btn w-100 text-capitalize dropdown-toggle" id="categoryDropdownBtn" type="button" data-bs-toggle="dropdown"
 								aria-expanded="false">
 								categories
 							</button>
-							<ul class="dropdown-menu w-100">
+							<ul class="dropdown-menu w-100" id="categoryDropdown">
 								<% for(const category of categories) {%>
-									<li><a class="dropdown-item" data-categoryId="<%= category._id %>" ><%= category.name %></a></li>
+									<li><a class="dropdown-item" data-id="<%= category._id %>" ><%= category.name %></a></li>
 								<% } %>
 							</ul>
 						</div>
 					</li>
 					<li class="list-group-item ">
 						<div class="dropdown">
-							<button class="btn text-capitalize w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown"
+							<button class="btn text-capitalize w-100 dropdown-toggle" id="subcategoryDropdownBtn" type="button" data-bs-toggle="dropdown"
 								aria-expanded="false">
 								subcategories
 							</button>
-							<ul class="dropdown-menu w-100">
+							<ul class="dropdown-menu w-100" id="subcategoryDropdown">
 								<% for(const subcategory of subcategories) {%>
-									<li><a class="dropdown-item" data-subcategoryId="<%= subcategory._id %>">
+									<li><a class="dropdown-item" data-id="<%= subcategory._id %>">
 											<%= subcategory.name %>
 										</a></li>
 									<% } %>
@@ -129,10 +129,10 @@
 
 		<!-- * products -->
 		<section class="d-flex col-7">
-			<div class="d-flex flex-wrap justify-content-start ">
+			<div class="d-flex flex-wrap ">
 				<% for(let item of products){ %>
 					<!-- * mycard -->
-					<div class="col-md-3 m-1 mx-3 mb-3 w-auto text-center p-2 cardStoke ">
+					<div class="col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke allCategoriesCard">
 						<div class="d-flex flex-column align-content-center ">
 							<div class="d-flex justify-content-center ">
 								<a class="cardImage" href="/product?productId=<%=item._id %>">

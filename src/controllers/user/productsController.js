@@ -1,9 +1,10 @@
 const CustomError = require("../../constants/CustomError")
-const { NO_CONTENT, OK } = require("../../constants/httpStatusCodes")
+const { NO_CONTENT, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
 const { viewUsersPage } = require("../../constants/pageConfid")
 const productModel = require('../../model/productModel')
 const categoryModel = require('../../model/categoryModel')
 const subcategoryModel = require('../../model/subCategoryModel')
+const { default: mongoose } = require("mongoose")
 
 
 const getProductsAggregation = async ({ sort, skip, limit }) => {
@@ -36,6 +37,8 @@ const getProductsAggregation = async ({ sort, skip, limit }) => {
   ])
   return products
 }
+
+
 
 const getProductsController = async (req, res, next) => {
   try {
@@ -221,25 +224,123 @@ const getSingleProductController = async (req, res, next) => {
 
 
 const getProductsProductsPageController = async (req, res, next) => {
-  const { page = 1 } = req.body
+  const { page = 1, categoryId, subcategoryId } = req.query
+  console.log(categoryId)
+
   try {
-    const LIMIT = 6
+    const LIMIT = 10
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await productModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
 
 
-    const products = await productModel.find({ isDeleted: false })
-      .sort().skip(startIndex).limit(LIMIT)
-
     const categories = await categoryModel.find({ isDeleted: false })
     const subcategories = await subcategoryModel.find({ isDeleted: false })
+
+    const handleEmptyData = async() => {
+      products = await productModel.find({ isDeleted: false })
+        .sort().skip(startIndex).limit(LIMIT)
+      res.render('user/products/products', {
+        ...viewUsersPage,
+        products,
+        categories,
+        subcategories,
+        title,
+        page: Number(page),
+        numberOfPages
+      })
+    }
+
+    let title = 'All categories'
+    let products
+    if (categoryId) {
+      const categoryObjId = mongoose.Types.ObjectId.createFromHexString(categoryId)
+      const result = await categoryModel.aggregate(
+        [
+          {
+            $match: {
+              isDeleted: false,
+              _id: categoryObjId
+            }
+          },
+          {
+            $lookup: {
+              from: "subcategories",
+              localField: "_id",
+              foreignField: "parentId",
+              as: "subcategories"
+            }
+          },
+          {
+            $unwind: "$subcategories"
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "subcategories._id",
+              foreignField: "categoryId",
+              as: "products"
+            }
+          },
+          {
+            $unwind: "$products"
+          },
+          {
+            $group: {
+              _id: "$_id",
+              image: { $first: "$image" },
+              name: { $first: "$name" },
+              allProducts: { $push: "$products" }
+            }
+          }
+        ])
+      if (!result || result.length===0) {
+        handleEmptyData()
+        return
+      }
+      title = result?.[0].name
+      products = result[0].allProducts
+    } else if (subcategoryId) {
+      const subcategoryObjId = mongoose.Types.ObjectId.createFromHexString(subcategoryId)
+      products = await productModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+            categoryId: subcategoryObjId
+          }
+        },
+        {
+          $lookup: {
+            from: "subcategories",
+            localField: "categoryId",
+            foreignField: "_id",
+            as: "subcategory"
+          }
+        },
+        {
+          $addFields: {
+            subcategory: { $arrayElemAt: ["$subcategory", 0] }
+          }
+        }
+      ])
+      if (!products || products.length === 0) {
+        handleEmptyData()
+        return
+      }
+      title = products?.[0].subcategory.name
+
+    } else {
+      products = await productModel.find({ isDeleted: false })
+        .sort().skip(startIndex).limit(LIMIT)
+    }
+
 
     res.render('user/products/products', {
       ...viewUsersPage,
       products,
       categories,
       subcategories,
+      title,
       page: Number(page),
       numberOfPages
     })

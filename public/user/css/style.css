@@ -226,3 +226,9 @@
   width: 150px;
   height: 150px;
 }
+
+/* * show all categories */
+.allCategoriesCard{
+  max-height: 360px;
+  min-width: 200px;
+}
