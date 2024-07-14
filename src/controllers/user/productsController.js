@@ -4,9 +4,45 @@ const { viewUsersPage } = require("../../constants/pageConfid")
 const productModel = require('../../model/productModel')
 
 
+
+const getProductsAggregation = async ({ sort, skip, limit }) => {
+  const products = await productModel.aggregate([
+    { $match: { isDeleted: false } },
+    {
+      $lookup: {
+        from: "offers",
+        localField: "_id",
+        foreignField: "productIds",
+        as: "offerDetails"
+      }
+    },
+    {
+      $unwind: "$offerDetails"
+    },
+    {
+      $project: {
+        "offerDetails.productIds": 0,
+        "offerDetails.categoryIds": 0,
+        "offerDetails.subcategoryIds": 0,
+        "offerDetails.isDisabled": 0,
+        "offerDetails.createdAt": 0,
+        "offerDetails.updatedAt": 0
+      }
+    },
+    { $sort: sort },
+    { $skip: skip },
+    { $limit: limit }
+  ])
+  return products
+}
+
+
+
+
+
 const getProductsController = async (req, res, next) => {
   try {
-    
+
 
     res.render('user/home/home2', {
       ...viewUsersPage,
@@ -31,8 +67,41 @@ const getTopBrandsProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-    const topBrandProducts = await productModel.find({ isDeleted: false })
-      .sort({ "productInfo.brand": -1 }).skip(startIndex).limit(LIMIT)
+    // const topBrandProducts = await productModel.aggregate([
+    //   { $match: { isDeleted: false } },
+    //   {
+    //     $lookup: {
+    //       from: "offers",
+    //       localField: "_id",
+    //       foreignField: "productIds",
+    //       as: "offerDetails"
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$offerDetails"
+    //   },
+    //   {
+    //     $project: {
+    //       "offerDetails.productIds": 0,
+    //       "offerDetails.categoryIds": 0,
+    //       "offerDetails.subcategoryIds": 0,
+    //       "offerDetails.isDisabled": 0,
+    //       "offerDetails.createdAt": 0,
+    //       "offerDetails.updatedAt": 0
+    //     }
+    //   },
+    //   { $sort: { "productInfo.brand": 1 } },
+    //   { $skip: startIndex },
+    //   { $limit: LIMIT }
+    // ])
+
+    const topBrandProducts = await getProductsAggregation({
+      sort: { "productInfo.brand": 1 },
+      skip: startIndex,
+      limit: LIMIT,
+    })
+
+
 
     res.status(OK).json({
       products: topBrandProducts,
@@ -56,8 +125,14 @@ const getPopularProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-    const popularProducts = await productModel.find({ isDeleted: false })
-      .sort({ peopleRated: -1 }).skip(startIndex).limit(LIMIT)
+    // const popularProducts = await productModel.find({ isDeleted: false })
+    //   .sort({ peopleRated: -1 }).skip(startIndex).limit(LIMIT)
+
+    const popularProducts = await getProductsAggregation({
+      sort: { peopleRated: -1 },
+      skip: startIndex,
+      limit: LIMIT
+    })
 
     res.status(OK).json({
       products: popularProducts,
@@ -81,8 +156,14 @@ const getTopRatedProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-    const topRatedProducts = await productModel.find({ isDeleted: false })
-      .sort({ rating: -1 }).skip(startIndex).limit(LIMIT)
+    // const topRatedProducts = await productModel.find({ isDeleted: false })
+    //   .sort({ rating: -1 }).skip(startIndex).limit(LIMIT)
+
+    const topRatedProducts = await getProductsAggregation({
+      sort: { rating: -1 },
+      skip: startIndex,
+      limit: LIMIT,
+    })
 
     res.status(OK).json({
       products: topRatedProducts,
@@ -106,8 +187,15 @@ const getNewProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-    const newProducts = await productModel.find({ isDeleted: false })
-      .sort({ createdAt : -1 }).skip(startIndex).limit(LIMIT)
+
+    const newProducts = await getProductsAggregation({
+      sort: { createdAt: -1 },
+      skip:startIndex,
+      limit:LIMIT,
+    })
+
+    console.log("topBrandProducts[0].length ")
+    console.log(newProducts.length)
 
     res.status(OK).json({
       products: newProducts,

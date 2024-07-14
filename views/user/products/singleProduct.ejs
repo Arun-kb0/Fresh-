@@ -25,7 +25,7 @@
 
 	<!-- * breadcrumbs -->
 	<div class="container">
-		<h3>Home / All categories / <span class="orangeTextColor"> Apple </span></h3>
+		<h3>Home / All categories / <span class="orangeTextColor"> <%= product.name %> </span></h3>
 	</div>
 	<!-- * end breadcrumbs -->
 
@@ -49,7 +49,7 @@
 	</div>
 	<!-- end search arewa -->
 <!-- * product details -->
-	<div class="container d-sm-flex flex-sm-row flex-cloumn col-12 my-5 singleProductContainer">
+	<div class="container-fluid d-sm-flex justify-content-center flex-sm-row flex-cloumn my-5 singleProductContainer">
 		<!-- * image -->
 		<section class="d-flex col-4 py-5 productImageSection">
 			<div class="d-block col-3 ">
@@ -76,8 +76,6 @@
 			</div>
 			<!-- * zoom content end -->
 		</section>
-
-
 		<!-- * end image -->
 
 		<!-- * details -->
@@ -313,7 +311,8 @@
 	<!-- * suggestions end -->
 
 
-	<div class="d-sm-flex flex-sm-row flex-cloumn  justify-content-center singleProductContainer my-3">
+
+	<div class="container-fluid d-sm-flex justify-content-center flex-sm-row flex-cloumn my-5 singleProductContainer">
 		<!-- * rating -->
 		<section class="col-4 ratingSection">
 			<h4>Ratings & Reviews</h4>

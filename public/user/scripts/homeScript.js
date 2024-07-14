@@ -60,7 +60,7 @@ $(function () {
 
 
 
-// * load more content  function
+  // * load more content  function
   function loadMoreData({ page, container, url, name }) {
     $.ajax({
       url: url,
@@ -110,7 +110,10 @@ $(function () {
                 <h5 class="priceTextColor">₹${item.finalPrice}</h5>
                 <div class="d-flex justify-content-center">
                   <p class="text-secondary px-3 textLineTrough">₹${item.price}</p>
-                  <p class="text-success px-3">20%</p>
+                  <p class="text-success px-3">${item.offerDetails?.discountType === 'percentage'
+                    ? item.offerDetails?.discountValue+"% OFF"
+                    : "₹"+item.offerDetails?.discountValue +" OFF"
+                  }</p>
                 </div>
                 <div class="d-flex align-items-baseline">
                   <div class="d-flex pb-3 px-3">

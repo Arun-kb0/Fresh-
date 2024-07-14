@@ -201,7 +201,7 @@ const createOfferController = async (req, res, next) => {
       image,
       categoryIds: categoryId ? [categoryId] : [],
       subcategoryIds: subcategoryId ? [subcategoryId] : [],
-      productIds: productId ? [productId] : [],
+      productIds: productsIds ? productsIds : [],
     })
 
     const discountType = newOffer.discountType
