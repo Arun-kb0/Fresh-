@@ -3,7 +3,13 @@ $(function () {
   const categoryDropdown = $("#categoryDropdown")
   const subcategoryDropdown = $("#subcategoryDropdown")
 
-
+  let sortValue = 'aToz'
+  $('input[name="sortRadioBtn"]').on("change", function () {
+    if ($(this).is(':checked')) {
+      sortValue = $(this).val().trim()
+      console.log(`Active radio button: ${sortValue}`);
+    }
+  });
 
 
   subcategoryDropdown.find('.dropdown-item').on('click',
@@ -14,10 +20,11 @@ $(function () {
       $('#subcategoryDropdownBtn').text(name);
       getProductsByFilter({
         id: subcategoryId,
-        name:'subcategoryId'
+        name: 'subcategoryId',
+        sortValue,
       })
     });
-  
+
   categoryDropdown.find('.dropdown-item').on('click',
     function () {
       const name = $(this).text().trim();
@@ -26,22 +33,14 @@ $(function () {
       $('#categoryDropdownBtn').text(name);
       getProductsByFilter({
         id: categoryId,
-        name: 'categoryId'
+        name: 'categoryId',
+        sortValue
       })
     });
-  
-  function getProductsByFilter({ id, name }) {
-    window.location.href = `/products?${name}=${id}`
-    // $.ajax({
-    //   url: `/products?${name}=${id}`,
-    //   method: 'GET',
-    //   error: function (xhr,status,error) {
-    //     const res = JSON.parse(xhr.responseText)
-    //     showAlert(res.message)
-    //     console.log(error)
-    //   } 
-    // })
+
+  function getProductsByFilter({ id, name, sortValue }) {
+    window.location.href = `/products?${name}=${id}&sortValue=${sortValue}`
   }
-  
-  
+
+
 })

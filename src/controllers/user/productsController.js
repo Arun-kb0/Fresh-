@@ -224,8 +224,8 @@ const getSingleProductController = async (req, res, next) => {
 
 
 const getProductsProductsPageController = async (req, res, next) => {
-  const { page = 1, categoryId, subcategoryId } = req.query
-  console.log(categoryId)
+  const { page = 1, categoryId, subcategoryId, sortValue } = req.query
+  console.log(sortValue)
 
   try {
     const LIMIT = 10
@@ -234,12 +234,84 @@ const getProductsProductsPageController = async (req, res, next) => {
     const numberOfPages = Math.ceil(total / LIMIT)
 
 
+
     const categories = await categoryModel.find({ isDeleted: false })
     const subcategories = await subcategoryModel.find({ isDeleted: false })
 
-    const handleEmptyData = async() => {
+    const getSortQueryField = (idName, fieldName) => {
+      switch (idName) {
+        case 'categoryId':
+          return `products.${fieldName}`
+        default:
+          return fieldName
+      }
+    }
+
+    let sortQuery = ''
+    let fieldName = ''
+    switch (sortValue) {
+      case 'aToz':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'lowercaseName')
+        } else {
+          fieldName = getSortQueryField('', 'name')
+        }
+        sortQuery = { [fieldName]: 1 }
+        break;
+      case 'price':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'finalPrice')
+        } else {
+          fieldName = getSortQueryField('', 'finalPrice')
+        }
+        sortQuery = { [fieldName]: 1 }
+        break;
+      case 'priceHighToLow':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'finalPrice')
+        } else {
+          fieldName = getSortQueryField('', 'finalPrice')
+        }
+        sortQuery = { [fieldName]: -1 }
+        break;
+      case 'rating':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'rating')
+        } else {
+          fieldName = getSortQueryField('', 'rating')
+        }
+        sortQuery = { [fieldName]: -1 }
+        break;
+      case 'newArrivals':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'createdAt')
+        } else {
+          fieldName = getSortQueryField('', 'createdAt')
+        }
+        sortQuery = { [fieldName]: 1 }
+        break;
+      case 'popularity':
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'peopleRated')
+        } else {
+          fieldName = getSortQueryField('', 'peopleRated')
+        }
+        sortQuery = { [fieldName]: -1 }
+        break
+      default:
+        if (categoryId) {
+          fieldName = getSortQueryField('categoryId', 'lowercaseName')
+        } else {
+          fieldName = getSortQueryField('', 'name')
+        }
+        sortQuery = { [fieldName]: 1 }
+        break;
+    }
+    console.log(sortQuery)
+
+    const handleEmptyData = async () => {
       products = await productModel.find({ isDeleted: false })
-        .sort().skip(startIndex).limit(LIMIT)
+        .sort(sortQuery).skip(startIndex).limit(LIMIT)
       res.render('user/products/products', {
         ...viewUsersPage,
         products,
@@ -286,15 +358,30 @@ const getProductsProductsPageController = async (req, res, next) => {
             $unwind: "$products"
           },
           {
+            $addFields: {
+              "products.lowercaseName": {
+                $toLower: "$products.name"
+              }
+            }
+          },
+          // { $sort: { "products.lowercaseName": 1 } },
+          { $sort: sortQuery },
+          {
             $group: {
               _id: "$_id",
-              image: { $first: "$image" },
-              name: { $first: "$name" },
-              allProducts: { $push: "$products" }
+              image: {
+                $first: "$image"
+              },
+              name: {
+                $first: "$name"
+              },
+              allProducts: {
+                $push: "$products"
+              }
             }
           }
         ])
-      if (!result || result.length===0) {
+      if (!result || result.length === 0) {
         handleEmptyData()
         return
       }
@@ -321,7 +408,10 @@ const getProductsProductsPageController = async (req, res, next) => {
           $addFields: {
             subcategory: { $arrayElemAt: ["$subcategory", 0] }
           }
-        }
+        },
+        { $sort: sortQuery },
+        { $skip: startIndex },
+        { $limit: LIMIT }
       ])
       if (!products || products.length === 0) {
         handleEmptyData()
@@ -330,8 +420,8 @@ const getProductsProductsPageController = async (req, res, next) => {
       title = products?.[0].subcategory.name
 
     } else {
-      products = await productModel.find({ isDeleted: false })
-        .sort().skip(startIndex).limit(LIMIT)
+      handleEmptyData()
+      return
     }
 
 
