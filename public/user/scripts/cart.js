@@ -1,12 +1,10 @@
 $(function () {
 
   const pathsNotNeedDelegation = [
-    '/products',
-    '/products/search',
-    '/profile/wishlist',
+    '/'
   ]
 
-  if (!pathsNotNeedDelegation.includes(window.location.pathname)) {
+  if (pathsNotNeedDelegation.includes(window.location.pathname)) {
     // * event delegation for dynamically added btn
     $(document).on('click', '.addToCartBtn', handleAddToCart);
     $(document).on('click', '.addToWishlistBtn', handleAddToWishlist);
@@ -155,13 +153,21 @@ $(function () {
       method: 'POST',
       data: { productId },
       success: function (data) {
+        if (!data) {
+          console.log('addToWishlist no data')
+          return
+        }
         console.log(data)
         if (window.location.pathname === '/profile/wishlist') {
           card.remove()
         } else {
-          wishlistIcon
-            .removeClass('text-secondary')
-            .addClass('wishlistBtnIcon')
+          data.isAdd
+            ? wishlistIcon
+              .removeClass('text-secondary')
+              .addClass('wishlistBtnIcon')
+            : wishlistIcon
+              .removeClass('wishlistBtnIcon')
+              .addClass('text-secondary')
         }
       },
       error: function (xhr, status, error) {

@@ -33,7 +33,7 @@ const getWishlistController = async (req, res, next) => {
     console.log("result ")
     console.log(result[0])
 
-    res.render('user/profile/wishlist', { ...viewUsersPage, products: result[0]?.products ? result[0].products : []  })
+    res.render('user/profile/wishlist', { ...viewUsersPage, products: result[0]?.products ? result[0].products : [] })
   } catch (error) {
     next(error)
   }
@@ -44,40 +44,45 @@ const addToWishlistController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
     const userId = user.userId
-    console.log(req.body)
+
     if (!mongoose.isObjectIdOrHexString(productId)) {
       throw new CustomError("invalid product id", BAD_REQUEST)
     }
-    console.log(productId)
-    const productObjId = mongoose.Types.ObjectId.createFromHexString(productId)
 
+    const productObjId = mongoose.Types.ObjectId.createFromHexString(productId)
     const isWishlistExists = await wishlistModel.findOne({ userId })
+    let isAdd = true
+
     let wishlist
     if (isWishlistExists) {
       if (isWishlistExists?.productIds?.includes(productObjId)) {
         wishlist = await wishlistModel.findOneAndUpdate(
           { userId },
-          { $pull : { productIds: productObjId } },
+          { $pull: { productIds: productObjId } },
           { new: true }
         )
+        isAdd = false
+        console.log('item removed')
       } else {
         wishlist = await wishlistModel.findOneAndUpdate(
           { userId },
           { $addToSet: { productIds: productObjId } },
           { new: true }
         )
+        isAdd = true
       }
     } else {
       wishlist = await wishlistModel.create({
         userId,
-       productIds: [productObjId] 
+        productIds: [productObjId]
       })
-  }
+      isAdd = true
+    }
     console.log(wishlist)
-  res.status(OK).json({ message: 'add to wishlist success', wishlist })
-} catch (error) {
-  next(error)
-}
+    res.status(OK).json({ message: 'wishlist update success', wishlist, isAdd })
+  } catch (error) {
+    next(error)
+  }
 }
 
 module.exports = {
