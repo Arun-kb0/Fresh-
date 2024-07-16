@@ -99,7 +99,12 @@ $(function () {
 
         data.products.forEach(item => {
           container.append(`
-            <div class="col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke">
+            <div class="position-relative col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke">
+            <div class="position-absolute top-0 start-0">
+							<a class="addToWishlistBtn" data-id='${item._id}' >
+								<i class="fa-solid fa-heart fa-xl text-secondary"></i>
+							</a>
+						</div>
               <div class="d-flex flex-column align-content-center">
                 <div class="d-flex justify-content-center">
                   <a class="cardImage" href="/product?productId=${item._id}">

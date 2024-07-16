@@ -14,6 +14,7 @@ const {
   getCouponsPageController,
   
  } = require('../../controllers/user/profileController')
+const { addToWishlistController, getWishlistController } = require('../../controllers/user/wishlistController')
 const router = express.Router()
 
 
@@ -37,5 +38,10 @@ router.get('/orders', getAllOrdersPageController)
 router.get("/orderdetails", getOrderDetailsPageController)
 
 router.get('/coupons',getCouponsPageController)
+
+// * wishlist
+router.route('/wishlist')
+  .get(getWishlistController)
+  .post(addToWishlistController)
 
 module.exports = router

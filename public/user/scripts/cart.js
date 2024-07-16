@@ -2,12 +2,14 @@ $(function () {
 
   const pathsNotNeedDelegation = [
     '/products',
-    '/products/search'
+    '/products/search',
+    '/profile/wishlist',
   ]
 
   if (!pathsNotNeedDelegation.includes(window.location.pathname)) {
     // * event delegation for dynamically added btn
     $(document).on('click', '.addToCartBtn', handleAddToCart);
+    $(document).on('click', '.addToWishlistBtn', handleAddToWishlist);
   }
 
 
@@ -15,6 +17,7 @@ $(function () {
   const addToCartBtn = $(".addToCartBtn")
 
   // * cart btns
+  const addToWishlistBtn = $(".addToWishlistBtn")
   const deleteCartItemBtn = $(".deleteCartItemBtn")
   const priceDetails = $("#priceDetails")
 
@@ -22,6 +25,7 @@ $(function () {
   const decQtyBtn = $(".decQtyBtn")
 
   // * add to cart event 
+  addToWishlistBtn.on('click', handleAddToWishlist)
   addToCartBtn.on("click", handleAddToCart)
 
   deleteCartItemBtn.on("click", handleCartItemDelete)
@@ -122,7 +126,7 @@ $(function () {
   // * add to cart btn 
   function handleAddToCart(event) {
     const productId = $(this).attr("data-id")
-    console.log("productId ",productId)
+    console.log("productId ", productId)
     console.log(event)
     $.ajax({
       url: '/cart/',
@@ -138,6 +142,34 @@ $(function () {
       }
     })
 
+  }
+
+  function handleAddToWishlist(e) {
+    const productId = $(this).attr('data-id').trim()
+    const wishlistIcon = $(this).find('i')
+    const card = $(`#${productId}`)
+
+    console.log("productId ", productId)
+    $.ajax({
+      url: '/profile/wishlist',
+      method: 'POST',
+      data: { productId },
+      success: function (data) {
+        console.log(data)
+        if (window.location.pathname === '/profile/wishlist') {
+          card.remove()
+        } else {
+          wishlistIcon
+            .removeClass('text-secondary')
+            .addClass('wishlistBtnIcon')
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
   }
 
 })
