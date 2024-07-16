@@ -1,7 +1,14 @@
 $(function () {
 
-  // * event delegation for dynamically added btn
-  $(document).on('click', '.addToCartBtn', handleAddToCart);
+  const pathsNotNeedDelegation = [
+    '/products',
+    '/products/search'
+  ]
+
+  if (!pathsNotNeedDelegation.includes(window.location.pathname)) {
+    // * event delegation for dynamically added btn
+    $(document).on('click', '.addToCartBtn', handleAddToCart);
+  }
 
 
   // * add to cart btn 
@@ -97,7 +104,7 @@ $(function () {
   function handleCartItemDelete(e, productId = null) {
     if (!productId) {
       productId = $(this).attr('data-productId')
-    } 
+    }
     $.ajax({
       url: '/cart/deleteitem',
       method: 'DELETE',
@@ -115,7 +122,7 @@ $(function () {
   // * add to cart btn 
   function handleAddToCart(event) {
     const productId = $(this).attr("data-id")
-    console.log(productId)
+    console.log("productId ",productId)
     console.log(event)
     $.ajax({
       url: '/cart/',

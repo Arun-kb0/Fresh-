@@ -30,6 +30,8 @@ const productSchema = new Schema({
 )
 
 
+productSchema.index({ name: 'text' })
+
 
 
 const productModel = mongoose.model("products", productSchema)

@@ -314,6 +314,7 @@ const getProductsProductsPageController = async (req, res, next) => {
         .sort(sortQuery).skip(startIndex).limit(LIMIT)
       res.render('user/products/products', {
         ...viewUsersPage,
+        isSearchPage: false,
         products,
         categories,
         subcategories,
@@ -427,6 +428,7 @@ const getProductsProductsPageController = async (req, res, next) => {
 
     res.render('user/products/products', {
       ...viewUsersPage,
+      isSearchPage: false,
       products,
       categories,
       subcategories,
@@ -440,6 +442,34 @@ const getProductsProductsPageController = async (req, res, next) => {
 }
 
 
+const getProductSearchResultController = async (req, res, next) => {
+  const { searchQuery } = req.query
+  try {
+    const products = await productModel.find({
+      $text: { $search: searchQuery }
+    })
+      .select({ score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .limit(10);
+
+    const categories = await categoryModel.find({ isDeleted: false })
+    const subcategories = await subcategoryModel.find({ isDeleted: false })
+
+    res.render('user/products/products', {
+      ...viewUsersPage,
+      isSearchPage: true,
+      products,
+      categories,
+      subcategories,
+      title: 'search',
+      page: 1,
+      numberOfPages: 2
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 
 module.exports = {
@@ -449,5 +479,6 @@ module.exports = {
   getPopularProductsController,
   getTopRatedProductsController,
   getNewProductsController,
-  getProductsProductsPageController
+  getProductsProductsPageController,
+  getProductSearchResultController
 }

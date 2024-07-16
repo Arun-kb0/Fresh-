@@ -50,7 +50,9 @@
 	<!-- end search arewa -->
 	<!-- * products  -->
 	<div class="container-fluid d-sm-flex justify-content-center flex-sm-row flex-cloumn my-5 singleProductContainer">
+
 		<!-- * filters -->
+		<% if(!isSearchPage) {%>
 		<section class="d-flex col-2 py-5  productImageSection">
 			<div class="container shadow rounded-3 px-2 py-3">
 				<ul class="list-group list-group-flush">
@@ -137,10 +139,12 @@
 				</ul>
 			</div>
 		</section>
+		<% } %>
 		<!-- * end filters -->
 
+
 		<!-- * products -->
-		<section class="d-flex col-7">
+		<section class='d-flex <%= isSearchPage ? "col-10" : "col-7" %>   '>
 			<div class="d-flex flex-wrap ">
 				<% for(let item of products){ %>
 					<!-- * mycard -->
@@ -265,8 +269,8 @@
 
 
 
-	<% scriptBlock=` <script src="static/user/scripts/products.js">
-		</script>
+	<% scriptBlock=`
+		<script src="static/user/scripts/products.js"></script>
 		<script src="static/user/scripts/user.js"></script>
 		<script src="/static/user/scripts/cart.js"></script>
 		`

@@ -104,7 +104,10 @@ const addToCartController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
     const userId = user.userId
-    const product = await productModel.findById(productId).select('stock finalPrice image productInfo.soldBy');
+    if (!mongoose.isObjectIdOrHexString(productId)) {
+      throw new CustomError('invalid productId',BAD_REQUEST)
+    }
+    const product = await productModel.findById(productId)
     if (!product) {
       return res.status(BAD_REQUEST).json({ message: "Product not found" });
     }
