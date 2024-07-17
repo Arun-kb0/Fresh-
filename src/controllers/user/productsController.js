@@ -5,159 +5,15 @@ const productModel = require('../../model/productModel')
 const categoryModel = require('../../model/categoryModel')
 const subcategoryModel = require('../../model/subCategoryModel')
 const { default: mongoose } = require("mongoose")
-
-
-const getProductsAggregation = async ({ sort, skip, limit, userId = '' }) => {
-  // const products = await productModel.aggregate([
-  //   { $match: { isDeleted: false } },
-  //   {
-  //     $lookup: {
-  //       from: "offers",
-  //       localField: "_id",
-  //       foreignField: "productIds",
-  //       as: "offerDetails"
-  //     }
-  //   },
-  //   {
-  //     $unwind: "$offerDetails"
-  //   },
-  //   {
-  //     $project: {
-  //       "offerDetails.productIds": 0,
-  //       "offerDetails.categoryIds": 0,
-  //       "offerDetails.subcategoryIds": 0,
-  //       "offerDetails.isDisabled": 0,
-  //       "offerDetails.createdAt": 0,
-  //       "offerDetails.updatedAt": 0
-  //     }
-  //   },
-  //   { $sort: sort },
-  //   { $skip: skip },
-  //   { $limit: limit }
-  // ])
-
-  console.log("userId ", userId)
-  const products = await productModel.aggregate([
-    {
-      $match: {
-        isDeleted: false
-      }
-    },
-    {
-      $lookup: {
-        from: "offers",
-        localField: "_id",
-        foreignField: "productIds",
-        as: "offerDetails"
-      }
-    },
-    {
-      $unwind: {
-        path: "$offerDetails",
-        preserveNullAndEmptyArrays: true
-      }
-    },
-    {
-      $group: {
-        _id: "$_id",
-        productDetails: {
-          $first: "$$ROOT"
-        },
-        offerDetails: {
-          $push: "$offerDetails"
-        }
-      }
-    },
-    {
-      $addFields: {
-        "productDetails.offerDetails": {
-          $arrayElemAt: ["$offerDetails", 0]
-        }
-      }
-    },
-    {
-      $replaceRoot: {
-        newRoot: "$productDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "wishlists",
-        let: {
-          productId: "$_id",
-          userId: userId,
-        },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $eq: ["$userId", "$$userId"]
-              }
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              isWishlisted: {
-                $in: ["$$productId", "$productIds"]
-              }
-            }
-          }
-        ],
-        as: "wishlist"
-      }
-    },
-    {
-      $addFields: {
-        isWishlisted: {
-          $cond: {
-            if: {
-              $gt: [
-                {
-                  $size: "$wishlist"
-                },
-                0
-              ]
-            },
-            then: {
-              $arrayElemAt: [
-                "$wishlist.isWishlisted",
-                0
-              ]
-            },
-            else: false
-          }
-        }
-      }
-    },
-    {
-      $project: {
-        wishlist: 0,
-        "offerDetails.productIds": 0,
-        "offerDetails.categoryIds": 0,
-        "offerDetails.subcategoryIds": 0,
-        "offerDetails.isDisabled": 0,
-        "offerDetails.createdAt": 0,
-        "offerDetails.updatedAt": 0
-      }
-    },
-    { $sort: sort },
-    { $skip: skip },
-    { $limit: limit }
-  ])
-  return products
-}
+const { getProductsAggregation} = require('../../helpers/aggregationPipelines')
 
 
 
 const getProductsController = async (req, res, next) => {
   try {
-
-
     res.render('user/home/home2', {
       ...viewUsersPage,
     })
-
   } catch (error) {
     next(error)
   }
@@ -307,10 +163,132 @@ const getSingleProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
   try {
-    const product = await productModel.findOne({ _id: productId, isDeleted: false })
-    const suggestions = await productModel.find({ isDeleted: false })
+    const productObjId = mongoose.Types.ObjectId.createFromHexString(productId)
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
+    
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          _id: productObjId,
+          isDeleted: false
+        }
+      },
+      {
+        $lookup: {
+          from: "offers",
+          localField: "_id",
+          foreignField: "productIds",
+          as: "offerDetails"
+        }
+      },
+      {
+        $unwind: {
+          path: "$offerDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          productDetails: {
+            $first: "$$ROOT"
+          },
+          offerDetails: {
+            $push: "$offerDetails"
+          }
+        }
+      },
+      {
+        $addFields: {
+          "productDetails.offerDetails": {
+            $arrayElemAt: ["$offerDetails", 0]
+          }
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$productDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "wishlists",
+          let: {
+            productId: "$_id",
+            userId: userId
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$userId", "$$userId"]
+                }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                isWishlisted: {
+                  $in: ["$$productId", "$productIds"]
+                }
+              }
+            }
+          ],
+          as: "wishlist"
+        }
+      },
+      {
+        $addFields: {
+          isWishlisted: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: "$wishlist"
+                  },
+                  0
+                ]
+              },
+              then: {
+                $arrayElemAt: [
+                  "$wishlist.isWishlisted",
+                  0
+                ]
+              },
+              else: false
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          wishlist: 0,
+          "offerDetails.productIds": 0,
+          "offerDetails.categoryIds": 0,
+          "offerDetails.subcategoryIds": 0,
+          "offerDetails.isDisabled": 0,
+          "offerDetails.createdAt": 0,
+          "offerDetails.updatedAt": 0
+        }
+      }
+    ])
+
+    
+    const suggestions = await getProductsAggregation({
+      sort: { peopleRated: -1 },
+      skip: 0,
+      limit: 10,
+      userId
+    })
+
     console.log(product)
-    res.render('user/products/singleProduct', { ...viewUsersPage, product, suggestions })
+    res.render('user/products/singleProduct', {
+      ...viewUsersPage,
+      product: product ? product[0] : [],
+      suggestions: suggestions ? suggestions : []
+    })
   } catch (error) {
     next(error)
   }

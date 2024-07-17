@@ -11,6 +11,7 @@ const mongoose = require("mongoose")
 const { find } = require("../../model/cartModel")
 const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
+const { getProductsAggregation } = require("../../helpers/aggregationPipelines")
 
 
 const getProfileController = async (req, res, next) => {
@@ -21,53 +22,20 @@ const getProfileController = async (req, res, next) => {
     const total = await productModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
 
-    const products = await productModel.aggregate([
-      {
-        $match: {
-          isDeleted: false
-        }
-      },
-      {
-        $lookup: {
-          from: "subcategories",
-          localField: "categoryId",
-          foreignField: "_id",
-          as: "subcategory"
-        }
-      },
-      {
-        $addFields: {
-          subcategory: {
-            $filter: {
-              input: "$subcategory",
-              as: "category",
-              cond: {
-                $eq: ["$$category.isDeleted", false]
-              }
-            }
-          }
-        }
-      },
-      {
-        $unwind: {
-          path: "$subcategory",
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $sort: {
-          rating: 1,
-          name: 1
-        }
-      },
-      {
-        $skip: startIndex
-      },
-      {
-        $limit: LIMIT
-      }
-    ])
-    res.render('user/profile/profile', { ...viewUsersPage, suggestions: products })
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
+    const products = await getProductsAggregation({
+      sort: { rating: 1, name: 1 },
+      skip: startIndex,
+      limit: LIMIT,
+      userId
+    })
+
+    res.render('user/profile/profile', {
+      ...viewUsersPage,
+      suggestions: products ? products : []
+    })
   } catch (error) {
     next(error)
   }
