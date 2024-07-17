@@ -33,7 +33,23 @@ const getWishlistController = async (req, res, next) => {
     console.log("result ")
     console.log(result[0])
 
-    res.render('user/profile/wishlist', { ...viewUsersPage, products: result[0]?.products ? result[0].products : [] })
+    res.render('user/profile/wishlist', {
+      ...viewUsersPage,
+      products: result[0]?.products ? result[0].products : []
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getWhitelistedProductIdsController = async (req, res, next) => {
+  try {
+    const user = JSON.parse(req.cookies.user)
+    if (!user) {
+      throw new CustomError('userId is required to find wishlist',BAD_REQUEST)
+    }
+    const wishlist = await wishlistModel.findOne({userId:user.userId})
+    res.status(OK).json({message:'get wishlist productIds success', wishlist})
   } catch (error) {
     next(error)
   }
@@ -87,5 +103,6 @@ const addToWishlistController = async (req, res, next) => {
 
 module.exports = {
   addToWishlistController,
-  getWishlistController
+  getWishlistController,
+  getWhitelistedProductIdsController
 }

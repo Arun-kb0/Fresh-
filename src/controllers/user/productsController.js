@@ -7,9 +7,42 @@ const subcategoryModel = require('../../model/subCategoryModel')
 const { default: mongoose } = require("mongoose")
 
 
-const getProductsAggregation = async ({ sort, skip, limit }) => {
+const getProductsAggregation = async ({ sort, skip, limit, userId = '' }) => {
+  // const products = await productModel.aggregate([
+  //   { $match: { isDeleted: false } },
+  //   {
+  //     $lookup: {
+  //       from: "offers",
+  //       localField: "_id",
+  //       foreignField: "productIds",
+  //       as: "offerDetails"
+  //     }
+  //   },
+  //   {
+  //     $unwind: "$offerDetails"
+  //   },
+  //   {
+  //     $project: {
+  //       "offerDetails.productIds": 0,
+  //       "offerDetails.categoryIds": 0,
+  //       "offerDetails.subcategoryIds": 0,
+  //       "offerDetails.isDisabled": 0,
+  //       "offerDetails.createdAt": 0,
+  //       "offerDetails.updatedAt": 0
+  //     }
+  //   },
+  //   { $sort: sort },
+  //   { $skip: skip },
+  //   { $limit: limit }
+  // ])
+
+  console.log("userId ", userId)
   const products = await productModel.aggregate([
-    { $match: { isDeleted: false } },
+    {
+      $match: {
+        isDeleted: false
+      }
+    },
     {
       $lookup: {
         from: "offers",
@@ -19,10 +52,87 @@ const getProductsAggregation = async ({ sort, skip, limit }) => {
       }
     },
     {
-      $unwind: "$offerDetails"
+      $unwind: {
+        path: "$offerDetails",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $group: {
+        _id: "$_id",
+        productDetails: {
+          $first: "$$ROOT"
+        },
+        offerDetails: {
+          $push: "$offerDetails"
+        }
+      }
+    },
+    {
+      $addFields: {
+        "productDetails.offerDetails": {
+          $arrayElemAt: ["$offerDetails", 0]
+        }
+      }
+    },
+    {
+      $replaceRoot: {
+        newRoot: "$productDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "wishlists",
+        let: {
+          productId: "$_id",
+          userId: userId,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$userId", "$$userId"]
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              isWishlisted: {
+                $in: ["$$productId", "$productIds"]
+              }
+            }
+          }
+        ],
+        as: "wishlist"
+      }
+    },
+    {
+      $addFields: {
+        isWishlisted: {
+          $cond: {
+            if: {
+              $gt: [
+                {
+                  $size: "$wishlist"
+                },
+                0
+              ]
+            },
+            then: {
+              $arrayElemAt: [
+                "$wishlist.isWishlisted",
+                0
+              ]
+            },
+            else: false
+          }
+        }
+      }
     },
     {
       $project: {
+        wishlist: 0,
         "offerDetails.productIds": 0,
         "offerDetails.categoryIds": 0,
         "offerDetails.subcategoryIds": 0,
@@ -58,6 +168,7 @@ const getProductsController = async (req, res, next) => {
 const getTopBrandsProductsController = async (req, res, next) => {
   const { page = 1 } = req.query
   try {
+
     const LIMIT = 6
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await productModel.countDocuments({ isDeleted: false })
@@ -67,41 +178,15 @@ const getTopBrandsProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-    // const topBrandProducts = await productModel.aggregate([
-    //   { $match: { isDeleted: false } },
-    //   {
-    //     $lookup: {
-    //       from: "offers",
-    //       localField: "_id",
-    //       foreignField: "productIds",
-    //       as: "offerDetails"
-    //     }
-    //   },
-    //   {
-    //     $unwind: "$offerDetails"
-    //   },
-    //   {
-    //     $project: {
-    //       "offerDetails.productIds": 0,
-    //       "offerDetails.categoryIds": 0,
-    //       "offerDetails.subcategoryIds": 0,
-    //       "offerDetails.isDisabled": 0,
-    //       "offerDetails.createdAt": 0,
-    //       "offerDetails.updatedAt": 0
-    //     }
-    //   },
-    //   { $sort: { "productInfo.brand": 1 } },
-    //   { $skip: startIndex },
-    //   { $limit: LIMIT }
-    // ])
-
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
     const topBrandProducts = await getProductsAggregation({
       sort: { "productInfo.brand": 1 },
       skip: startIndex,
       limit: LIMIT,
+      userId: userId
     })
-
-
 
     res.status(OK).json({
       products: topBrandProducts,
@@ -127,11 +212,14 @@ const getPopularProductsController = async (req, res, next) => {
 
     // const popularProducts = await productModel.find({ isDeleted: false })
     //   .sort({ peopleRated: -1 }).skip(startIndex).limit(LIMIT)
-
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
     const popularProducts = await getProductsAggregation({
       sort: { peopleRated: -1 },
       skip: startIndex,
-      limit: LIMIT
+      limit: LIMIT,
+      userId
     })
 
     res.status(OK).json({
@@ -158,11 +246,14 @@ const getTopRatedProductsController = async (req, res, next) => {
 
     // const topRatedProducts = await productModel.find({ isDeleted: false })
     //   .sort({ rating: -1 }).skip(startIndex).limit(LIMIT)
-
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
     const topRatedProducts = await getProductsAggregation({
       sort: { rating: -1 },
       skip: startIndex,
       limit: LIMIT,
+      userId
     })
 
     res.status(OK).json({
@@ -187,11 +278,14 @@ const getNewProductsController = async (req, res, next) => {
       throw new CustomError('page end', NO_CONTENT)
     }
 
-
+    const userId = req?.cookies?.user
+      ? JSON.parse(req.cookies.user).userId
+      : ''
     const newProducts = await getProductsAggregation({
       sort: { createdAt: -1 },
       skip: startIndex,
       limit: LIMIT,
+      userId
     })
 
     console.log("topBrandProducts[0].length ")
