@@ -26,7 +26,7 @@ const { createCouponController,
   getCreateCouponPageController, 
   getCouponsPageController} = require('../../controllers/admin/couponController')
 const { getAdminOffersTablePageController, getCreateOfferPageController, createOfferController, deleteOfferController } = require('../../controllers/offferController')
-const { getSalesReportController, downloadSalesReportExcelController } = require('../../controllers/admin/reportsController')
+const { getSalesReportController, downloadSalesReportExcelController, downloadSalesReportPdfController } = require('../../controllers/admin/reportsController')
 
 
 const router = express.Router()
@@ -104,7 +104,6 @@ router.route('/offer/create')
   
 
 router.get('/report/sales',getSalesReportController)
-router.get('/report/sales/excel', downloadSalesReportExcelController)
 
 
 module.exports = router
