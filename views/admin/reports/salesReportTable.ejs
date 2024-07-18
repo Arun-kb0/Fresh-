@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<!-- beautify ignore:start -->
+<html
+  lang="en"
+  class="light-style layout-menu-fixed"
+  dir="ltr"
+  data-theme="theme-default"
+  data-template="vertical-menu-template-free"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <title>Products table</title>
+    <meta name="description" content="" />
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            <div class="container-xxl flex-grow-1 container-p-y">
+              <!-- * alert -->
+              <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+                <div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+                </div>
+              </div>
+              <!-- * alert end -->
+
+              
+              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Report /</span> Sales report</h4>
+
+              <section class="d-flex">
+                <a class="btn btn-outline-info rounded-pill mx-2 my-3" href="/admin/report/sales/excel">download excel</a>
+                <button class="btn btn-outline-info rounded-pill  my-3 mx-2" >download pdf</button>
+              </section>
+
+              <!-- product Table rows -->
+              <div class="card">
+                <div class="table-responsive text-nowrap">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>order id</th>
+                        <th>Order status</th>
+                        <th>Total</th>
+                        <th>Payment method</th>
+                        <th>Payment status</th>
+                        <th>Created at</th>
+                        <th>user</th>
+                        <th>Address</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+
+
+                      <% for (const item of reportDetails){%>
+                        <tr>
+
+                          <td>
+                            <div class="orderImageCollection d-flex flex-wrap">
+                              <% let n = item.products.length < 6  ? item.products.length : 6  %>
+                              <% for(let i=0; i < n ; i++) {%>
+                              <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up"
+                                  title= "<%= item?.products[i].productDetails.name %>">
+                                  <img src="<%= item?.products[i].productDetails.image[0]?.path %>" alt="<%= item?.products[i].productDetails.image[0]?.originalName %>" class="rounded-circle" />
+                                </li>
+                              </ul>
+                              <% } %>
+                            </div>
+                          </td>
+
+                          <td class="">
+                            <div class="d-flex flex-column ">
+                              <% for(const product of item.products) {%>
+                               <strong> <%= product.productDetails.name %> </strong>
+                               <% } %>
+                            </div>
+                          </td>
+                          <td>
+                            <%= item._id %>
+                          </td>
+                          <td>
+                            <div class="dropdown orderStatusDropdown">
+                              <a class="btn btn-secondary btn-sm disabled"  id="dropdownMenuLink" >
+                                <span class="orderStatus">
+                                  <%= item.orderStatus %>
+                                </span>
+                              </a>
+                            </div>
+                          </td>
+                          <td>
+                            ₹<%= item.total %>
+                          </td>
+                          <td>
+                            <%= item.paymentMethod %>
+                          </td>
+                          <td>
+                            <div class="dropdown paymentStatusDropdown">
+                              <a class="btn btn-secondary btn-sm dropdown-toggle"  id="dropdownMenuLink" >
+                                <span class="paymentStatus">
+                                  <%= item.paymentStatus %>
+                                </span>
+                              </a>
+                            </div>
+                            
+                          </td>
+                          <td>
+                            <span class="createdAt">
+                              <%= item.createdAt %>
+                            </span>
+                          </td>
+                          <td>
+                           <div class="d-flex flex-column">  
+                            <span><%= item.userDetails.name %>  </span>
+                            <span><%= item.userDetails.username %>  </span>
+                            <span><%= item.userDetails.phone %>  </span>
+                           </div>
+                          </td>
+                          <td class="">
+                            <div class="d-flex flex-column">
+                              <strong> <%= item.addressDetails.name %> </strong>
+                              <span> <%= item.addressDetails.phone %> </span>
+                              <span> <%= item.addressDetails.email %> </span>
+                              <div class="d-flex">
+                                <span> <%= item.addressDetails.place+" ," %> </span>
+                                <span> <%= item.addressDetails.city+" ," %> </span>
+                                <span> <%= item.addressDetails.state+" ," %> </span>
+                                <span> <%= item.addressDetails.country+" ," %> </span>
+                              </div>
+                              <span> <%= item.addressDetails.pinCode %> </span>
+                            </div>
+                          </td>
+                          
+                         
+                        </tr>
+                     <% } %>
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!--/ product Table rows -->
+
+              <!-- *pagination  -->
+              <div class="d-flex justify-content-center align-items-center p-2 "  >
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn"> 
+                  <i class="fa-solid fa-chevron-left fa-xs"></i>
+                </button>
+                <div id="pageInfoContainer">
+                  <span><%= page %> out of </span>
+                  <span><%= numberOfPages %> </span>
+                </div>
+                <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+              <!-- *pagination end -->
+
+              <div class="d-flex justify-content-end ">
+                <h5 class="text-capitalize p-3 shadow py-2 rounded-3">total sales : ₹123 </h5>
+              </div>
+
+              <hr class="my-5" />
+
+
+            </div>
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                <div class="mb-2 mb-md-0">
+                  ©
+                  <script>
+                    document.write(new Date().getFullYear());
+                  </script>
+                  , made with ❤️ by
+                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                </div>
+                <div>
+                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
+
+                  <a
+                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Documentation</a
+                  >
+
+                  <a
+                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Support</a
+                  >
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+    <!-- * variable  -->
+    <script>
+      const pageDetails = {
+        page: parseInt("<%= page %>"),
+        numberOfPages: parseInt("<%= numberOfPages %>"),
+      } 
+    </script>
+    <!--  * product  scripts -->
+    <% scriptBlock= `
+      <script src="/static/admin/scripts/orderTable.js"></script>
+      `
+    %>
+  </body>
+</html>

@@ -26,6 +26,7 @@ const { createCouponController,
   getCreateCouponPageController, 
   getCouponsPageController} = require('../../controllers/admin/couponController')
 const { getAdminOffersTablePageController, getCreateOfferPageController, createOfferController, deleteOfferController } = require('../../controllers/offferController')
+const { getSalesReportController, downloadSalesReportExcelController } = require('../../controllers/admin/reportsController')
 
 
 const router = express.Router()
@@ -99,7 +100,11 @@ router.route('/offer')
 
 router.route('/offer/create')
   .get(getCreateOfferPageController)
-  .post(upload.single('filename') ,createOfferController)
+  .post(upload.single('filename'), createOfferController)
+  
+
+router.get('/report/sales',getSalesReportController)
+router.get('/report/sales/excel', downloadSalesReportExcelController)
 
 
 module.exports = router
