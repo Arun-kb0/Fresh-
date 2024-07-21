@@ -54,7 +54,20 @@ const adminLoginController = async (req, res, next) => {
       isAdmin: true
     }
     req.session.isAuthorized = true
-    console.log(req.session)
+    // console.log(req.session)
+    // const sessionUser = {
+    //   name: admin.name,
+    //   username: admin.username,
+    //   isAdmin: true,
+    //   provider: null
+    // }
+    // req.session.user = sessionUser
+    // req.session.isAuthorized = true
+    // res.cookie(
+    //   'admin',
+    //   JSON.stringify(sessionUser),
+    //   { maxAge: sessionCookieMaxAge }
+    // )
 
     res.status(OK).json({ message: "admin login success", user: admin })
   } catch (error) {

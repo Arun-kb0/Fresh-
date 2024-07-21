@@ -41,3 +41,13 @@
   max-height: 300px;
   overflow-y: scroll;
 }
+
+
+#dayDropdown,
+#yearDropdown,
+#monthDropdown{
+  width: auto;
+  max-height: 300px;
+  overflow-y: scroll;
+
+}

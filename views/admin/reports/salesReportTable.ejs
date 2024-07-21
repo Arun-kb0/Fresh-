@@ -14,6 +14,9 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
     <title>Products table</title>
     <meta name="description" content="" />
   </head>
@@ -43,11 +46,86 @@
               
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Report /</span> Sales report</h4>
 
-              <section class="d-flex">
-                <a class="btn btn-outline-info rounded-pill mx-2 my-3" href="/admin/report/sales?isExcelDownload=true">download excel</a>
-                <a class="btn btn-outline-info rounded-pill  my-3 mx-2" href="/admin/report/sales?isPdfDownload=true" >download pdf</a>
-              </section>
+              <% if(!isDownload) {%>
+              <section class="d-flex flex-column ">
+                <div class="">
+                  <!-- * select by date range -->
+                  <div class="d-flex w-50">
+                    <!-- * date picker -->
+                    <div class="container mb-3 col-sm-6 ">
+                      <label for="datepicker2" class="form-label">Start date</label>
+                      <div id="datepicker2" class="input-group date" data-date-format="mm-dd-yyyy">
+                        <input id="startDate" name="startDate" class="form-control" type="text" readonly />
+                        <span class="input-group-addon">
+                          <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- * start date picker end-->
+                    <!-- * end date picker -->
+                    <div class=" mb-3 col-sm-6 ">
+                      <label for="datepicker" class="form-label">End date</label>
+                      <div id="datepicker" class="input-group date" data-date-format="mm-dd-yyyy">
+                        <input id="endDate" name="endDate" class="form-control" type="text" readonly />
+                        <span class="input-group-addon">
+                          <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- * end date picker end-->
 
+                  </div>
+                  <div class="mx-3">
+                    <button  id="getByDateRangeBtn"  class="btn btn-outline-primary rounded-pill " >Apply</button>
+                  </div>
+
+                  <!-- * select by day ,month and year -->
+                  <div class="d-flex m-3 mb-1">
+                    <div class="mt-2 px-2 mb-3 ">
+                      <div class="dropdown">
+                        <button id="dayDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          day
+                        </button>
+                        <ul class="dropdown-menu " id="dayDropdown">
+                  
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="mt-2 px-2 mb-3">
+                      <div class="dropdown">
+                        <button id="monthDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          month
+                        </button>
+                        <ul class="dropdown-menu " id="monthDropdown">
+                  
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="mt-2 px-2  mr-2 mb-3">
+                      <div class="dropdown ">
+                        <button id="yearDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          year
+                        </button>
+                        <ul class="dropdown-menu" id="yearDropdown">
+                          
+                        </ul>
+                      </div>
+                    </div>
+                  
+                  </div>
+                  <!-- * select by day ,month and year end-->
+                </div>
+
+                <!-- * download report -->
+                <div>
+                  <a class="btn btn-outline-info rounded-pill mx-2 my-3" id="excelDownloadBtn" >download excel</a>
+                  <a class="btn btn-outline-info rounded-pill  my-3 mx-2" id="pdfDownloadBtn" >download pdf</a>
+                </div>
+              </section>
+              <% } %>
               <!-- product Table rows -->
               <div class="card">
                 <div class="table-responsive text-nowrap">
@@ -143,6 +221,7 @@
               </div>
               <!--/ product Table rows -->
 
+              <% if(!isDownload) {%>
               <!-- *pagination  -->
               <div class="d-flex justify-content-center align-items-center p-2 "  >
                 <button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn"> 
@@ -157,9 +236,21 @@
                 </button>
               </div>
               <!-- *pagination end -->
-
-              <div class="d-flex justify-content-end ">
-                <h5 class="text-capitalize p-3 shadow py-2 rounded-3">total sales : ₹123 </h5>
+            <% } %>
+              
+              
+              <div class="d-flex justify-content-center">
+                <div class="p-2 shadow rounded bg-white" >
+                  <h4 class="text-primary text-center">Report</h4>
+                  <h6 class="text-capitalize">total orders <span class="mx-2 h5" > 12312</span>
+                  <h6 class="text-capitalize">Number of online payments <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">Number of cod <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">Number of cancelled orders <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">Total discounts <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">Total coupons <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">Total <span class="mx-2 h5"> 12312</span>
+                </div>
+                </h6>
               </div>
 
               <hr class="my-5" />
@@ -168,6 +259,7 @@
             </div>
             <!-- / Content -->
 
+            <% if(!isDownload) {%>
             <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
@@ -200,6 +292,7 @@
               </div>
             </footer>
             <!-- / Footer -->
+             <% } %>
 
             <div class="content-backdrop fade"></div>
           </div>
@@ -222,7 +315,11 @@
     </script>
     <!--  * product  scripts -->
     <% scriptBlock= `
+     <script src= 
+        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"> 
+      </script> 
       <script src="/static/admin/scripts/orderTable.js"></script>
+      <script src="/static/admin/scripts/salesReport.js"></script>
       `
     %>
   </body>

@@ -15,7 +15,13 @@ const getSalesReportController = async (req, res, next) => {
   const endDateDefault = new Date();
   const startDateDefault = new Date(endDateDefault.getTime() - 10 * 24 * 60 * 60 * 1000); // Subtract 10 days
 
-  let { startDate, endDate, page = 1, isPdfDownload, isExcelDownload } = req.query;
+  let { startDate, endDate } = req.query
+  const {
+    page = 1,
+    day, month, year,
+    isPdfDownload, isExcelDownload,
+  } = req.query;
+  console.log("day, month, year ", day, month, year)
   startDate = startDate ? new Date(startDate) : startDateDefault;
   endDate = endDate ? new Date(endDate) : endDateDefault;
   try {
@@ -23,9 +29,22 @@ const getSalesReportController = async (req, res, next) => {
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await orderModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
+ 
+    if (day) {
+      const currentYear = new Date().getFullYear()
+      const currentMonth = new Date().getMonth()
+      startDate = new Date(currentYear, currentMonth, day)
+      endDate = new Date(currentYear, currentMonth, day, 23, 59, 59, 999)
+    } else if (month) {
+      const startMonth = month - 1
+      const currentYear = new Date().getFullYear()
+      startDate = new Date(currentYear, startMonth, 1)
+      endDate = new Date(currentYear, startMonth + 1, 0, 23, 59, 59, 999)
+    } else if (year) {
+      startDate = new Date(year, 0, 1)
+      endDate = new Date(year, 11, 31, 23, 59, 59, 999)
+    }
 
-    // console.log("startDate ", startDate)
-    // console.log("endDate ", endDate)
 
     const report = await getSalesReportAggregation({
       startDate,
@@ -40,12 +59,13 @@ const getSalesReportController = async (req, res, next) => {
     if (isPdfDownload) {
       const filePath = path.join(__dirname, '../../../views/admin/reports/salesReportTable.ejs')
       const renderedFile = await ejs.renderFile(filePath, {
-      // const file = await ejs.renderFile('/admin/reports/salesReportTable', {
+        // const file = await ejs.renderFile('/admin/reports/salesReportTable', {
         ...viewAdminPage,
         reportDetails,
         numberOfPages,
+        isDownload:true,
         page,
-      })
+      }) 
       const file = { content: renderedFile }
       const options = { format: 'A4' }
       const pdfBuffer = await htmlToPdf.generatePdf(file, options)
@@ -113,11 +133,13 @@ const getSalesReportController = async (req, res, next) => {
       return
     }
 
+    console.log('get sales report page call ')
     // res.status(OK).json({ report })
     res.render('admin/reports/salesReportTable', {
       ...viewAdminPage,
       reportDetails,
       numberOfPages,
+      isDownload:false,
       page: Number(page)
     })
 

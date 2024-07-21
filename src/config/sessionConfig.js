@@ -2,7 +2,7 @@ const session = require("express-session")
 const mongoStore = require('connect-mongo')
 
 
-const sessionCookieMaxAge = 1000 * 60 * 60
+const sessionCookieMaxAge = 1000 * 60 * 60 * 60
 
 const sessionConfig = session({
   secret: process.env.SESSION_SECRET,
