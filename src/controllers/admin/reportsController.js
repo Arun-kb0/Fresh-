@@ -25,11 +25,11 @@ const getSalesReportController = async (req, res, next) => {
   startDate = startDate ? new Date(startDate) : startDateDefault;
   endDate = endDate ? new Date(endDate) : endDateDefault;
   try {
-    const LIMIT = 6
+    const LIMIT = 20
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await orderModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
- 
+
     if (day) {
       const currentYear = new Date().getFullYear()
       const currentMonth = new Date().getMonth()
@@ -46,14 +46,32 @@ const getSalesReportController = async (req, res, next) => {
     }
 
 
-    const report = await getSalesReportAggregation({
+    const result = await getSalesReportAggregation({
       startDate,
       endDate,
       sort: { createdAt: 1 },
       skip: startIndex,
       limit: LIMIT
     })
-    const reportDetails = report ? report : []
+    console.log(result)
+
+
+    const reportDetails = result[0]?.docs ? result[0]?.docs : []
+    const data = {
+      totalAmount: result[0].totalAmount,
+      maxTotalAmount: result[0].maxTotalAmount,
+      totalDiscountAmount: result[0].totalDiscountAmount,
+      totalOrders: result[0].totalOrders,
+      totalPendingOrders: result[0].totalPendingOrders,
+      totalSuccessedOrders: result[0].totalSuccessedOrders,
+      totalCancelledOrders: result[0].totalCancelledOrders,
+      totalReturnedOrders: result[0].totalReturnedOrders,
+      totalPendingPayments: result[0].totalPendingPayments,
+      totalFailedPayments: result[0].totalFailedPayments,
+      totalCompletedPayments: result[0].totalCompletedPayments,
+      totalOnlinePayments: result[0].totalOnlinePayments,
+      totalCodPayments: result[0].totalCodPayments,
+    }
 
     // * pdf download
     if (isPdfDownload) {
@@ -63,9 +81,9 @@ const getSalesReportController = async (req, res, next) => {
         ...viewAdminPage,
         reportDetails,
         numberOfPages,
-        isDownload:true,
+        isDownload: true,
         page,
-      }) 
+      })
       const file = { content: renderedFile }
       const options = { format: 'A4' }
       const pdfBuffer = await htmlToPdf.generatePdf(file, options)
@@ -138,8 +156,9 @@ const getSalesReportController = async (req, res, next) => {
     res.render('admin/reports/salesReportTable', {
       ...viewAdminPage,
       reportDetails,
+      data,
       numberOfPages,
-      isDownload:false,
+      isDownload: false,
       page: Number(page)
     })
 

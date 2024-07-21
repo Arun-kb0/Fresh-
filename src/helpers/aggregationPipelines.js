@@ -115,7 +115,7 @@ const getProductsAggregation = async ({ sort, skip, limit, userId = '' }) => {
 }
 
 
-const getSalesReportAggregation = async ({startDate,endDate, sort, skip, limit }) => {
+const getSalesReportAggregation = async ({ startDate, endDate, sort, skip, limit }) => {
   const report = await orderModel.aggregate([
     {
       $match: {
@@ -173,8 +173,12 @@ const getSalesReportAggregation = async ({startDate,endDate, sort, skip, limit }
     },
     {
       $addFields: {
-        "products.category": { $arrayElemAt: ["$category.name", 0] },
-        "products.subcategory": { $arrayElemAt: ["$subcategory.name", 0] },
+        "products.category": {
+          $arrayElemAt: ["$category.name", 0]
+        },
+        "products.subcategory": {
+          $arrayElemAt: ["$subcategory.name", 0]
+        },
         "products.productDetails": "$productDetails"
       }
     },
@@ -191,10 +195,16 @@ const getSalesReportAggregation = async ({startDate,endDate, sort, skip, limit }
           paymentStatus: "$paymentStatus",
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
-          userDetails: { $arrayElemAt: ["$user", 0] },
-          addressDetails: { $arrayElemAt: ["$address", 0] }
+          userDetails: {
+            $arrayElemAt: ["$user", 0]
+          },
+          addressDetails: {
+            $arrayElemAt: ["$address", 0]
+          }
         },
-        products: { $push: "$products" }
+        products: {
+          $push: "$products"
+        }
       }
     },
     {
@@ -214,11 +224,174 @@ const getSalesReportAggregation = async ({startDate,endDate, sort, skip, limit }
         products: 1
       }
     },
+    {
+      $addFields: {
+        products: {
+          $map: {
+            input: "$products",
+            as: "product",
+            in: {
+              $mergeObjects: [
+                "$$product",
+                // Keep all existing fields in the product
+                {
+                  maxPrice: {
+                    $multiply: [
+                      "$$product.productDetails.price",
+                      "$$product.quantity"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        maxTotal: {
+          $sum: {
+            $map: {
+              input: "$products",
+              as: "product",
+              in: "$$product.maxPrice"
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        discountAmount: {
+          $subtract: ["$maxTotal", "$total"]
+        }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: "$total"
+        },
+        maxTotalAmount: {
+          $sum: "$maxTotal"
+        },
+        totalDiscountAmount: {
+          $sum: "$discountAmount"
+        },
+        totalOrders: {
+          $sum: 1
+        },
+        totalPendingOrders: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$orderStatus", "Pending"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalSuccessedOrders: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$orderStatus", "Delivered"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalCancelledOrders: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$orderStatus", "Cancelled"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalReturnedOrders: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$orderStatus", "Returned"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalCodPayments: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$paymentMethod", "cod"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalOnlinePayments: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$paymentMethod", "online"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalCompletedPayments: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$paymentStatus", "Completed"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalFailedPayments: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$paymentStatus", "Failed"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        totalPendingPayments: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$paymentStatus", "Pending"]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        docs: {
+          $push: "$$ROOT"
+        }
+      }
+    },
     { $sort: sort },
     { $skip: skip },
     { $limit: limit }
   ])
-  return report 
+  return report
 }
 
 

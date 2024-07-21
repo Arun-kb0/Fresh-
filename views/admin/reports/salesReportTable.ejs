@@ -135,6 +135,8 @@
                         <th>Products</th>
                         <th>order id</th>
                         <th>Order status</th>
+                        <th>Max total</th>
+                        <th>discount amount</th>
                         <th>Total</th>
                         <th>Payment method</th>
                         <th>Payment status</th>
@@ -166,6 +168,12 @@
                                 </span>
                               </a>
                             </div>
+                          </td>
+                          <td>
+                            ₹<%= item.maxTotal %>
+                          </td>
+                          <td>
+                            ₹<%= item.discountAmount %>
                           </td>
                           <td>
                             ₹<%= item.total %>
@@ -240,17 +248,22 @@
               
               
               <div class="d-flex justify-content-center">
-                <div class="p-2 shadow rounded bg-white" >
+                <div class="p-2 shadow rounded bg-white p-2 px-3" >
                   <h4 class="text-primary text-center">Report</h4>
-                  <h6 class="text-capitalize">total orders <span class="mx-2 h5" > 12312</span>
-                  <h6 class="text-capitalize">Number of online payments <span class="mx-2 h5"> 12312</span>
-                  <h6 class="text-capitalize">Number of cod <span class="mx-2 h5"> 12312</span>
-                  <h6 class="text-capitalize">Number of cancelled orders <span class="mx-2 h5"> 12312</span>
-                  <h6 class="text-capitalize">Total discounts <span class="mx-2 h5"> 12312</span>
-                  <h6 class="text-capitalize">Total coupons <span class="mx-2 h5"> 12312</span>
-                  <h6 class="text-capitalize">Total <span class="mx-2 h5"> 12312</span>
+                  <h6 class="text-capitalize">total orders <span class="mx-2 h5" > <%= data.totalOrders %></span></h6>
+                  <h6 class="text-capitalize">pending orders <span class="mx-2 h5 text-warning"> <%= data.totalPendingOrders %></span></h6>
+                  <h6 class="text-capitalize">delivered orders <span class="mx-2 h5 text-success"> <%= data.totalSuccessedOrders %></span></h6>
+                  <h6 class="text-capitalize">cancelled orders <span class="mx-2 h5 text-danger"> <%= data.totalCancelledOrders %></span></h6>
+                  <h6 class="text-capitalize">returned orders <span class="mx-2 h5"> <%= data.totalReturnedOrders %></span></h6>
+                  <h6 class="text-capitalize">total cod payments <span class="mx-2 h5"> <%= data.totalCodPayments %></span></h6>
+                  <h6 class="text-capitalize">total online payments <span class="mx-2 h5"> <%= data.totalOnlinePayments %></span></h6>
+                  <h6 class="text-capitalize">total pending payments <span class="mx-2 h5 text-warning"> <%= data.totalPendingPayments %></span></h6>
+                  <h6 class="text-capitalize">total failed payments <span class="mx-2 h5 text-danger"> <%= data.totalFailedPayments %></span></h6>
+                  <h6 class="text-capitalize">total completed payments<span class="mx-2 h5 text-success"> <%= data.totalCompletedPayments %></span></h6>
+                  <h6 class="text-capitalize">total amount <span class="mx-2 h5"> ₹<%= data.maxTotalAmount %></span></h6>
+                  <h6 class="text-capitalize">discount amount <span class="mx-2 h5 text-danger"> ₹<%= data.totalDiscountAmount %></span></h6>
+                  <h6 class="text-capitalize">amount received <span class="mx-2 h5  text-success"> ₹<%= data.totalAmount %></span></h6>
                 </div>
-                </h6>
               </div>
 
               <hr class="my-5" />
