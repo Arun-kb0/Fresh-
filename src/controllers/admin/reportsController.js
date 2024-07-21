@@ -25,7 +25,7 @@ const getSalesReportController = async (req, res, next) => {
   startDate = startDate ? new Date(startDate) : startDateDefault;
   endDate = endDate ? new Date(endDate) : endDateDefault;
   try {
-    const LIMIT = 20
+    const LIMIT = 10
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await orderModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
@@ -80,6 +80,7 @@ const getSalesReportController = async (req, res, next) => {
         // const file = await ejs.renderFile('/admin/reports/salesReportTable', {
         ...viewAdminPage,
         reportDetails,
+        data,
         numberOfPages,
         isDownload: true,
         page,
@@ -107,8 +108,14 @@ const getSalesReportController = async (req, res, next) => {
         { header: 'Created at', key: 'createdAt', width: 25 },
         { header: 'User', key: 'user', width: 40 },
         { header: 'Address', key: 'address', width: 100 },
-      ]
 
+        // * data
+        { header: '', key: '', width: 25 },
+        { header: '', key: '', width: 25 },
+        { header: 'Report Details', key: 'reportDetails', width: 30 },
+        { header: 'Values', key: 'value', width: 25 }
+      ]
+      
       reportDetails.map(item => {
         const productNames = []
         item.products.map((product) => {
@@ -138,6 +145,30 @@ const getSalesReportController = async (req, res, next) => {
           address: address
         })
       })
+
+      const summaryData = {
+        'Total Amount': data.totalAmount,
+        'Max Total Amount': data.maxTotalAmount,
+        'Total Discount Amount': data.totalDiscountAmount,
+        'Total Orders': data.totalOrders,
+        'Total Pending Orders': data.totalPendingOrders,
+        'Total Successed Orders': data.totalSuccessedOrders,
+        'Total Cancelled Orders': data.totalCancelledOrders,
+        'Total Returned Orders': data.totalReturnedOrders,
+        'Total Pending Payments': data.totalPendingPayments,
+        'Total Failed Payments': data.totalFailedPayments,
+        'Total Completed Payments': data.totalCompletedPayments,
+        'Total Online Payments': data.totalOnlinePayments,
+        'Total COD Payments': data.totalCodPayments
+      };
+
+      Object.entries(summaryData).forEach(([detail, value]) => {
+        sheet.addRow({
+          reportDetails: detail,
+          value: value
+        });
+      });
+      
 
       res.setHeader(
         'content-Type',
