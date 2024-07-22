@@ -1,5 +1,6 @@
 const orderModel = require("../model/orderModel")
 const productModel = require("../model/productModel")
+const walletModel = require("../model/walletModel")
 
 const getProductsAggregation = async ({ sort, skip, limit, userId = '' }) => {
   console.log("userId ", userId)
@@ -395,10 +396,28 @@ const getSalesReportAggregation = async ({ startDate, endDate, sort, skip, limit
 }
 
 
+const getWalletWithSortedTransactionsAggregation = async ({userId})=>  {
+  const wallet = await walletModel.aggregate([
+    { $match: { userId: userId } },
+    { $unwind: "$transactions" },
+    { $sort: { "transactions.date": -1 } },
+    {
+      $group: {
+        _id: "$_id",
+        userId: { $first: "$userId" },
+        balance: { $first: "$balance" },
+        transactions: { $push: "$transactions" }
+      }
+    }
+  ]);
+
+  return wallet[0];
+}
 
 
 
 module.exports = {
   getProductsAggregation,
   getSalesReportAggregation,
+  getWalletWithSortedTransactionsAggregation
 }

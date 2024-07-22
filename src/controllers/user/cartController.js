@@ -11,6 +11,7 @@ const usedCouponsModel = require("../../model/usedCouponsModel")
 const paypal = require('@paypal/checkout-server-sdk')
 const CC = require('currency-converter-lt')
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
+const walletModel = require("../../model/walletModel")
 
 let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
 
@@ -105,7 +106,7 @@ const addToCartController = async (req, res, next) => {
     const user = JSON.parse(req.cookies.user)
     const userId = user.userId
     if (!mongoose.isObjectIdOrHexString(productId)) {
-      throw new CustomError('invalid productId',BAD_REQUEST)
+      throw new CustomError('invalid productId', BAD_REQUEST)
     }
     const product = await productModel.findById(productId)
     if (!product) {
@@ -573,6 +574,7 @@ const cancelOrderController = async (req, res, next) => {
 const returnOrderController = async (req, res, next) => {
   const { orderId } = req.body
   try {
+    const user = JSON.parse(req.cookies.user)
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       throw new CustomError("invalid orderId", BAD_REQUEST)
     }
@@ -594,6 +596,24 @@ const returnOrderController = async (req, res, next) => {
       product.stock += item.quantity;
       await product.save();
     }
+
+    await walletModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $push: {
+          transactions: {
+            amount: order.total,
+            debit: false,
+            credit: true,
+            date: new Date()
+          }
+        },
+        $inc: {
+          balance: order.total
+        }
+      },
+      { new: true }
+    )
 
     const cancelledOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },

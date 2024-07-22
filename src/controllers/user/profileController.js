@@ -8,10 +8,10 @@ const userModel = require("../../model/userModel")
 const bcrypt = require('bcrypt')
 const orderModel = require('../../model/orderModel')
 const mongoose = require("mongoose")
-const { find } = require("../../model/cartModel")
 const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
 const { getProductsAggregation } = require("../../helpers/aggregationPipelines")
+const walletModel = require("../../model/walletModel")
 
 
 const getProfileController = async (req, res, next) => {
@@ -32,8 +32,11 @@ const getProfileController = async (req, res, next) => {
       userId
     })
 
+    const wallet = await walletModel.findOne({ userId})
+
     res.render('user/profile/profile', {
       ...viewUsersPage,
+      walletBalanceAmount: wallet.balance,
       suggestions: products ? products : []
     })
   } catch (error) {

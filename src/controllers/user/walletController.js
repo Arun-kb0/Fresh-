@@ -1,13 +1,15 @@
 const CustomError = require("../../constants/CustomError")
 const { OK, BAD_REQUEST } = require("../../constants/httpStatusCodes")
-const { viewAdminPage, viewUsersPage } = require("../../constants/pageConfid")
+const { viewUsersPage } = require("../../constants/pageConfid")
+const { getWalletWithSortedTransactionsAggregation } = require("../../helpers/aggregationPipelines")
 const walletModel = require("../../model/walletModel")
 
 
 const getWalletController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
-    let wallet = await walletModel.findOne({ userId: user.userId })
+    // let wallet = await walletModel.findOne({ userId: user.userId })
+    let wallet = await getWalletWithSortedTransactionsAggregation({userId:user.userId})
     if (!wallet) {
       wallet = await walletModel.create({
         userId: user.userId,
@@ -52,6 +54,7 @@ const addAmountToWalletController = async (req, res, next) => {
     next(error)
   }
 }
+
 
 
 
