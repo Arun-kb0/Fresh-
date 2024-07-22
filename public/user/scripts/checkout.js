@@ -3,6 +3,8 @@ $(function () {
   const addressRadioBtn = $("#addressRadioBtn")
   const paymentRadioBtn = $("#paymentRadioBtn")
 
+  const couponBtn = $(".couponBtns")
+  const removeCouponBtn = $("#removeCouponBtn")
 
   const selectPaymentBtn = $("#selectPaymentBtn")
   const selectAddressBtn = $("#selectAddressBtn")
@@ -11,7 +13,11 @@ $(function () {
 
   const applyCouponBtn = $("#applyCouponBtn")
 
+  showAppliedCoupon()
   paypalSection.hide()
+
+  removeCouponBtn.on('click', handleRemoveCoupon)
+  couponBtn.on("click", enterCouponCode)
   applyCouponBtn.on("click", handleCoupon)
   paymentBtn.on("click", handlePayment)
 
@@ -42,6 +48,7 @@ $(function () {
     const coupon = $('#coupon')
     const prevTotal = $("#prevTotal")
     const totalValue = parseFloat(total.text().trim())
+    const showingCouponBtn = couponBtn.attr('name', code)
 
     $.ajax({
       url: "/cart/checkout",
@@ -52,14 +59,14 @@ $(function () {
           showAlert(data.message)
           total.text(`${data.finalTotal}`)
           coupon.parent().removeClass('d-none')
-          const couponValue =  (data.coupon.discountType === 'percentage') 
+          const couponValue = (data.coupon.discountType === 'percentage')
             ? `${data.coupon.discountValue}% OFF`
             : `₹${data.coupon.discountValue} OFF`
           coupon.text(couponValue)
 
           prevTotal.parent().removeClass('d-none')
           prevTotal.text(totalValue)
-
+          showingCouponBtn.remove()
         } else {
           console.log('apply coupon no data found')
         }
@@ -67,6 +74,30 @@ $(function () {
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)
         showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
+
+  function handleRemoveCoupon() {
+    if (!appliedCoupon) {
+      console.log('no coupon is applied')
+      return
+    }
+    const code = appliedCoupon.code
+    console.log(code)
+    $.ajax({
+      url: '/cart/checkout/coupon/remove',
+      method: 'PATCH',
+      data: {code},
+      success: function (data) {
+        if (!data) {
+          console.log('no data found')
+          return
+        }
+        showAlert(data.message)
+      },
+      error: function (xhr, status, error) {
         console.log(error)
       }
     })
@@ -121,8 +152,31 @@ $(function () {
   }
 
 
-  // * paypal code
+  function enterCouponCode() {
+    const couponInput = applyCouponBtn.parent().find('input')
+    const code = $(this).attr('data-code')
+    couponInput.val(code)
+    console.log(code)
+  }
 
+  function showAppliedCoupon() {
+    if (appliedCoupon) {
+      const showingCouponBtn = couponBtn.attr('name', applyCouponBtn.code)
+      const total = $('#total')
+      const coupon = $("#coupon")
+      coupon.parent().removeClass('d-none')
+      const couponValue = (appliedCoupon?.discountType === 'percentage')
+        ? `${appliedCoupon.discountValue}% OFF`
+        : `₹${appliedCoupon.discountValue} OFF`
+      coupon.text(couponValue)
+
+      total.text()
+      showingCouponBtn.remove()
+    }
+  }
+
+
+  // * paypal code
   window.paypal
     .Buttons({
       style: {
@@ -141,7 +195,7 @@ $(function () {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({addressId})
+            body: JSON.stringify({ addressId })
           });
 
           const orderData = await response.json();
@@ -168,7 +222,7 @@ $(function () {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({...data, addressId})
+            body: JSON.stringify({ ...data, addressId })
           });
 
           console.log(data)

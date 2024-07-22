@@ -36,7 +36,7 @@ const getProfileController = async (req, res, next) => {
 
     res.render('user/profile/profile', {
       ...viewUsersPage,
-      walletBalanceAmount: wallet.balance,
+      walletBalanceAmount: wallet?.balance ? wallet.balance : 0,
       suggestions: products ? products : []
     })
   } catch (error) {

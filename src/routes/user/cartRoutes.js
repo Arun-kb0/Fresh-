@@ -10,7 +10,8 @@ const {
   returnOrderController,
   applyCouponController,
   orderUsingPaypalController,
-  orderSuccessPaypalController
+  orderSuccessPaypalController,
+  removeCouponController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -25,6 +26,8 @@ router.delete('/deleteitem', deleteItemFromCartController)
 router.route('/checkout')
   .get(getCheckoutPageController)
   .post(applyCouponController)
+
+router.patch('/checkout/coupon/remove', removeCouponController)
 
 
 router.post('/order/cod', orderUsingCodController)

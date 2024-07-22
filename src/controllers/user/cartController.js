@@ -225,8 +225,14 @@ const getCheckoutPageController = async (req, res, next) => {
     const deliveryFee = 10
 
     const cartWithDetails = await cartModel.aggregate([
-      { $match: { userId: user.userId } },
-      { $unwind: "$products" },
+      {
+        $match: {
+          userId: user.userId
+        }
+      },
+      {
+        $unwind: "$products"
+      },
       {
         $lookup: {
           from: "products",
@@ -235,16 +241,25 @@ const getCheckoutPageController = async (req, res, next) => {
           as: "productDetails"
         }
       },
-      { $unwind: "$productDetails" },
+      {
+        $unwind: "$productDetails"
+      },
       {
         $project: {
           _id: 1,
           userId: 1,
+          coupon: 1,
           "products.quantity": 1,
           "products.productId": 1,
           productName: "$productDetails.name",
-          image: { $arrayElemAt: ["$productDetails.image.path", 0] },
-          soldBy: "$productDetails.productInfo.soldBy",
+          image: {
+            $arrayElemAt: [
+              "$productDetails.image.path",
+              0
+            ]
+          },
+          soldBy:
+            "$productDetails.productInfo.soldBy",
           stock: "$productDetails.stock",
           productTotalPrice: "$products.price"
         }
@@ -252,7 +267,12 @@ const getCheckoutPageController = async (req, res, next) => {
       {
         $group: {
           _id: "$_id",
-          userId: { $first: "$userId" },
+          userId: {
+            $first: "$userId"
+          },
+          appliedCoupon: {
+            $first: "$coupon"
+          },
           products: {
             $push: {
               productId: "$products.productId",
@@ -264,15 +284,23 @@ const getCheckoutPageController = async (req, res, next) => {
               stock: "$stock"
             }
           },
-          totalItems: { $sum: 1 },
-          totalQuantity: { $sum: "$products.quantity" },
-          subTotalPrice: { $sum: "$productTotalPrice" }
+          totalItems: {
+            $sum: 1
+          },
+          totalQuantity: {
+            $sum: "$products.quantity"
+          },
+          subTotalPrice: {
+            $sum: "$productTotalPrice"
+          }
         }
       },
       {
         $addFields: {
           deliveryFee: deliveryFee,
-          totalPrice: { $add: ["$subTotalPrice", deliveryFee] }
+          totalPrice: {
+            $add: ["$subTotalPrice", deliveryFee]
+          }
         }
       },
       {
@@ -284,30 +312,84 @@ const getCheckoutPageController = async (req, res, next) => {
         }
       },
       {
+        $lookup: {
+          from: "usedcoupons",
+          localField: "userId",
+          foreignField: "userId",
+          as: "usedcoupons"
+        }
+      },
+      {
+        $lookup: {
+          from: "coupons",
+          let: {
+            usedCoupons: "$usedcoupons"
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $not: {
+                    $in: [
+                      "$_id",
+                      {
+                        $reduce: {
+                          input: "$$usedCoupons",
+                          initialValue: [],
+                          in: {
+                            $setUnion: [
+                              "$$value",
+                              "$$this.coupons"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          as: "unusedCoupons"
+        }
+      },
+      {
+        $lookup: {
+          from: "coupons",
+          localField: "appliedCoupon",
+          foreignField: "code",
+          as: "appliedCouponDetails"
+        }
+      },
+      {
         $project: {
           totalItems: 1,
           totalQuantity: 1,
           subTotalPrice: 1,
           deliveryFee: 1,
           totalPrice: 1,
+          unusedCoupons: 1,
+          appliedCouponDetails: { $arrayElemAt: ["$appliedCouponDetails", 0] },
           addresses: {
             $filter: {
               input: "$addresses",
               as: "address",
-              cond: { $eq: ["$$address.isDeleted", false] }
+              cond: {
+                $eq: ["$$address.isDeleted", false]
+              }
             }
           }
         }
       }
     ]);
 
-    // console.log(cartWithDetails[0]);
-
+    console.log(cartWithDetails[0].appliedCouponDetails);
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
     res.render('user/cart/checkout', {
       ...viewUsersPage,
       paypalClientId: process.env.PAYPAL_CLIENT_ID,
-      checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
+      checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null,
+      appliedCouponDetails: cartWithDetails?.[0].appliedCouponDetails ? cartWithDetails[0].appliedCouponDetails : null
     })
   } catch (error) {
     next(error)
@@ -687,6 +769,21 @@ const applyCouponController = async (req, res, next) => {
   }
 }
 
+const removeCouponController = async (req, res, next) => {
+  const { couponId } = req.body
+  try {
+    if (mongoose.isObjectIdOrHexString(couponId)) {
+      throw new CustomError('invalid couponId',BAD_REQUEST)
+    }
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+
+
 
 
 
@@ -705,5 +802,6 @@ module.exports = {
   cancelOrderController,
   returnOrderController,
 
-  applyCouponController
+  applyCouponController,
+  removeCouponController
 }

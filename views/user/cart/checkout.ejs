@@ -195,8 +195,25 @@
 						<%= checkoutCart.deliveryFee %>
 					</span>
 				</h6>
-				<h6 class=" d-none">Coupon : <span class="fs-5 text-success" id="coupon">
-					</span>
+				<div class="my-2">
+					<% let j=0 %>
+					<% for(const coupon of checkoutCart?.unusedCoupons) {%>
+						<a data-code="<%= coupon.code %>" name="<%= coupon.code %>"  class="couponBtns d-flex justify-content-center border-1 border-success p-1">
+							<span class="text-success h6 "> 
+								get 
+								<%= coupon.discountType ==='amount' ? '₹' : '%' %>
+								<%= coupon.discountValue %>OFF 
+							</span>
+						</a>
+						<% j++ %>
+						<% if(j>=3){%>
+							<% break %>
+						<% } %>
+					<% } %>
+				</div>
+				<h6 class="d-none border-1 border-success" >Applied coupon : 
+					<span class="fs-5 text-success" id="coupon"> <%= appliedCouponDetails?.discountValue %> </span>
+					<a id="removeCouponBtn" ><i class="fa-regular fa-circle-xmark"></i></a>
 				</h6>
 				<h6 class="d-none text-secondary text-decoration-line-through ">₹<span class="fs-5v " id="prevTotal">
 					</span>
@@ -295,13 +312,17 @@
 		</div>
 	</div>
 
-
 	<!-- Initialize the JS-SDK -->
 	<% scriptBlock=` 
     <script
       src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
       data-sdk-integration-source="developer-studio"
     ></script>
+
+		<script>
+			const appliedCoupon = ${JSON.stringify(appliedCouponDetails)};
+		</script>
+
 		<script src="/static/user/scripts/paypal.js"></script>
 		<script src="/static/user/scripts/user.js"></script>
 		<script src="/static/user/scripts/checkout.js"> </script>
