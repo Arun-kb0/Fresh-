@@ -12,9 +12,10 @@ const {
   getAllOrdersPageController,
   getOrderDetailsPageController,
   getCouponsPageController,
-  
- } = require('../../controllers/user/profileController')
+
+} = require('../../controllers/user/profileController')
 const { addToWishlistController, getWishlistController, getWhitelistedProductIdsController } = require('../../controllers/user/wishlistController')
+const { getWalletController, addAmountToWalletController } = require('../../controllers/user/walletController')
 const router = express.Router()
 
 
@@ -37,7 +38,7 @@ router.get('/userdetails', getUserDetailsController)
 router.get('/orders', getAllOrdersPageController)
 router.get("/orderdetails", getOrderDetailsPageController)
 
-router.get('/coupons',getCouponsPageController)
+router.get('/coupons', getCouponsPageController)
 
 // * wishlist
 router.route('/wishlist')
@@ -45,5 +46,9 @@ router.route('/wishlist')
   .post(addToWishlistController)
 
 router.get('/wishlist/productIds', getWhitelistedProductIdsController)
+
+router.route('/wallet')
+  .get(getWalletController)
+  .post(addAmountToWalletController)
 
 module.exports = router

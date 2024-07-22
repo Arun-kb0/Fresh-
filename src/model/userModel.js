@@ -15,20 +15,20 @@ const userSchema = new Schema({
   isBlocked: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
-  wallet: {
-    balance: { type: Number, default: 0 },
-    currency: { type: String, default: "INR" },
-    transactions: [{
-      amount: { type: Number, required: true },
-      message: { type: String },
-      type: {
-        type: String,
-        required: true,
-        enum: ["credit", "debit"]
-      },
-      date: { type: Date, default: Date.now },
-    }]
-  }
+  // wallet: {
+  //   balance: { type: Number, default: 0 },
+  //   currency: { type: String, default: "INR" },
+  //   transactions: [{
+  //     amount: { type: Number, required: true },
+  //     message: { type: String },
+  //     type: {
+  //       type: String,
+  //       required: true,
+  //       enum: ["credit", "debit"]
+  //     },
+  //     date: { type: Date, default: Date.now },
+  //   }]
+  // }
 }, {
   timestamps: true
 })
