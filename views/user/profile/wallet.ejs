@@ -54,16 +54,18 @@
   <div class=" container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
 
 
-    <section class="container d-flex justify-content-start flex-wrap align-items-center ">
+    <section class="container-sm d-flex justify-content-start flex-wrap align-items-center flex-sm-row flex-column ">
 
-      <div class="col-3 ">
-        <input class="form-control w-100" type="Number" placeholder="enter amount" />
-        <div class="d-flex justify-content-center">
-          <button class="btn btn-outline-success rounded-pill">add amount to wallet</button>
+      <div class="col-sm-3 col-12  h-100 my-2 d-flex align-items-start justify-content-center">
+        <div class="">
+          <input class="form-control w-100" type="Number" placeholder="enter amount" />
+          <div class="d-flex justify-content-center">
+            <button class="btn btn-outline-success rounded-pill">Add money</button>
+          </div>
         </div>
       </div>
 
-        <div class="col-8 justify-content-center">
+        <div class="col-sm-8 col-12 justify-content-center">
           <div class="d-flex justify-content-center ">
             <h5 class="text-secondary">wallet amount : <span class="text-success">
               ₹<%= wallet?.balance %>
