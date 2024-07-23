@@ -213,7 +213,7 @@
 				</div>
 				<h6 class="d-none border-1 border-success" >Applied coupon : 
 					<span class="fs-5 text-success" id="coupon"> <%= appliedCouponDetails?.discountValue %> </span>
-					<a id="removeCouponBtn" ><i class="fa-regular fa-circle-xmark"></i></a>
+					<a id="removeCouponBtn"  ><i class="fa-regular fa-circle-xmark"></i></a>
 				</h6>
 				<h6 class="d-none text-secondary text-decoration-line-through ">₹<span class="fs-5v " id="prevTotal">
 					</span>
@@ -320,7 +320,7 @@
     ></script>
 
 		<script>
-			const appliedCoupon = ${JSON.stringify(appliedCouponDetails)};
+			let appliedCoupon = ${JSON.stringify(appliedCouponDetails)};
 		</script>
 
 		<script src="/static/user/scripts/paypal.js"></script>

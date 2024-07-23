@@ -1,9 +1,10 @@
 $(function () {
+  appliedCoupon
 
   const addressRadioBtn = $("#addressRadioBtn")
   const paymentRadioBtn = $("#paymentRadioBtn")
 
-  const couponBtn = $(".couponBtns")
+  const couponBtn = $("a.couponBtns")
   const removeCouponBtn = $("#removeCouponBtn")
 
   const selectPaymentBtn = $("#selectPaymentBtn")
@@ -56,6 +57,8 @@ $(function () {
       data: { code, total: totalValue },
       success: function (data) {
         if (data) {
+          appliedCoupon = data.coupon
+          input.val('')
           showAlert(data.message)
           total.text(`${data.finalTotal}`)
           coupon.parent().removeClass('d-none')
@@ -66,7 +69,9 @@ $(function () {
 
           prevTotal.parent().removeClass('d-none')
           prevTotal.text(totalValue)
-          showingCouponBtn.remove()
+          showingCouponBtn
+            .removeClass('d-flex')
+            .addClass('d-none')
         } else {
           console.log('apply coupon no data found')
         }
@@ -84,18 +89,36 @@ $(function () {
       console.log('no coupon is applied')
       return
     }
+    const couponId = appliedCoupon._id
     const code = appliedCoupon.code
+    const showingCouponBtn = couponBtn.attr('name', code)
+    const appliedCouponParent = $(this).parent()
+    const prevTotal = $("#prevTotal")
+    const total = $('#total')
+
+
     console.log(code)
+    console.log(showingCouponBtn)
+
     $.ajax({
       url: '/cart/checkout/coupon/remove',
       method: 'PATCH',
-      data: {code},
+      data: { couponId },
       success: function (data) {
         if (!data) {
           console.log('no data found')
           return
         }
         showAlert(data.message)
+        total.text(`${data?.cart.total}`)
+        prevTotal.parent().addClass('d-none')
+        appliedCouponParent
+          .removeClass('d-flex')
+          .addClass('d-none')
+        showingCouponBtn
+          .removeClass('d-none')
+          .addClass('d-flex')
+        console.log(showingCouponBtn.html())
       },
       error: function (xhr, status, error) {
         console.log(error)

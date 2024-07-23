@@ -1,3 +1,4 @@
+const cartModel = require("../model/cartModel")
 const orderModel = require("../model/orderModel")
 const productModel = require("../model/productModel")
 const walletModel = require("../model/walletModel")
@@ -396,7 +397,7 @@ const getSalesReportAggregation = async ({ startDate, endDate, sort, skip, limit
 }
 
 
-const getWalletWithSortedTransactionsAggregation = async ({userId})=>  {
+const getWalletWithSortedTransactionsAggregation = async ({ userId }) => {
   const wallet = await walletModel.aggregate([
     { $match: { userId: userId } },
     { $unwind: "$transactions" },
@@ -414,10 +415,248 @@ const getWalletWithSortedTransactionsAggregation = async ({userId})=>  {
   return wallet[0];
 }
 
+const getCartWithDetailsAggregation = async ({ userId, deliveryFee }) => {
+  const result = await cartModel.aggregate([
+    {
+      $match: {
+        userId: userId
+      }
+    },
+    {
+      $unwind: "$products"
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.productId",
+        foreignField: "_id",
+        as: "productDetails"
+      }
+    },
+    {
+      $unwind: "$productDetails"
+    },
+    {
+      $project: {
+        _id: 1,
+        "products.productId": 1,
+        "products.quantity": 1,
+        "products.price": 1,
+        productName: "$productDetails.name",
+        image: "$productDetails.image.path",
+        // Extract single image path
+        soldBy:
+          "$productDetails.productInfo.soldBy",
+        // Extract soldBy
+        stock: "$productDetails.stock",
+        productTotalPrice: "$products.price",
+        totalPrice: "$total"
+      }
+    },
+    {
+      $group: {
+        _id: "$_id",
+        products: {
+          $push: {
+            productId: "$products.productId",
+            name: "$productName",
+            quantity: "$products.quantity",
+            price: "$products.price",
+            image: "$image",
+            soldBy: "$soldBy",
+            stock: "$stock"
+          }
+        },
+        totalItems: {
+          $sum: 1
+        },
+        totalQuantity: {
+          $sum: "$products.quantity"
+        },
+        totalPrice: {
+          $first: "$totalPrice"
+        }
+      }
+    },
+    {
+      $addFields: {
+        totalItems: "$totalItems",
+        totalQuantity: "$totalQuantity",
+        subTotalPrice: "$totalPrice",
+        deliveryFee: deliveryFee,
+        totalPrice: "$totalPrice"
+      }
+    }
+  ])
+  return (result && result.length > 0) ? result[0] : null
+}
+
+const cartCheckoutAggregation = async ({ userId}) => {
+  const result = await cartModel.aggregate([
+    {
+      $match: {
+        userId: userId
+      }
+    },
+    {
+      $unwind: "$products"
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.productId",
+        foreignField: "_id",
+        as: "productDetails"
+      }
+    },
+    {
+      $unwind: "$productDetails"
+    },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        coupon: 1,
+        "products.quantity": 1,
+        "products.productId": 1,
+        productName: "$productDetails.name",
+        image: {
+          $arrayElemAt: [
+            "$productDetails.image.path",
+            0
+          ]
+        },
+        soldBy:
+          "$productDetails.productInfo.soldBy",
+        stock: "$productDetails.stock",
+        productTotalPrice: "$products.price",
+        total: "$total"
+      }
+    },
+    {
+      $group: {
+        _id: "$_id",
+        userId: {
+          $first: "$userId"
+        },
+        appliedCoupon: {
+          $first: "$coupon"
+        },
+        products: {
+          $push: {
+            productId: "$products.productId",
+            name: "$productName",
+            quantity: "$products.quantity",
+            price: "$products.price",
+            image: "$image",
+            soldBy: "$soldBy",
+            stock: "$stock"
+          }
+        },
+        totalItems: {
+          $sum: 1
+        },
+        totalQuantity: {
+          $sum: "$products.quantity"
+        },
+        subTotalPrice: {
+          $sum: "$productTotalPrice"
+        },
+        totalPrice: {
+          $first: "$total"
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "addresses",
+        localField: "userId",
+        foreignField: "userId",
+        as: "addresses"
+      }
+    },
+    {
+      $lookup: {
+        from: "usedcoupons",
+        localField: "userId",
+        foreignField: "userId",
+        as: "usedcoupons"
+      }
+    },
+    {
+      $lookup: {
+        from: "coupons",
+        let: {
+          usedCoupons: "$usedcoupons"
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $not: {
+                  $in: [
+                    "$_id",
+                    {
+                      $reduce: {
+                        input: "$$usedCoupons",
+                        initialValue: [],
+                        in: {
+                          $setUnion: [
+                            "$$value",
+                            "$$this.coupons"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        as: "unusedCoupons"
+      }
+    },
+    {
+      $lookup: {
+        from: "coupons",
+        localField: "appliedCoupon",
+        foreignField: "code",
+        as: "appliedCouponDetails"
+      }
+    },
+    {
+      $project: {
+        totalItems: 1,
+        totalQuantity: 1,
+        subTotalPrice: 1,
+        deliveryFee: 1,
+        totalPrice: 1,
+        unusedCoupons: 1,
+        appliedCouponDetails: {
+          $arrayElemAt: ["$appliedCouponDetails", 0]
+        },
+        addresses: {
+          $filter: {
+            input: "$addresses",
+            as: "address",
+            cond: {
+              $eq: ["$$address.isDeleted", false]
+            }
+          }
+        }
+      }
+    }
+  ])
+  return (result && result.length>0) ? result[0]  : null
+}
+
 
 
 module.exports = {
   getProductsAggregation,
   getSalesReportAggregation,
-  getWalletWithSortedTransactionsAggregation
+  getWalletWithSortedTransactionsAggregation,
+  getCartWithDetailsAggregation,
+  cartCheckoutAggregation
 }

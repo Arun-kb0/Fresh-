@@ -12,6 +12,7 @@ const paypal = require('@paypal/checkout-server-sdk')
 const CC = require('currency-converter-lt')
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
 const walletModel = require("../../model/walletModel")
+const { getCartWithDetailsAggregation, cartCheckoutAggregation } = require("../../helpers/aggregationPipelines")
 
 let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
 
@@ -28,71 +29,60 @@ const paypalClient = new paypal.core.PayPalHttpClient(
   )
 )
 
+// * helperFunctions 
+
+const getCartTotal = ({cart,deliveryFee=10}) => {
+  const total = cart.products.reduce((acc, item) => (acc + item.price), 0)
+  return total + deliveryFee
+}
+
+const calculateDiscount = ({ total, coupon }) => {
+  let finalTotal=0
+  if (coupon.discountType === 'percentage') {
+    const discount = (total * coupon.discountValue) / 100;
+    finalTotal = total - discount;
+  } else if (coupon.discountType === 'amount') {
+    finalTotal = total - coupon.discountValue
+  }
+  return finalTotal
+}
+
+
+// * helper functions end
+
 
 const getCartPageController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
 
-    const cartWithDetails = await cartModel.aggregate([
-      { $match: { userId: user.userId } },
-      { $unwind: "$products" },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "productDetails"
-        }
-      },
-      { $unwind: "$productDetails" },
-      {
-        $project: {
-          _id: 1,
-          "products.productId": 1,
-          "products.quantity": 1,
-          "products.price": 1,
-          productName: "$productDetails.name",
-          image: "$productDetails.image.path", // Extract single image path
-          soldBy: "$productDetails.productInfo.soldBy", // Extract soldBy
-          stock: "$productDetails.stock",
-          productTotalPrice: "$products.price"
-        }
-      },
-      {
-        $group: {
-          _id: "$_id",
-          products: {
-            $push: {
-              productId: "$products.productId",
-              name: "$productName",
-              quantity: "$products.quantity",
-              price: "$products.price",
-              image: "$image",
-              soldBy: "$soldBy",
-              stock: "$stock"
-            }
-          },
-          totalItems: { $sum: 1 },
-          totalQuantity: { $sum: "$products.quantity" },
-          totalPrice: { $sum: "$productTotalPrice" }
-        }
-      },
-      {
-        $addFields: {
-          totalItems: "$totalItems",
-          totalQuantity: "$totalQuantity",
-          subTotalPrice: "$totalPrice",
-          deliveryFee: deliveryFee,
-          totalPrice: { $add: ["$totalPrice", deliveryFee] }
-        }
-      }
-    ]);
+    const cart = await cartModel.findOne({ userId: user.userId })
+    if (!cart) {
+      res.render('user/cart/cart', {
+        ...viewUsersPage,
+        cart: null
+      })
+      return
+    }
 
-    // res.status(OK).json({ cart: cartWithDetails[0] })
+    let total = 0
+    if (cart?.coupon) {
+      const coupon = await couponModel.findOne({ _id: cart.couponId })
+      let cartTotal = getCartTotal({ cart ,deliveryFee})
+      total = calculateDiscount({ total: cartTotal, coupon })
+    } else {
+      total = getCartTotal({ cart, deliveryFee })
+    }
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $set: { total } }
+    )
+    console.log("total ", total)
+    const cartWithDetails = await getCartWithDetailsAggregation({userId:user.userId,deliveryFee})
+
     res.render('user/cart/cart', {
       ...viewUsersPage,
-      cart: cartWithDetails.length > 0 ? cartWithDetails[0] : null
+      cart: cartWithDetails
     })
   } catch (error) {
     next(error)
@@ -118,18 +108,18 @@ const addToCartController = async (req, res, next) => {
     }
 
     const cart = await cartModel.findOne({ userId: userId, 'products.productId': productId });
-
     const pricePerQuantity = product.finalPrice * quantity
+
+
     let updatedCart
     if (cart) {
-      // If the product exists, increment the quantity
       updatedCart = await cartModel.findOneAndUpdate(
         { userId: userId, 'products.productId': productId },
         {
           $inc: {
             'products.$.quantity': quantity,
-            'products.$.price': pricePerQuantity
-          }
+            'products.$.price': pricePerQuantity,
+          },
         },
         { new: true }
       ).populate('products.productId', 'image productInfo.soldBy stock');
@@ -139,22 +129,20 @@ const addToCartController = async (req, res, next) => {
       updatedCart = await cartModel.findOneAndUpdate(
         { userId: userId },
         {
-          $set: { userId: userId },
+          $set: {
+            userId: userId,
+          },
           $addToSet: {
             products: {
               productId: product._id,
               quantity: quantity,
               price: product.finalPrice
-            }
+            },
           }
         },
         { new: true, upsert: true }
       ).populate('products.productId', 'image productInfo.soldBy stock');
     }
-
-
-
-
     res.status(OK).json({ message: "item added", cart: updatedCart })
   } catch (error) {
     next(error)
@@ -224,172 +212,189 @@ const getCheckoutPageController = async (req, res, next) => {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
 
-    const cartWithDetails = await cartModel.aggregate([
-      {
-        $match: {
-          userId: user.userId
-        }
-      },
-      {
-        $unwind: "$products"
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "productDetails"
-        }
-      },
-      {
-        $unwind: "$productDetails"
-      },
-      {
-        $project: {
-          _id: 1,
-          userId: 1,
-          coupon: 1,
-          "products.quantity": 1,
-          "products.productId": 1,
-          productName: "$productDetails.name",
-          image: {
-            $arrayElemAt: [
-              "$productDetails.image.path",
-              0
-            ]
-          },
-          soldBy:
-            "$productDetails.productInfo.soldBy",
-          stock: "$productDetails.stock",
-          productTotalPrice: "$products.price"
-        }
-      },
-      {
-        $group: {
-          _id: "$_id",
-          userId: {
-            $first: "$userId"
-          },
-          appliedCoupon: {
-            $first: "$coupon"
-          },
-          products: {
-            $push: {
-              productId: "$products.productId",
-              name: "$productName",
-              quantity: "$products.quantity",
-              price: "$products.price",
-              image: "$image",
-              soldBy: "$soldBy",
-              stock: "$stock"
-            }
-          },
-          totalItems: {
-            $sum: 1
-          },
-          totalQuantity: {
-            $sum: "$products.quantity"
-          },
-          subTotalPrice: {
-            $sum: "$productTotalPrice"
-          }
-        }
-      },
-      {
-        $addFields: {
-          deliveryFee: deliveryFee,
-          totalPrice: {
-            $add: ["$subTotalPrice", deliveryFee]
-          }
-        }
-      },
-      {
-        $lookup: {
-          from: "addresses",
-          localField: "userId",
-          foreignField: "userId",
-          as: "addresses"
-        }
-      },
-      {
-        $lookup: {
-          from: "usedcoupons",
-          localField: "userId",
-          foreignField: "userId",
-          as: "usedcoupons"
-        }
-      },
-      {
-        $lookup: {
-          from: "coupons",
-          let: {
-            usedCoupons: "$usedcoupons"
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $not: {
-                    $in: [
-                      "$_id",
-                      {
-                        $reduce: {
-                          input: "$$usedCoupons",
-                          initialValue: [],
-                          in: {
-                            $setUnion: [
-                              "$$value",
-                              "$$this.coupons"
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          ],
-          as: "unusedCoupons"
-        }
-      },
-      {
-        $lookup: {
-          from: "coupons",
-          localField: "appliedCoupon",
-          foreignField: "code",
-          as: "appliedCouponDetails"
-        }
-      },
-      {
-        $project: {
-          totalItems: 1,
-          totalQuantity: 1,
-          subTotalPrice: 1,
-          deliveryFee: 1,
-          totalPrice: 1,
-          unusedCoupons: 1,
-          appliedCouponDetails: { $arrayElemAt: ["$appliedCouponDetails", 0] },
-          addresses: {
-            $filter: {
-              input: "$addresses",
-              as: "address",
-              cond: {
-                $eq: ["$$address.isDeleted", false]
-              }
-            }
-          }
-        }
-      }
-    ]);
+    // const cartWithDetails = await cartModel.aggregate([
+    //   {
+    //     $match: {
+    //       userId: user.userId
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$products"
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "products",
+    //       localField: "products.productId",
+    //       foreignField: "_id",
+    //       as: "productDetails"
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$productDetails"
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 1,
+    //       userId: 1,
+    //       coupon: 1,
+    //       "products.quantity": 1,
+    //       "products.productId": 1,
+    //       productName: "$productDetails.name",
+    //       image: {
+    //         $arrayElemAt: [
+    //           "$productDetails.image.path",
+    //           0
+    //         ]
+    //       },
+    //       soldBy:
+    //         "$productDetails.productInfo.soldBy",
+    //       stock: "$productDetails.stock",
+    //       productTotalPrice: "$products.price"
+    //     }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$_id",
+    //       userId: {
+    //         $first: "$userId"
+    //       },
+    //       appliedCoupon: {
+    //         $first: "$coupon"
+    //       },
+    //       products: {
+    //         $push: {
+    //           productId: "$products.productId",
+    //           name: "$productName",
+    //           quantity: "$products.quantity",
+    //           price: "$products.price",
+    //           image: "$image",
+    //           soldBy: "$soldBy",
+    //           stock: "$stock"
+    //         }
+    //       },
+    //       totalItems: {
+    //         $sum: 1
+    //       },
+    //       totalQuantity: {
+    //         $sum: "$products.quantity"
+    //       },
+    //       subTotalPrice: {
+    //         $sum: "$productTotalPrice"
+    //       }
+    //     }
+    //   },
+    //   {
+    //     $addFields: {
+    //       deliveryFee: deliveryFee,
+    //       totalPrice: {
+    //         $add: ["$subTotalPrice", deliveryFee]
+    //       }
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "addresses",
+    //       localField: "userId",
+    //       foreignField: "userId",
+    //       as: "addresses"
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "usedcoupons",
+    //       localField: "userId",
+    //       foreignField: "userId",
+    //       as: "usedcoupons"
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "coupons",
+    //       let: {
+    //         usedCoupons: "$usedcoupons"
+    //       },
+    //       pipeline: [
+    //         {
+    //           $match: {
+    //             $expr: {
+    //               $not: {
+    //                 $in: [
+    //                   "$_id",
+    //                   {
+    //                     $reduce: {
+    //                       input: "$$usedCoupons",
+    //                       initialValue: [],
+    //                       in: {
+    //                         $setUnion: [
+    //                           "$$value",
+    //                           "$$this.coupons"
+    //                         ]
+    //                       }
+    //                     }
+    //                   }
+    //                 ]
+    //               }
+    //             }
+    //           }
+    //         }
+    //       ],
+    //       as: "unusedCoupons"
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "coupons",
+    //       localField: "appliedCoupon",
+    //       foreignField: "code",
+    //       as: "appliedCouponDetails"
+    //     }
+    //   },
+    //   {
+    //     $project: {
+    //       totalItems: 1,
+    //       totalQuantity: 1,
+    //       subTotalPrice: 1,
+    //       deliveryFee: 1,
+    //       totalPrice: 1,
+    //       unusedCoupons: 1,
+    //       appliedCouponDetails: { $arrayElemAt: ["$appliedCouponDetails", 0] },
+    //       addresses: {
+    //         $filter: {
+    //           input: "$addresses",
+    //           as: "address",
+    //           cond: {
+    //             $eq: ["$$address.isDeleted", false]
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // ]);
 
-    console.log(cartWithDetails[0].appliedCouponDetails);
+    const cart = await cartModel.findOne({userId:user.userId})
+    let total = 0
+    if (cart?.coupon) {
+      const coupon = await couponModel.findOne({ _id: cart.couponId })
+      let cartTotal = getCartTotal({ cart, deliveryFee })
+      total = calculateDiscount({ total: cartTotal, coupon })
+    } else {
+      total = getCartTotal({ cart, deliveryFee })
+    }
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $set: { total } }
+    )    
+    
+    const cartWithDetails = await cartCheckoutAggregation({ userId: user.userId })
+    
+
+    console.log(cartWithDetails.appliedCouponDetails);
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
     res.render('user/cart/checkout', {
       ...viewUsersPage,
       paypalClientId: process.env.PAYPAL_CLIENT_ID,
-      checkoutCart: cartWithDetails.length > 0 ? cartWithDetails[0] : null,
-      appliedCouponDetails: cartWithDetails?.[0].appliedCouponDetails ? cartWithDetails[0].appliedCouponDetails : null
+      checkoutCart: cartWithDetails,
+      appliedCouponDetails: cartWithDetails.appliedCouponDetails ? cartWithDetails.appliedCouponDetails : null
     })
   } catch (error) {
     next(error)
@@ -417,9 +422,6 @@ const orderUsingCodController = async (req, res, next) => {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
 
-    const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
-    cart.total = total
-    console.log(cart)
     // * decreasing stock
     for (const item of cart.products) {
       const product = await productModel.findById(item.productId);
@@ -445,7 +447,17 @@ const orderUsingCodController = async (req, res, next) => {
     });
 
 
-    await cartModel.findOneAndUpdate({ userId: user.userId }, { products: [] });
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          products: [],
+          coupon: null,
+          couponId: null,
+          total: 0
+        }
+      }
+    )
     await usedCouponsModel.findOneAndUpdate(
       { userId: user.userId },
       {
@@ -573,8 +585,17 @@ const orderSuccessPaypalController = async (req, res, next) => {
     console.log(cart.total)
     console.log(newOrder.total)
 
-    await cartModel.findOneAndUpdate({ userId: user.userId }, { products: [] });
-
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          products: [],
+          coupon: null,
+          couponId: null,
+          total: 0
+        }
+      }
+    )
     if (cart.couponId) {
       await usedCouponsModel.findOneAndUpdate(
         { userId: user.userId },
@@ -714,7 +735,7 @@ const returnOrderController = async (req, res, next) => {
 
 
 const applyCouponController = async (req, res, next) => {
-  const { code, total } = req.body
+  const { code } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
     const coupon = await couponModel.findOne({ code, isDeleted: false })
@@ -726,6 +747,14 @@ const applyCouponController = async (req, res, next) => {
       throw new CustomError('coupon expired', GONE)
     }
 
+    const cart = await cartModel.findOne({ userId: user.userId })
+    let total = getCartTotal({cart})
+    let finalTotal = calculateDiscount({ total, coupon })
+
+    if (cart.coupon) {
+      throw new CustomError('coupon already added remove to add another',CONFLICT)
+    }
+
     if (total < coupon.minCartAmount) {
       throw new CustomError(`${coupon.minCartAmount} is required to apply this coupon`, BAD_REQUEST)
     }
@@ -734,24 +763,21 @@ const applyCouponController = async (req, res, next) => {
       throw new CustomError('coupon limit exceeded', GONE)
     }
 
+
     const usedCoupons = await usedCouponsModel.findOne({
       userId: user.userId,
       coupons: { $elemMatch: { $eq: coupon._id } }
     })
+    console.log("coupon code ")
+    console.log(coupon._id)
+    console.log(usedCoupons)
 
     if (usedCoupons) {
       throw new CustomError('coupon already used', CONFLICT)
     }
 
-    let finalTotal = total
-    if (coupon.discountType === 'percentage') {
-      const discount = (total * coupon.discountValue) / 100;
-      finalTotal = total - discount;
-    } else if (coupon.discountType === 'amount') {
-      finalTotal = total - coupon.discountValue
-    }
 
-    const cart = await cartModel.findOneAndUpdate(
+    await cartModel.findOneAndUpdate(
       { userId: user.userId },
       {
         $set: {
@@ -760,6 +786,12 @@ const applyCouponController = async (req, res, next) => {
           total: finalTotal,
         }
       },
+      { new: true }
+    )
+
+    const updatedUsedCoupons = await usedCouponsModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $push: { coupons: coupon._id } },
       { new: true }
     )
 
@@ -772,10 +804,34 @@ const applyCouponController = async (req, res, next) => {
 const removeCouponController = async (req, res, next) => {
   const { couponId } = req.body
   try {
-    if (mongoose.isObjectIdOrHexString(couponId)) {
-      throw new CustomError('invalid couponId',BAD_REQUEST)
+    const user = JSON.parse(req.cookies.user)
+    if (!mongoose.isObjectIdOrHexString(couponId)) {
+      throw new CustomError('invalid couponId', BAD_REQUEST)
     }
+    const cart = await cartModel.findOne({ userId: user.userId })
+    const usedCoupons = await usedCouponsModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $pull : { coupons: couponId } },
+      { new: true }
+    )
 
+    let total = getCartTotal({cart})
+    const updatedCart = await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          coupon: null,
+          couponId: null,
+          total: total.toFixed(2)
+        }
+      },
+      { new: true }
+    )
+
+    res.status(OK).json({
+      message: 'coupon removed ',
+      cart: updatedCart
+    })
   } catch (error) {
     next(error)
   }
