@@ -98,6 +98,20 @@ $(function () {
         $('.loading').remove(); // Remove loading indicator
 
         data.products.forEach(item => {
+
+          const discountSection = item.offerDetails?.discountValue
+            ?`
+            <div class="d-flex justify-content-center">
+              <p class="text-secondary px-3 textLineTrough">₹${item.price}</p>
+              <p class="text-success px-3">${item.offerDetails?.discountType === 'percentage'
+                ? item.offerDetails?.discountValue + "% OFF"
+                : "₹" + item.offerDetails?.discountValue + " OFF"
+            }</p>
+            </div>
+          `
+            : `<div class='' style='height:42px' >  </div>`
+
+
           container.append(`
             <div class="position-relative col-lg-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke">
             <div class="position-absolute top-0 start-0">
@@ -113,13 +127,9 @@ $(function () {
                 </div>
                 <h6>${item.name}</h6>
                 <h5 class="priceTextColor">₹${item.finalPrice}</h5>
-                <div class="d-flex justify-content-center">
-                  <p class="text-secondary px-3 textLineTrough">₹${item.price}</p>
-                  <p class="text-success px-3">${item.offerDetails?.discountType === 'percentage'
-                    ? item.offerDetails?.discountValue+"% OFF"
-                    : "₹"+item.offerDetails?.discountValue +" OFF"
-                  }</p>
-                </div>
+
+                ${discountSection}
+
                 <div class="d-flex align-items-baseline">
                   <div class="d-flex pb-3 px-3">
                     ${Array(5).fill().map((_, i) => i < item.rating ? '<i class="fa-solid fa-star fa-lg text-warning"></i>' : '<i class="fa-regular fa-star fa-lg text-warning"></i>').join('')}

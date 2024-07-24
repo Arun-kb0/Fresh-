@@ -135,8 +135,9 @@ const createOfferController = async (req, res, next) => {
           }
         }
       ])
-      productsIds = result[0]?.productIds
-    } else if (subcategoryId) {
+      productsIds = result[0]?.productIds || []
+    }
+    if (subcategoryId) {
       const result = await subCategoryModel.aggregate([
         {
           $match: { _id: subcategoryId }
@@ -184,13 +185,14 @@ const createOfferController = async (req, res, next) => {
           }
         }
       ])
-      productsIds = result[0]?.productIds
-    } else if (productId) {
-      productsIds = [productId]
+      productsIds = [...productsIds, ...(result[0]?.productIds || [])];
+    }
+    if (productId) {
+      productsIds = [...productsIds , productId]
     }
 
     console.log(productsIds)
-    if (!productsIds ||  productsIds.length === 0) {
+    if (!productsIds || productsIds.length === 0) {
       throw new CustomError('no products found to apply offer', NOT_FOUND)
     }
 
@@ -212,8 +214,14 @@ const createOfferController = async (req, res, next) => {
       let finalPrice;
 
       if (discountType === 'percentage') {
+        if (discountValue >= 97) {
+          throw new CustomError('cannot apply discount more than 97%', BAD_REQUEST)
+        }
         finalPrice = product.price - (product.price * (discountValue / 100));
       } else {
+        if (product.price < (discountValue * 2)) {
+          throw new CustomError('price of the products is too low to apply this offer', BAD_REQUEST)
+        }
         finalPrice = product.price >= (discountValue * 2) ? product.price - discountValue : product.price;
       }
 
@@ -316,7 +324,7 @@ const deleteOfferController = async (req, res, next) => {
     if (subcategoryIds.length !== 0) {
       const result = await subCategoryModel.aggregate([
         {
-          $match: { _id: {$in : subcategoryIds} }
+          $match: { _id: { $in: subcategoryIds } }
         },
         {
           $lookup: {
