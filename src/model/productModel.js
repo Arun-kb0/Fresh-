@@ -17,6 +17,14 @@ const productSchema = new Schema({
   peopleRated: { type: Number, default: 0 },
   categoryId: { type: ObjectId, required: true },
   reviewsId: { type: ObjectId },
+  offer: {
+    discountType: {
+      type: String,
+      enum: ['percentage', 'amount'],
+      required: true
+    },
+    discountValue: { type: Number, required: true },
+  },
   productInfo: {
     description: { type: String },
     featuresAndDetails: { type: String },

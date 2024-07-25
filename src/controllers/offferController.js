@@ -58,6 +58,15 @@ const createOfferController = async (req, res, next) => {
     if (!offer.subcategory && !offer.category && !offer.product) {
       throw new CustomError('category , subcategory or product is required to create an offer', BAD_REQUEST)
     }
+
+    if (!offer.discountType && !offer.discountValue) {
+      throw new CustomError('discount type and value required',BAD_REQUEST)
+    }
+
+    if (offer.discountType === 'percentage' && (offer.discountValue >= 99 || offer.discountValue<=0) ) {
+      throw new CustomError('cannot apply discount more than 99%', BAD_REQUEST)
+    }
+
     const isOfferExists = await offerModel.findOne({ name: offer.name.toLowerCase() })
     if (isOfferExists) {
       throw new CustomError('offer name already exists', CONFLICT)
@@ -188,7 +197,7 @@ const createOfferController = async (req, res, next) => {
       productsIds = [...productsIds, ...(result[0]?.productIds || [])];
     }
     if (productId) {
-      productsIds = [...productsIds , productId]
+      productsIds = [...productsIds, productId]
     }
 
     console.log(productsIds)
@@ -208,29 +217,61 @@ const createOfferController = async (req, res, next) => {
 
     const discountType = newOffer.discountType
     const discountValue = newOffer.discountValue
+    
 
     const products = await productModel.find({ _id: { $in: productsIds } });
     const updatedProducts = products.map(product => {
       let finalPrice;
 
       if (discountType === 'percentage') {
-        if (discountValue >= 97) {
-          throw new CustomError('cannot apply discount more than 97%', BAD_REQUEST)
-        }
         finalPrice = product.price - (product.price * (discountValue / 100));
       } else {
-        if (product.price < (discountValue * 2)) {
-          throw new CustomError('price of the products is too low to apply this offer', BAD_REQUEST)
-        }
         finalPrice = product.price >= (discountValue * 2) ? product.price - discountValue : product.price;
       }
 
-      return {
-        updateOne: {
-          filter: { _id: product._id },
-          update: { $set: { finalPrice } }
+      console.log(product.finalPrice, " - ", finalPrice)
+
+      if (finalPrice <= product.finalPrice) {
+        return {
+          updateOne: {
+            filter: { _id: product._id },
+            update: {
+              $set: {
+                finalPrice: finalPrice,
+                "offer.discountType": discountType,
+                "offer.discountValue": discountValue,
+              }
+            }
+          }
+        }
+      } else {
+        return {
+          updateOne: {
+            filter: { _id: product._id },
+            update: {
+              $set: {
+                finalPrice: product.finalPrice,
+                "offer.discountType": product.discountType,
+                "offer.discountValue": product.discountValue,
+              }
+            }
+          }
         }
       }
+
+      // return {
+      //   updateOne: {
+      //     filter: { _id: product._id },
+      //     update: {
+      //       $set: {
+      //         finalPrice: (finalPrice <= product.finalPrice) ? finalPrice : product.finalPrice,
+      //         "offer.discountType": (finalPrice <= product.finalPrice) ? discountType : product.discountType,
+      //         "offer.discountValue": (finalPrice <= product.finalPrice) ? discountValue : product.discountValue,
+      //       }
+      //     }
+      //   }
+      // }
+
     })
 
     const updated = await productModel.bulkWrite(updatedProducts)
@@ -377,7 +418,12 @@ const deleteOfferController = async (req, res, next) => {
     console.log(productsIds)
     await productModel.updateMany(
       { _id: { $in: productsIds } },
-      [{ $set: { finalPrice: "$price" } }]
+      [{
+        $set: {
+          finalPrice: "$price",
+          offer: {}
+        }
+      }]
     )
     const result = await offerModel.findOneAndDelete({ _id: offerId })
     console.log(result)

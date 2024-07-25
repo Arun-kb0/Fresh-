@@ -99,13 +99,13 @@ $(function () {
 
         data.products.forEach(item => {
 
-          const discountSection = item.offerDetails?.discountValue
-            ?`
+          const discountSection = item.offer?.discountValue
+            ? `
             <div class="d-flex justify-content-center">
               <p class="text-secondary px-3 textLineTrough">₹${item.price}</p>
-              <p class="text-success px-3">${item.offerDetails?.discountType === 'percentage'
-                ? item.offerDetails?.discountValue + "% OFF"
-                : "₹" + item.offerDetails?.discountValue + " OFF"
+              <p class="text-success px-3">${item?.offer?.discountType === 'percentage'
+                ? item?.offer?.discountValue + "% OFF"
+                : "₹" + item?.offer?.discountValue + " OFF"
             }</p>
             </div>
           `
