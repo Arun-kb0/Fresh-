@@ -8,6 +8,92 @@ const productModel = require("../model/productModel")
 const subCategoryModel = require("../model/subCategoryModel")
 const mongoose = require('mongoose')
 
+
+applyMaxDiscountsToProducts = async ({ productIds, offerId }) => {
+  const products = await productModel.find({ _id: { $in: productIds } });
+  const offers = await offerModel.find({
+    productIds: { $in: productIds },
+    _id: { $ne: offerId }
+  });
+
+  const maxDiscounts = {};
+
+  //* Calculate the maximum discount for each product
+  offers.forEach(offer => {
+    offer.productIds.forEach(productId => {
+      if (!maxDiscounts[productId]) {
+        maxDiscounts[productId] = { discountType: offer.discountType, discountValue: 0 };
+      }
+
+      let discount = 0;
+      if (offer.discountType === 'percentage') {
+        discount = offer.discountValue;
+      } else if (offer.discountType === 'amount') {
+        discount = offer.discountValue;
+      }
+
+      // Check if this offer provides a better discount
+      if (offer.discountType === 'percentage' && discount > maxDiscounts[productId].discountValue) {
+        maxDiscounts[productId] = { discountType: 'percentage', discountValue: discount };
+      } else if (offer.discountType === 'amount' && (maxDiscounts[productId].discountType !== 'percentage' || discount > maxDiscounts[productId].discountValue)) {
+        maxDiscounts[productId] = { discountType: 'amount', discountValue: discount };
+      }
+    });
+  });
+
+  // *  Create bulk update operations
+  const bulkOperations = products.map(product => {
+    const { discountType, discountValue } = maxDiscounts[product._id] || { discountType: null, discountValue: 0 };
+    let finalPrice = product.price;
+
+    if (discountType === 'percentage') {
+      finalPrice = product.price - (product.price * (discountValue / 100));
+    } else if (discountType === 'amount') {
+      finalPrice = product.price - discountValue;
+    }
+
+    if (discountType) {
+      return {
+        updateOne: {
+          filter: { _id: product._id },
+          update: {
+            $set: {
+              finalPrice: finalPrice,
+              "offer.discountType": discountType,
+              "offer.discountValue": discountValue,
+            }
+          }
+        }
+      };
+    } else {
+      return {
+        updateOne: {
+          filter: { _id: product._id },
+          update: {
+            $set: {
+              finalPrice: finalPrice,
+              offer:{}
+            }
+          }
+        }
+      };
+    }
+  });
+
+  // console.log('maxDiscounts')
+  // console.log(maxDiscounts)
+  // console.log('bulkOperations')
+  // console.log(bulkOperations)
+
+  // Execute the bulk write operation
+  const result = await productModel.bulkWrite(bulkOperations);
+  return result
+}
+
+
+
+
+
 const getAdminOffersTablePageController = async (req, res, next) => {
   const { page = 1 } = req.query
   try {
@@ -60,10 +146,10 @@ const createOfferController = async (req, res, next) => {
     }
 
     if (!offer.discountType && !offer.discountValue) {
-      throw new CustomError('discount type and value required',BAD_REQUEST)
+      throw new CustomError('discount type and value required', BAD_REQUEST)
     }
 
-    if (offer.discountType === 'percentage' && (offer.discountValue >= 99 || offer.discountValue<=0) ) {
+    if (offer.discountType === 'percentage' && (offer.discountValue >= 99 || offer.discountValue <= 0)) {
       throw new CustomError('cannot apply discount more than 99%', BAD_REQUEST)
     }
 
@@ -217,7 +303,7 @@ const createOfferController = async (req, res, next) => {
 
     const discountType = newOffer.discountType
     const discountValue = newOffer.discountValue
-    
+
 
     const products = await productModel.find({ _id: { $in: productsIds } });
     const updatedProducts = products.map(product => {
@@ -258,19 +344,6 @@ const createOfferController = async (req, res, next) => {
           }
         }
       }
-
-      // return {
-      //   updateOne: {
-      //     filter: { _id: product._id },
-      //     update: {
-      //       $set: {
-      //         finalPrice: (finalPrice <= product.finalPrice) ? finalPrice : product.finalPrice,
-      //         "offer.discountType": (finalPrice <= product.finalPrice) ? discountType : product.discountType,
-      //         "offer.discountValue": (finalPrice <= product.finalPrice) ? discountValue : product.discountValue,
-      //       }
-      //     }
-      //   }
-      // }
 
     })
 
@@ -415,18 +488,24 @@ const deleteOfferController = async (req, res, next) => {
       }
     }
 
-    console.log(productsIds)
-    await productModel.updateMany(
-      { _id: { $in: productsIds } },
-      [{
-        $set: {
-          finalPrice: "$price",
-          offer: {}
-        }
-      }]
-    )
-    const result = await offerModel.findOneAndDelete({ _id: offerId })
-    console.log(result)
+    const bulkWriteResult = await applyMaxDiscountsToProducts({
+      productIds: productsIds,
+      offerId
+    })
+    console.log('Bulk update result:', bulkWriteResult);
+
+
+    // console.log(productsIds)
+    // await productModel.updateMany(
+    //   { _id: { $in: productsIds } },
+    //   [{
+    //     $set: {
+    //       finalPrice: "$price",
+    //       offer: {}
+    //     }
+    //   }]
+    // )
+    await offerModel.findOneAndDelete({ _id: offerId })
     res.status(OK).json({ message: `offer ${offer.name} deleted ` })
   } catch (error) {
     next(error)

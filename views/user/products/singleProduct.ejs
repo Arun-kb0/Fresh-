@@ -123,13 +123,13 @@
 						<h5 class="priceTextColor">
 							₹ <%= product.finalPrice %>
 						</h5>
-						<% if(product.offer) {%>
+						<% if(product.offer && product?.offer?.discountType) {%>
 							<div class="d-flex">
 								<h5 class=" mr-2 text-secondary textLineTrough mr-3" >₹<%= product.price %></h5>
 								<% if(product.offer.discountType==='percentage') { %>	
 									<h5 class="text-success"><%= product?.offer.discountValue %>% OFF</h5>
 								<% }else { %>
-									<h5 class="text-success">₹<%= product?.offer.discountValue %>OFF</h5>
+									<h5 class="text-success">₹<%= product?.offer.discountValue %> OFF</h5>
 								<% } %>
 							</div>
 						<% } %>
