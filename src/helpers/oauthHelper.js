@@ -1,4 +1,5 @@
 const userModel = require("../model/userModel")
+const {v4: uuid} =  require('uuid')
 
 const oauthGoogleCreateOrCheckUser = async (profile) => {
   try {
@@ -14,7 +15,8 @@ const oauthGoogleCreateOrCheckUser = async (profile) => {
         username: email,
         image: picture,
         isVerified: email_verified,
-        provider: 'google'
+        provider: 'google',
+        referralCode: uuid().slice(0, 8),
       })
     }
 
@@ -44,7 +46,8 @@ const oauthFacebookCreateOrCheckUser = async (profile) => {
         name: displayName,
         image: photos[0].value,
         isVerified: true,
-        provider: 'facebook'
+        provider: 'facebook',
+        referralCode: uuid().slice(0, 8),
       })
     }
     const sessionUser = {
