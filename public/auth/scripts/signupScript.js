@@ -6,6 +6,7 @@ $(function () {
   const submitBtn = $("#signupBtn")
   const name = $("#name")
   const confirmPassword = $("#confirmPassword")
+  const referralCode = $('#referralCode')
 
   const otp = $("#otp")
   const resendOtp = $("#resendOtp")
@@ -143,7 +144,8 @@ $(function () {
     const data = {
       name: name.val().trim(),
       username: email.val().trim(),
-      password: password.val()
+      password: password.val(),
+      referralCode:referralCode.val().trim()
     }
 
     $.ajax({

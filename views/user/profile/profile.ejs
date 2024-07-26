@@ -23,11 +23,28 @@
 	</div>
 	<!--PreLoader Ends-->
 
+	<!-- * alert -->
+	<div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+		<div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+		</div>
+	</div>
+	<!-- * alert end -->
+
 	<!-- * breadcrumbs -->
 	<div class="container">
 		<h3> <span class="orangeTextColor">My profile </span></h3>
 	</div>
 	<!-- * end breadcrumbs -->
+
+	<!-- * referral code -->
+	<div class="container mt-3">
+		<button id="copyReferralCodeBtn" data-code="<%= user?.referralCode %>"
+			class="btn btn-outline-info d-flex align-items-center rounded-pill">
+			<span class="mr-2 fw-bold">Copy referral code</span>
+			<i class="fa-solid fa-copy fa-2x"></i>
+		</button>
+	</div>
+	<!-- * referral code end -->
 
 
 	<!-- search area -->
@@ -48,6 +65,8 @@
 		</div>
 	</div>
 	<!-- end search arewa -->
+
+	
 
 	<!-- * user buttons -->
 	<div class="container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
@@ -89,7 +108,9 @@
 				</div>
 				<div class="col-9 py-2">
 					<h5 class="btnTitle">Wallet</h5>
-					<p class="fs-5 text-capitalize">Available amount ₹<span id="walletAmount"> <%= walletBalanceAmount %> </span> </p>
+					<p class="fs-5 text-capitalize">Available amount ₹<span id="walletAmount">
+							<%= walletBalanceAmount %>
+						</span> </p>
 				</div>
 			</a>
 
@@ -133,7 +154,7 @@
 				</div>
 			</a>
 
-			<a class="d-flex justify-content-center p-3 shadow rounded mb-5 userBtnCard " >
+			<a class="d-flex justify-content-center p-3 shadow rounded mb-5 userBtnCard ">
 				<div class="pr-4 d-flex justify-content-center align-items-center ">
 					<i class="fa-solid fa-right-from-bracket fa-4x orangeTextColor"></i>
 				</div>
@@ -195,29 +216,29 @@
 										</p>
 										<% }else{ %>
 											<p class="text-success px-3">₹<%= item.offer.discountValue %> OFF</p>
-								<% } %>
+											<% } %>
 								</div>
 								<% } else { %>
 									<div style='height:42px'></div>
-								<% } %>
-							<div class="d-flex align-items-baseline">
-								<div class="d-flex pb-3 px-3">
-									<% for(let i=0;i< 5 ;i++) {%>
-										<% if(i<item.rating) {%>
-											<i class="fa-solid fa-star fa-lg text-warning"></i>
-											<% } else { %>
-												<i class="fa-regular fa-star fa-lg text-warning"></i>
-												<% } %>
-													<% } %>
-								</div>
-								<span class="text-secondary">
-									<%= item.peopleRated %>
-								</span>
-							</div>
-							<button class="btn btn-outline-secondary rounded-pill addToCartBtn" data-id="<%= item._id %>"
-								data-price="<%= item.finalPrice %>">
-								<span>Add</span>
-							</button>
+									<% } %>
+										<div class="d-flex align-items-baseline">
+											<div class="d-flex pb-3 px-3">
+												<% for(let i=0;i< 5 ;i++) {%>
+													<% if(i<item.rating) {%>
+														<i class="fa-solid fa-star fa-lg text-warning"></i>
+														<% } else { %>
+															<i class="fa-regular fa-star fa-lg text-warning"></i>
+															<% } %>
+																<% } %>
+											</div>
+											<span class="text-secondary">
+												<%= item.peopleRated %>
+											</span>
+										</div>
+										<button class="btn btn-outline-secondary rounded-pill addToCartBtn" data-id="<%= item._id %>"
+											data-price="<%= item.finalPrice %>">
+											<span>Add</span>
+										</button>
 						</div>
 					</div>
 					<!-- * end card -->
@@ -307,6 +328,8 @@
 	<% scriptBlock=` <script src="static/user/scripts/user.js">
 		</script>
 		<script src="/static/user/scripts/cart.js"></script>
+		<script src="/static/user/scripts/profile.js"></script>
+
 		`
 		%>
 

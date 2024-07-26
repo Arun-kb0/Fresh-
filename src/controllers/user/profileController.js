@@ -33,9 +33,11 @@ const getProfileController = async (req, res, next) => {
     })
 
     const wallet = await walletModel.findOne({ userId})
+    const user = await userModel.findOne({ userId})
 
     res.render('user/profile/profile', {
       ...viewUsersPage,
+      user,
       walletBalanceAmount: wallet?.balance ? wallet.balance : 0,
       suggestions: products ? products : []
     })

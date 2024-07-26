@@ -5,7 +5,7 @@ const { nodeMailerTransporter } = require('../config/nodeMailerConfig')
 
 
 // * send otp function
-const sendOtpToEmail = async ({ email, name, password }) => {
+const sendOtpToEmail = async({ email, name, password, referralCode=null }) => {
   try {
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`
     const html = `
@@ -29,6 +29,7 @@ const sendOtpToEmail = async ({ email, name, password }) => {
       username: email,
       name,
       password,
+      referralCode,
       otp: hashedOtp,
       createdAt: Date.now(),
       expiresAt: Date.now() + 1 * 60 * 1000

@@ -9,6 +9,8 @@ const passport = require('passport')
 const { v4: uuid } = require('uuid')
 const mongoose = require('mongoose')
 const { sessionCookieMaxAge } = require('../../config/sessionConfig')
+const walletModel = require('../../model/walletModel')
+const { addAmountToWalletController } = require('../user/walletController')
 
 // * auth check
 const authenticate = async (username, password, modal) => {
@@ -98,7 +100,7 @@ const loginController = async (req, res, next) => {
   try {
     const user = await authenticate(username, password, userModel)
     const sessionUser = {
-      userId:user.userId,
+      userId: user.userId,
       name: user.name,
       username: user.username,
       isAdmin: false,
@@ -134,7 +136,7 @@ const getSignUpPageController = async (req, res, next) => {
 
 
 const signUpController = async (req, res, next) => {
-  const { name, username, password } = req.body
+  const { name, username, password, referralCode } = req.body
   try {
     console.log(name, username, password)
     if (typeof name !== 'string' || typeof username !== 'string'
@@ -148,7 +150,7 @@ const signUpController = async (req, res, next) => {
     if (isUserExists) throw new CustomError("user already exists", CONFLICT)
 
     const hashedPwd = await bcrypt.hash(password, 10)
-    const data = await sendOtpToEmail({ email: username, name, password: hashedPwd })
+    const data = await sendOtpToEmail({ email: username, name, password: hashedPwd, referralCode })
     res.status(OK).json(data)
   } catch (error) {
     next(error)
@@ -180,7 +182,7 @@ const verifyEmailController = async (req, res, next) => {
     }
     const { expiresAt } = otpUserVerificationRecord
     const hashedOtp = otpUserVerificationRecord.otp
-    const { name, password } = otpUserVerificationRecord
+    const { name, password, referralCode } = otpUserVerificationRecord
     if (expiresAt < Date.now()) {
       throw new CustomError("OTP has expired please request again", GONE)
     }
@@ -190,13 +192,58 @@ const verifyEmailController = async (req, res, next) => {
       throw new CustomError("Invalid OTP. check your inbox", GONE)
     }
 
+
     const user = await userModel.create({
       userId: uuid(),
       name,
       username,
       password,
+      referralCode: uuid().slice(0, 8),
       isVerified: true
     })
+
+    // * adding amount on valid referral
+    const referredUser = await userModel.findOne({ referralCode })
+    
+    // console.log("referralCode ", referralCode)
+    // console.log("referredUser ")
+    // console.log(referredUser)
+
+    if (referredUser) {
+      await walletModel.create({
+        userId: user.userId,
+        balance: 100,
+        transactions: [{
+          amount: 100,
+          debit: false,
+          credit: true,
+        }]
+      })
+
+      const wallet = await walletModel.findOneAndUpdate(
+        { userId: referredUser.userId },
+        {
+          $push: {
+            transactions: {
+              amount: 150,
+              debit: false,
+              credit: true
+            }
+          },
+          $inc: { balance: 150 },
+        },
+        { new: true }
+      )
+      console.log("wallet ")
+      console.log(wallet)
+    } else {
+      await walletModel.create({
+        userId: user.userId,
+        balance: 0,
+      })
+    }
+
+
     await otpVerificationModal.deleteMany({ _id })
     const sessionUser = {
       userId: user.userId,
@@ -205,7 +252,7 @@ const verifyEmailController = async (req, res, next) => {
       isAdmin: false,
       provider: null
     }
-    req.session.user = sessionUser 
+    req.session.user = sessionUser
     req.session.isAuthorized = true
     res.cookie(
       'user',
@@ -265,7 +312,7 @@ const oauthSuccessController = async (req, res, next) => {
     res.cookie(
       'user',
       JSON.stringify(user),
-      { maxAge: sessionCookieMaxAge}
+      { maxAge: sessionCookieMaxAge }
     )
     res.redirect('/')
   } catch (error) {
