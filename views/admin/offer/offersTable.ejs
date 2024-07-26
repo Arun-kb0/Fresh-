@@ -44,7 +44,11 @@
               <!-- * alert end -->
 
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">offers /</span> offer list </h4>
-              <a class="btn btn-primary my-2" href="/admin/offer/create"> Create offer</a>
+              <div class="d-flex flex-sm-row flex-column justify-content-start ">
+                <a class="btn btn-primary my-2 mx-2 " href="/admin/offer/create?isProductOffer=true"> Create product offer</a>
+                <a class="btn btn-primary my-2 mx-2" href="/admin/offer/create?isSubcategoryOffer=true"> Create subcategory offer</a>
+                <a class="btn btn-primary my-2 mx-2" href="/admin/offer/create?isCategoryOffer=true"> Create category offer</a>
+              </div>
               <!--* category Table rows -->
               <div class="card">
                 <div class="table-responsive text-nowrap">

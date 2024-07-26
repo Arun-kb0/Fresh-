@@ -44,7 +44,13 @@
             <!-- * alert end -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Offers /</span> create offer</h4>
+              <% if(isProductOffer) {%>
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Offers /</span> create product offer</h4>
+              <% } else if(isSubcategoryOffer){%>
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Offers /</span> create subcategory offer</h4>
+              <% }else if(isCategoryOffer) {%>
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Offers /</span> create category offer</h4>
+              <% } %>
 
               <div class="row">
                   <div class="card mb-4">
@@ -172,6 +178,7 @@
                             <span id="small" class="opacity-0"></span>
                           </div>
                           <!-- * category dropdown -->
+                          <% if(isCategoryOffer) {%>
                           <div class="mt-2 mb-3 col-md-6">
                             <div class="dropdown">
                               <button id="categoryDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -190,9 +197,12 @@
                               </ul>
                             </div>
                           </div>
+                          <% } %>
                           <!-- * category dropdown end -->
 
+
                           <!-- * subcategory dropdown -->
+                           <% if(isSubcategoryOffer) {%>
                           <div class="mt-2 mb-3 col-md-6">
                             <div class="dropdown">
                               <button id="subcategoryDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -211,9 +221,11 @@
                               </ul>
                             </div>
                           </div>
+                          <% } %>
                           <!-- * subcategory dropdown end -->
 
                           <!-- * product dropdown -->
+                           <% if(isProductOffer) {%>
                           <div class="mt-2 mb-3 col-md-6">
                             <div class="dropdown">
                               <button id="productDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button"
@@ -232,6 +244,7 @@
                               </ul>
                             </div>
                           </div>
+                          <% } %>
                           <!-- * product dropdown end -->
                             <!-- * date picker -->
                             <div class="container mb-3 col-sm-6 ">

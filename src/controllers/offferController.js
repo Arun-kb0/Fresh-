@@ -103,6 +103,7 @@ const getAdminOffersTablePageController = async (req, res, next) => {
     const numberOfPages = Math.ceil(total / LIMIT)
 
     const offers = await offerModel.find()
+    
 
     res.render('admin/offer/offersTable', {
       ...viewAdminPage,
@@ -116,13 +117,43 @@ const getAdminOffersTablePageController = async (req, res, next) => {
 }
 
 const getCreateOfferPageController = async (req, res, next) => {
+  const { isProductOffer, isSubcategoryOffer, isCategoryOffer } = req.query
+
   try {
     const categories = await categoryModel.find({ isDeleted: false }).select('_id name')
     const subcategories = await subCategoryModel.find({ isDeleted: false }).select('_id name')
     const products = await productModel.find({ isDeleted: false }).select('_id name')
 
+    let offerPageControl = {
+      isProductOffer: true,
+      isSubcategoryOffer: false,
+      isCategoryOffer: false,
+    }
+    if (isProductOffer) {
+      offerPageControl = {
+        isProductOffer: true,
+        isSubcategoryOffer: false,
+        isCategoryOffer: false,
+      }
+    } else if (isSubcategoryOffer) {
+      offerPageControl = {
+        isProductOffer: false,
+        isSubcategoryOffer: true,
+        isCategoryOffer: false,
+      }
+    } else if (isCategoryOffer) {
+      offerPageControl = {
+        isProductOffer: false,
+        isSubcategoryOffer: false,
+        isCategoryOffer: true,
+      }
+    } else {
+      throw new CustomError('invalid route', NOT_FOUND)
+    }
+
     res.render('admin/offer/createOffer', {
       ...viewAdminPage,
+      ...offerPageControl,
       categories,
       subcategories,
       products
