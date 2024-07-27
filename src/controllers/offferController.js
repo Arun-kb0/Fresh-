@@ -72,7 +72,7 @@ applyMaxDiscountsToProducts = async ({ productIds, offerId }) => {
           update: {
             $set: {
               finalPrice: finalPrice,
-              offer:{}
+              offer: {}
             }
           }
         }
@@ -97,17 +97,80 @@ applyMaxDiscountsToProducts = async ({ productIds, offerId }) => {
 const getAdminOffersTablePageController = async (req, res, next) => {
   const { page = 1 } = req.query
   try {
-    const LIMIT = 6
+    const LIMIT = 10
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await offerModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
 
-    const offers = await offerModel.find()
-    
+
+    const result = await offerModel.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryIds",
+          foreignField: "_id",
+          as: "categories"
+        }
+      },
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subcategoryIds",
+          foreignField: "_id",
+          as: "subcategories"
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "field",
+          foreignField: "productIds",
+          as: "products"
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          image: 1,
+          discountType: 1,
+          discountValue: 1,
+          startDate: 1,
+          endDate: 1,
+          isDisabled: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          products: {
+            $map: {
+              input: "$products",
+              as: "product",
+              in: "$$product.name"
+            }
+          },
+          categories: {
+            $map: {
+              input: "$categories",
+              as: "category",
+              in: "$$category.name"
+            }
+          },
+          subcategories: {
+            $map: {
+              input: "$subcategories",
+              as: "subcategory",
+              in: "$$subcategory.name"
+            }
+          }
+        }
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: LIMIT },
+      { $skip: startIndex }
+    ])
 
     res.render('admin/offer/offersTable', {
       ...viewAdminPage,
-      offers,
+      offers: result ? result : [],
       numberOfPages,
       page: Number(page)
     })

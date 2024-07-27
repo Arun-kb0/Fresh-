@@ -16,9 +16,8 @@
   overflow: hidden;
 }
 
-#imageContainerCropper img ,
-#imageContainerCropperResult img
-{
+#imageContainerCropper img,
+#imageContainerCropperResult img {
   width: 100%;
   height: auto;
   max-height: 100%;
@@ -26,18 +25,17 @@
   object-fit: contain;
 }
 
-#imageContainerCropperResult{
-    max-width: 50%;
-    max-height: 300px;
-    position: relative;
-    overflow: hidden;
+#imageContainerCropperResult {
+  max-width: 50%;
+  max-height: 300px;
+  position: relative;
+  overflow: hidden;
 }
 
 /* * offers */
 #productDropdown,
 #subcategoryDropdown,
-#categoryDropdown
-{
+#categoryDropdown {
   max-height: 300px;
   overflow-y: scroll;
 }
@@ -45,9 +43,16 @@
 
 #dayDropdown,
 #yearDropdown,
-#monthDropdown{
+#monthDropdown {
   width: auto;
   max-height: 300px;
   overflow-y: scroll;
 
+}
+
+
+/* * Offers */
+.offersNames {
+  max-height: 200px;
+  overflow-y: scroll;
 }

@@ -91,9 +91,31 @@
                             ₹<%= item.discountValue %> OFF
                           <% } %>
                         </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td> 
+                          <div class="d-flex flex-column offersNames">
+                            <% for(const name of item.categories) {%>
+                              <span ><%= name %></span>
+                            <% } %>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex flex-column offersNames">
+                            <% for(const name of item.subcategories) {%>
+                              <span>
+                                <%= name %>
+                              </span>
+                            <% } %>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex flex-column offersNames">
+                            <% for(const name of item.products) {%>
+                              <span>
+                                <%= name %>
+                              </span>
+                              <% } %>
+                          </div>
+                        </td>
                         <td class="startDateTd">
                           <%= item.startDate %>
                         </td>
