@@ -57,6 +57,7 @@
                         <th>Payment status</th>
                         <th>Created at</th>
                         <th>Address</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -163,6 +164,10 @@
                               </div>
                               <span> <%= item.addressDetails.pinCode %> </span>
                             </div>
+                          </td>
+
+                          <td>
+                            <a href="/admin/order/details?orderId=<%= item._id %>"  class="btn btn-outline-info">order details</a>
                           </td>
                           
                          

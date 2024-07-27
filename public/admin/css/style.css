@@ -8,6 +8,14 @@
 
 }
 
+.orderDetailsImage {
+  width: 160px;
+  height: 160;
+  padding: 12px;
+  object-fit: cover;
+  overflow: hidden,
+}
+
 /* * cropper  */
 #imageContainerCropper {
   max-width: 90%;

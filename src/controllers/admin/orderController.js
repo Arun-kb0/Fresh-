@@ -3,6 +3,7 @@ const CustomError = require("../../constants/CustomError")
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/httpStatusCodes")
 const { viewAdminPage } = require("../../constants/pageConfid")
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues, validatePaymentTransactions } = require("../../constants/statusValues")
+const { getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
 const orderModel = require("../../model/orderModel")
 const mongoose = require('mongoose')
 
@@ -160,9 +161,24 @@ const changePaymentStatusController = async (req, res, next) => {
   }
 }
 
+const getOrderDetailsAdminPageController = async (req, res, next) => {
+  let { orderId } = await req.query
+  try {
+    orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
+    const orderDetails = await getOrderDetailsAggregation({orderId})
+    
+    res.render('admin/order/orderDetailsAdmin', {
+      ...viewAdminPage,
+      order: orderDetails
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   getAllOrdersAdminPageController,
   changeOrderStatusController,
   changePaymentStatusController,
+  getOrderDetailsAdminPageController
 }

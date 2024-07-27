@@ -19,14 +19,14 @@ const {
   getAllCategoriesForDropDown
 } = require('../../controllers/admin/categoryController')
 const multer = require("multer")
-const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController } = require('../../controllers/admin/orderController')
+const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController, getOrderDetailsAdminPageController } = require('../../controllers/admin/orderController')
 const { getCropperController } = require('../../controllers/admin/cropController')
 const { createCouponController,
   deleteCouponController,
   getCreateCouponPageController, 
   getCouponsPageController} = require('../../controllers/admin/couponController')
 const { getAdminOffersTablePageController, getCreateOfferPageController, createOfferController, deleteOfferController } = require('../../controllers/offferController')
-const { getSalesReportController, downloadSalesReportExcelController, downloadSalesReportPdfController } = require('../../controllers/admin/reportsController')
+const { getSalesReportController } = require('../../controllers/admin/reportsController')
 
 
 const router = express.Router()
@@ -81,6 +81,7 @@ router.route('/category/create')
 
 router.route('/orders')
   .get(getAllOrdersAdminPageController)
+router.get('/order/details', getOrderDetailsAdminPageController)
 router.patch('/order/orderstatus', changeOrderStatusController)
 router.patch('/order/paymentstatus', changePaymentStatusController)
 

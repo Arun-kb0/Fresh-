@@ -10,7 +10,7 @@ const orderModel = require('../../model/orderModel')
 const mongoose = require("mongoose")
 const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
-const { getProductsAggregation } = require("../../helpers/aggregationPipelines")
+const { getProductsAggregation, getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
 const walletModel = require("../../model/walletModel")
 
 
@@ -258,67 +258,10 @@ const getOrderDetailsPageController = async (req, res, next) => {
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       throw new CustomError('invalid orderId', BAD_REQUEST)
     }
-
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
+    const orderDetails = await getOrderDetailsAggregation({orderId})
 
-    const orderDetails = await orderModel.aggregate([
-      {
-        $match: {
-          _id: orderId
-        }
-      },
-      {
-        $lookup: {
-          from: 'addresses',
-          localField: 'addressId',
-          foreignField: '_id',
-          as: 'addressDetails'
-        }
-      },
-      {
-        $unwind: '$addressDetails'
-      },
-      {
-        $unwind: '$products'
-      },
-      {
-        $lookup: {
-          from: 'products', // Collection name of products
-          localField: 'products.productId',
-          foreignField: '_id',
-          as: 'productDetails'
-        }
-      },
-      {
-        $set: {
-          'products.name': { $arrayElemAt: ['$productDetails.name', 0] },
-          'products.image': { $arrayElemAt: ['$productDetails.image', 0] },
-          'products.finalPrice': { $arrayElemAt: ['$productDetails.finalPrice', 0] },
-          "products.soldBy": { $arrayElemAt: ["$productDetails.productInfo.soldBy", 0] }
-        }
-      },
-      {
-        $unset: 'productDetails'
-      },
-      {
-        $group: {
-          _id: '$_id',
-          userId: { $first: '$userId' },
-          addressId: { $first: '$addressId' },
-          addressDetails: { $first: '$addressDetails' }, // Include full address details
-          orderStatus: { $first: '$orderStatus' },
-          total: { $first: '$total' },
-          paymentMethod: { $first: '$paymentMethod' },
-          coupon: { $first: '$coupon' },
-          paymentStatus: { $first: '$paymentStatus' },
-          products: { $push: '$products' },
-          createdAt: { $first: '$createdAt' }
-        }
-      }
-    ]);
-
-    // res.status(OK).json({ order: orderDetails[0] })
-    res.render('user/profile/orderDetails', { ...viewUsersPage, order: orderDetails[0] })
+    res.render('user/profile/orderDetails', { ...viewUsersPage, order: orderDetails })
   } catch (error) {
     next(error)
   }
