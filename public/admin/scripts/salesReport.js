@@ -106,7 +106,10 @@ $(function () {
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    months.forEach((month, index) => {
+
+    const currentMonth = new Date().getMonth();
+    const filteredMonths = months.slice(0, currentMonth+1);
+    filteredMonths.forEach((month, index) => {
       const htmlLi = $(`<li class="dropdown-item"></li>`)
         .text(month)
         .attr('data-value', index + 1)
@@ -116,7 +119,11 @@ $(function () {
 
   function addDayDropdownValues() {
     const dayDropdown = $("#dayDropdown")
-    for (let day = 1; day <= 31; day++) {
+
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+
+    for (let day = 1; day <= currentDay; day++) {
       const htmlLi = $(`<li class="dropdown-item"></li>`).text(day)
       dayDropdown.append(htmlLi)
     }

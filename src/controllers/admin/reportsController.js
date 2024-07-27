@@ -55,8 +55,20 @@ const getSalesReportController = async (req, res, next) => {
     })
     console.log(result)
 
+    if (!result || result.length === 0) {
+      res.render('admin/reports/salesReportTable', {
+        ...viewAdminPage,
+        reportDetails:[],
+        data:[],
+        numberOfPages,
+        isDownload: false,
+        page: Number(page)
+      })
+      return
+    }
 
     const reportDetails = result[0]?.docs ? result[0]?.docs : []
+
     const data = {
       totalAmount: result[0].totalAmount,
       maxTotalAmount: result[0].maxTotalAmount,
@@ -119,19 +131,19 @@ const getSalesReportController = async (req, res, next) => {
       reportDetails.map(item => {
         const productNames = []
         item.products.map((product) => {
-          productNames.push(product.productDetails.name)
+          productNames.push(product?.productDetails?.name)
         })
 
         const user = `
-          ${item.userDetails.name},
-          ${item.userDetails.username ? item.userDetails.username : ''}
+          ${item?.userDetails?.name},
+          ${item?.userDetails?.username ? item?.userDetails?.username : ''}
         `
         const address = `
-          ${item.addressDetails.name},
-          ${item.addressDetails.phone},
-          ${item.addressDetails.email},
+          ${item.addressDetails?.name},
+          ${item.addressDetails?.phone},
+          ${item.addressDetails?.email},
           ${item.addressDetails?.place}, ${item.addressDetails?.city}, ${item.addressDetails?.state}, ${item.addressDetails?.country},
-          ${item.addressDetails.pinCode},
+          ${item.addressDetails?.pinCode},
         `
         sheet.addRow({
           product: productNames.toString(),
@@ -147,19 +159,19 @@ const getSalesReportController = async (req, res, next) => {
       })
 
       const summaryData = {
-        'Total Amount': data.totalAmount,
-        'Max Total Amount': data.maxTotalAmount,
-        'Total Discount Amount': data.totalDiscountAmount,
-        'Total Orders': data.totalOrders,
-        'Total Pending Orders': data.totalPendingOrders,
-        'Total Successed Orders': data.totalSuccessedOrders,
-        'Total Cancelled Orders': data.totalCancelledOrders,
-        'Total Returned Orders': data.totalReturnedOrders,
-        'Total Pending Payments': data.totalPendingPayments,
-        'Total Failed Payments': data.totalFailedPayments,
-        'Total Completed Payments': data.totalCompletedPayments,
-        'Total Online Payments': data.totalOnlinePayments,
-        'Total COD Payments': data.totalCodPayments
+        'Total Amount': data?.totalAmount,
+        'Max Total Amount': data?.maxTotalAmount,
+        'Total Discount Amount': data?.totalDiscountAmount,
+        'Total Orders': data?.totalOrders,
+        'Total Pending Orders': data?.totalPendingOrders,
+        'Total Successed Orders': data?.totalSuccessedOrders,
+        'Total Cancelled Orders': data?.totalCancelledOrders,
+        'Total Returned Orders': data?.totalReturnedOrders,
+        'Total Pending Payments': data?.totalPendingPayments,
+        'Total Failed Payments': data?.totalFailedPayments,
+        'Total Completed Payments': data?.totalCompletedPayments,
+        'Total Online Payments': data?.totalOnlinePayments,
+        'Total COD Payments': data?.totalCodPayments
       };
 
       Object.entries(summaryData).forEach(([detail, value]) => {

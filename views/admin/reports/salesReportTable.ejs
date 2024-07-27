@@ -46,6 +46,8 @@
               
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Report /</span> Sales report</h4>
 
+             
+
               <% if(!isDownload) {%>
               <section class="d-flex flex-column ">
                 <div class="">
@@ -198,23 +200,23 @@
                           </td>
                           <td>
                            <div class="d-flex flex-column">  
-                            <span><%= item.userDetails.name %>  </span>
-                            <span><%= item.userDetails.username %>  </span>
-                            <span><%= item.userDetails.phone %>  </span>
+                            <span><%= item.userDetails?.name %>  </span>
+                            <span><%= item.userDetails?.username %>  </span>
+                            <span><%= item.userDetails?.phone %>  </span>
                            </div>
                           </td>
                           <td class="">
                             <div class="d-flex flex-column">
-                              <strong> <%= item.addressDetails.name %> </strong>
-                              <span> <%= item.addressDetails.phone %> </span>
-                              <span> <%= item.addressDetails.email %> </span>
+                              <strong> <%= item?.addressDetails?.name %> </strong>
+                              <span> <%= item?.addressDetails?.phone %> </span>
+                              <span> <%= item?.addressDetails?.email %> </span>
                               <div class="d-flex">
-                                <span> <%= item.addressDetails.place+" ," %> </span>
-                                <span> <%= item.addressDetails.city+" ," %> </span>
-                                <span> <%= item.addressDetails.state+" ," %> </span>
-                                <span> <%= item.addressDetails.country+" ," %> </span>
+                                <span> <%= item?.addressDetails?.place+" ," %> </span>
+                                <span> <%= item?.addressDetails?.city+" ," %> </span>
+                                <span> <%= item?.addressDetails?.state+" ," %> </span>
+                                <span> <%= item?.addressDetails?.country+" ," %> </span>
                               </div>
-                              <span> <%= item.addressDetails.pinCode %> </span>
+                              <span> <%= item?.addressDetails?.pinCode %> </span>
                             </div>
                           </td>
                           
