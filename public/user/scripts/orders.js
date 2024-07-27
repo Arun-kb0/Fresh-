@@ -6,9 +6,89 @@ $(function () {
   const orderCancelBtn = $(".orderCancelBtn")
   const orderReturnBtn = $(".orderReturnBtn")
 
+  const singleProductStatus = $(".singleProductStatus")
+  const cancelSingleProductBtn = $(".cancelSingleProductBtn")
+  const returnSingleProductBtn = $(".returnSingleProductBtn")
+
 
   orderCancelBtn.on("click", handleCancelOrder)
   orderReturnBtn.on("click", handleReturnOrder)
+
+  cancelSingleProductBtn.on('click', handleCancelSingleOrder)
+  returnSingleProductBtn.on('click', handleReturnSingleOrder)
+  
+
+  function handleCancelSingleOrder() {
+    const productId = $(this).attr('data-productId')
+    const orderId = $(this).attr('data-orderId')
+
+    const parent = $(this).parent().parent()
+    const currentSingleOrderStatus = parent.find('.singleProductStatus')
+    const cancelBtn = $(this)
+    const returnBtn = parent.find('.returnSingleProductBtn')
+    const orderTotal = $("#orderTotal")
+
+    $.ajax({
+      url: '/cart/order/single/cancel',
+      method: 'PATCH',
+      data:{productId, orderId},
+      success: function (data) {
+        if (!data.order) {
+          console.log('no data returned')
+          return
+        }
+        console.log(data)
+        currentSingleOrderStatus
+          .text('Cancelled')
+          .addClass('text-white bg-danger')
+        
+        cancelBtn.hide()
+        returnBtn.hide()
+
+        orderTotal.text(data.order?.total)
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 410) {
+          cancelOrderAjaxCall({ orderId })
+          return
+        }
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
+  
+  function handleReturnSingleOrder() {
+    const productId = $(this).attr('data-productId')
+    const orderId = $(this).attr('data-orderId')
+
+    const parent = $(this).parent().parent()
+    const singleOrderStatus = parent.find('.singleProductStatus')
+    
+    console.log('single status')
+    console.log(singleOrderStatus)
+
+    console.log(productId)
+    $.ajax({
+      url: '/cart/order/single/return',
+      method: 'PATCH',
+      data: { productId, orderId },
+      success: function (data) {
+        if (!data) {
+          console.log('no data returned')
+          return
+        }
+        console.log(data)
+
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
 
   function handleCancelOrder() {
     const orderId = $(this).attr("data-orderId")
@@ -214,5 +294,83 @@ $(function () {
   })
 
 
+  singleProductStatus.each(function () {
+    const element = $(this)
+    const elementValue = element.text().trim()
+    const parent = element.parent().parent()
+    const cancelBtn = parent.find('.cancelSingleProductBtn')
+    const returnBtn = parent.find('.returnSingleProductBtn')
+    returnBtn.hide()
+
+    switch (elementValue) {
+      case 'Pending':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-warning")
+        break;
+      case 'Processing':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-warning")
+        break;
+      case 'Shipped':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-info")
+        break;
+      case 'Delivered':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-success")
+        cancelBtn.hide()
+        returnBtn.show()
+        break;
+      case 'Cancelled':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-danger")
+        cancelBtn.hide()
+        break;
+      case 'Return Requested':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-warning")
+        cancelBtn.show()
+        break
+      case 'Return Approved':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-warning")
+        returnBtn.hide()
+        cancelBtn.hide()
+        break
+      case 'Returned':
+        element
+          .removeClass()
+          .addClass("px-3 rounded-pill text-white singleProductStatus bg-primary")
+        returnBtn.hide()
+        cancelBtn.hide()
+        break
+      default:
+        console.log("invalid order status value")
+    }
+  })
+
+  
+  // * cancel order function call id all orders are cancelled
+  function cancelOrderAjaxCall({orderId}) {
+    $.ajax({
+      url: '/cart/order/cancel',
+      method: "PATCH",
+      data: { orderId },
+      success: function (data) {
+        window.location.reload()
+      },
+      error: function (xhr, status, error) {
+        console.log(error)
+      }
+    })
+
+  }
 
 })

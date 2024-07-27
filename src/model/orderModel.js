@@ -21,6 +21,19 @@ const ordersSchema = new Schema({
     required: true
   },
   products: [{
+    orderStatus: {
+      type: String,
+      enum: [
+        'Pending',
+        'Shipped',
+        'Delivered',
+        'Cancelled',
+        'Return Requested',
+        'Return Approved',
+        'Returned',
+      ],
+      default: 'Pending'
+    },
     productId: { type: objectId, required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },

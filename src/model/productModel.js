@@ -21,9 +21,8 @@ const productSchema = new Schema({
     discountType: {
       type: String,
       enum: ['percentage', 'amount'],
-      required: true
     },
-    discountValue: { type: Number, required: true },
+    discountValue: { type: Number },
   },
   productInfo: {
     description: { type: String },

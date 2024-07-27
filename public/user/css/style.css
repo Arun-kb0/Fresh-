@@ -187,7 +187,7 @@
   overflow: auto;
 }
 
-#prevTotal{
+#prevTotal {
   text-decoration: line-through;
 }
 
@@ -216,8 +216,17 @@
 
 /* * order details */
 .orderDetailsImage {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
+  padding: 2rem;
+}
+
+.orderDetailsImageContainer {
+  width: 160px;
+  height: 160px;
+  /* padding: 12px; */
+  object-fit: cover;
+  overflow: hidden,
 }
 
 
@@ -228,11 +237,11 @@
 }
 
 /* * show all categories */
-.allCategoriesCard{
+.allCategoriesCard {
   max-height: 360px;
   min-width: 200px;
 }
 
-.wishlistBtnIcon{
+.wishlistBtnIcon {
   color: #FF5A5F
 }

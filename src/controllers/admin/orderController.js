@@ -165,8 +165,8 @@ const getOrderDetailsAdminPageController = async (req, res, next) => {
   let { orderId } = await req.query
   try {
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
-    const orderDetails = await getOrderDetailsAggregation({orderId})
-    
+    const orderDetails = await getOrderDetailsAggregation({ orderId })
+
     res.render('admin/order/orderDetailsAdmin', {
       ...viewAdminPage,
       order: orderDetails
@@ -176,9 +176,19 @@ const getOrderDetailsAdminPageController = async (req, res, next) => {
   }
 }
 
+const cancelSingleOrderController = async (req, res, next) => {
+  const { productId } = req.body
+  try {
+      
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   getAllOrdersAdminPageController,
   changeOrderStatusController,
   changePaymentStatusController,
-  getOrderDetailsAdminPageController
+  getOrderDetailsAdminPageController,
+  cancelSingleOrderController
 }

@@ -29,16 +29,17 @@ const paypalClient = new paypal.core.PayPalHttpClient(
   )
 )
 
-// * helperFunctions 
+// * helperFunctions
 
-const getCartTotal = ({cart,deliveryFee=10}) => {
+
+const getCartTotal = ({ cart, deliveryFee = 10 }) => {
   const total = cart.products.reduce((acc, item) => (acc + item.price), 0)
   return total + deliveryFee
 }
 
 const calculateDiscount = ({ total, coupon }) => {
-  let finalTotal=0
-  if (coupon.discountType === 'percentage') {
+  let finalTotal = 0
+  if (coupon?.discountType === 'percentage') {
     const discount = (total * coupon.discountValue) / 100;
     finalTotal = total - discount;
   } else if (coupon.discountType === 'amount') {
@@ -46,6 +47,8 @@ const calculateDiscount = ({ total, coupon }) => {
   }
   return finalTotal
 }
+
+
 
 
 // * helper functions end
@@ -68,7 +71,7 @@ const getCartPageController = async (req, res, next) => {
     let total = 0
     if (cart?.coupon) {
       const coupon = await couponModel.findOne({ _id: cart.couponId })
-      let cartTotal = getCartTotal({ cart ,deliveryFee})
+      let cartTotal = getCartTotal({ cart, deliveryFee })
       total = calculateDiscount({ total: cartTotal, coupon })
     } else {
       total = getCartTotal({ cart, deliveryFee })
@@ -78,7 +81,7 @@ const getCartPageController = async (req, res, next) => {
       { $set: { total } }
     )
     console.log("total ", total)
-    const cartWithDetails = await getCartWithDetailsAggregation({userId:user.userId,deliveryFee})
+    const cartWithDetails = await getCartWithDetailsAggregation({ userId: user.userId, deliveryFee })
 
     res.render('user/cart/cart', {
       ...viewUsersPage,
@@ -371,7 +374,7 @@ const getCheckoutPageController = async (req, res, next) => {
     //   }
     // ]);
 
-    const cart = await cartModel.findOne({userId:user.userId})
+    const cart = await cartModel.findOne({ userId: user.userId })
     let total = 0
     if (cart?.coupon) {
       const coupon = await couponModel.findOne({ _id: cart.couponId })
@@ -383,10 +386,10 @@ const getCheckoutPageController = async (req, res, next) => {
     await cartModel.findOneAndUpdate(
       { userId: user.userId },
       { $set: { total } }
-    )    
-    
+    )
+
     const cartWithDetails = await cartCheckoutAggregation({ userId: user.userId })
-    
+
 
     console.log(cartWithDetails.appliedCouponDetails);
     // res.status(OK).json({ message: "get checkout success", checkOutCart: cartWithDetails[0] })
@@ -458,22 +461,24 @@ const orderUsingCodController = async (req, res, next) => {
         }
       }
     )
-    await usedCouponsModel.findOneAndUpdate(
-      { userId: user.userId },
-      {
-        userId: user.userId,
-        $addToSet: {
-          coupons: cart.couponId
+    if (cart.couponId) {
+      await usedCouponsModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          userId: user.userId,
+          $addToSet: {
+            coupons: cart.couponId
+          }
+        },
+        {
+          upsert: true,
         }
-      },
-      {
-        upsert: true,
-      }
-    )
-    await couponModel.findOneAndUpdate(
-      { _id: cart.couponId },
-      { $inc: { usedCount: 1 } }
-    )
+      )
+      await couponModel.findOneAndUpdate(
+        { _id: cart.couponId },
+        { $inc: { usageLimit: 1 } }
+      )
+    }
 
     res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
@@ -548,6 +553,9 @@ const orderSuccessPaypalController = async (req, res, next) => {
     const user = JSON.parse(req.cookies.user)
     const cart = await cartModel.findOne({ userId: user.userId })
 
+    console.log('one')
+    console.log(cart.products.length)
+
     if (!cart) {
       throw new CustomError('cart not found', NOT_FOUND)
     }
@@ -562,8 +570,10 @@ const orderSuccessPaypalController = async (req, res, next) => {
         throw new CustomError(`Insufficient stock for product: ${product.name}`, BAD_REQUEST);
       }
       product.stock -= item.quantity;
+      console.log(product)
       await product.save();
     }
+    console.log('two')
 
     const newOrder = await orderModel.create({
       addressId: addressId,
@@ -597,6 +607,7 @@ const orderSuccessPaypalController = async (req, res, next) => {
       }
     )
     if (cart.couponId) {
+      console.log('cart.couponId ', cart.couponId)
       await usedCouponsModel.findOneAndUpdate(
         { userId: user.userId },
         {
@@ -607,9 +618,10 @@ const orderSuccessPaypalController = async (req, res, next) => {
         },
         { upsert: true, }
       )
+
       await couponModel.findOneAndUpdate(
         { _id: cart.couponId },
-        { $inc: { usedCount: 1 } }
+        { $inc: { usageLimit: 1 } }
       )
     }
 
@@ -622,6 +634,8 @@ const orderSuccessPaypalController = async (req, res, next) => {
 const cancelOrderController = async (req, res, next) => {
   const { orderId } = req.body
   try {
+    const user = JSON.parse(req.cookies.user)
+
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       throw new CustomError("invalid orderId", BAD_REQUEST)
     }
@@ -640,7 +654,6 @@ const cancelOrderController = async (req, res, next) => {
       orderStatus = orderStatusValues.Delivered
     }
     console.log("paymentStatus ", paymentStatus)
-
 
     if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.Cancelled)) {
       throw new CustomError('already cancelled or returned', BAD_REQUEST)
@@ -667,12 +680,145 @@ const cancelOrderController = async (req, res, next) => {
       },
       { new: true }
     )
+
+    if (cancelledOrder.paymentMethod !== 'cod') {
+      const updatedWallet = await walletModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          $inc: { balance: cancelledOrder.total },
+          $push: {
+            transactions: {
+              amount: cancelledOrder.total,
+              credit: true,
+              debit: false
+            }
+          }
+        }
+      )
+    }
+
+
     // console.log(cancelledOrder)
     res.status(OK).json({ message: "order cancelled", order: cancelledOrder })
   } catch (error) {
     next(error)
   }
 }
+
+// * single order 
+const cancelSingleOrderOrderController = async (req, res, next) => {
+  let { orderId, productId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+
+    const order = await orderModel.findOneAndUpdate(
+      { _id: orderId, 'products.productId': productId },
+      { $set: { 'products.$.orderStatus': 'Cancelled' } },
+      { new: true }
+    )
+    if (!order) {
+      throw new CustomError('no order found', NOT_FOUND)
+    }
+
+    let count = 0
+    let length = order.products.length
+    const orderProductDetails = order.products.filter((product) => {
+      if (product.orderStatus === 'Cancelled') {
+        count++
+      }
+      return product.productId.toString() === productId;
+    })
+
+    if (count === length) {
+      throw new CustomError('all orders cancelled', GONE)
+    }
+
+    // * total calculation
+    const deliveryFee = 10
+    let orderActualTotal =0
+    orderActualTotal += deliveryFee
+    order.products.map((product) => {
+      if (product.orderStatus !== orderStatusValues.Cancelled) {
+        orderActualTotal += product.price
+      }
+    })
+
+    console.log('orderActualTotal = ', orderActualTotal)
+    let orderTotal = 0
+    if (order.coupon) {
+      const coupon = await couponModel.findOne({ code: order.coupon })
+      if (coupon.discountType === 'percentage') {
+        const discountAmount = (orderActualTotal * coupon.discountValue) / 100;
+        orderTotal = orderActualTotal > (coupon.minCartAmount)
+          ? orderActualTotal - discountAmount
+          : orderActualTotal
+
+      } else {
+        orderTotal = orderActualTotal >= (coupon.discountValue * 2)
+          ? orderActualTotal - coupon.discountValue
+          : orderActualTotal
+      }
+    } else {
+      orderTotal = orderActualTotal
+    }
+
+    console.log(orderProductDetails)
+    console.log("orderTotal =  ", orderTotal)
+
+    const updatedProduct = await productModel.findOneAndUpdate(
+      { _id: productId },
+      { $inc: { stock: orderProductDetails?.[0].quantity } },
+      { new: true }
+    )
+
+    if (order.paymentMethod !== 'cod') {
+      const updatedWallet = await walletModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          $inc: { balance: orderProductDetails?.[0].price },
+          $push: {
+            transactions: {
+              amount: orderProductDetails?.[0].price,
+              credit: true,
+              debit: false,
+            }
+          }
+        },
+      )
+      console.log('wallet updated')
+    }
+
+    const updateOrder = await orderModel.findOneAndUpdate(
+      { _id: orderId },
+      { $set: { total: orderTotal } },
+      { new: true }
+    )
+
+    res.status(OK).json({ message: 'single product cancelled', order: updateOrder })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const returnSingleOrderOrderController = async (req, res, next) => {
+  const { orderId, productId } = req.body
+  try {
+    const order = await orderModel.findOneAndUpdate(
+      { _id: orderId, 'products.productId': productId },
+      {
+        $set: {
+          'products.$.orderStatus': 'Return Requested'
+        }
+      },
+      { new: true }
+    )
+    res.status(OK).json({ message: 'single product cancelled', order })
+  } catch (error) {
+    next(error)
+  }
+}
+// * single order  end
+
 
 const returnOrderController = async (req, res, next) => {
   const { orderId } = req.body
@@ -748,11 +894,11 @@ const applyCouponController = async (req, res, next) => {
     }
 
     const cart = await cartModel.findOne({ userId: user.userId })
-    let total = getCartTotal({cart})
+    let total = getCartTotal({ cart })
     let finalTotal = calculateDiscount({ total, coupon })
 
     if (cart.coupon) {
-      throw new CustomError('coupon already added remove to add another',CONFLICT)
+      throw new CustomError('coupon already added remove to add another', CONFLICT)
     }
 
     if (total < coupon.minCartAmount) {
@@ -811,11 +957,11 @@ const removeCouponController = async (req, res, next) => {
     const cart = await cartModel.findOne({ userId: user.userId })
     const usedCoupons = await usedCouponsModel.findOneAndUpdate(
       { userId: user.userId },
-      { $pull : { coupons: couponId } },
+      { $pull: { coupons: couponId } },
       { new: true }
     )
 
-    let total = getCartTotal({cart})
+    let total = getCartTotal({ cart })
     const updatedCart = await cartModel.findOneAndUpdate(
       { userId: user.userId },
       {
@@ -859,5 +1005,8 @@ module.exports = {
   returnOrderController,
 
   applyCouponController,
-  removeCouponController
+  removeCouponController,
+
+  cancelSingleOrderOrderController,
+  returnSingleOrderOrderController
 }
