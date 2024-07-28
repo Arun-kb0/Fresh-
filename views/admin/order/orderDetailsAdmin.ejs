@@ -76,7 +76,7 @@
 												<div class="d-flex flex-column mx-2">
 													<span class="text-secondary h5">Order summery</span>
 													<div class="d-flex justify-content-between">
-														<span class="text-secondary px-2">Order status </span>
+														<span class="text-secondary px-2 ">Order status </span>
 														<span class="text-secondary orderStatus">
 															<%= order.orderStatus %>
 														</span>
@@ -105,6 +105,38 @@
 														<span class="h5 text-secondary mr-1">
 															<%= product.name %>
 														</span>
+														<div class="dropdown orderStatusDropdown">
+                              <a class="btn btn-secondary btn-sm dropdown-toggle" href="#" role="button" 
+                                id="dropdownMenuLink" 
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span class="singleOrderStatus">
+                                  <%= product.orderStatus %>
+                                </span>
+                              </a>
+                            
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <% if(product.orderStatus==='Pending' ) {%>
+                                  <li><a class="dropdown-item Pending" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Pending</a></li>
+                                  <li><a class="dropdown-item Shipped" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Shipped</a></li>
+                                <% } %>
+                                <% if(product.orderStatus==='Shipped') {%>
+                                <li><a class="dropdown-item Delivered" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Delivered</a></li>
+                                <% } %>
+                                <% if(product.orderStatus==='Pending' || product.orderStatus==='Shipped' ) {%>
+                                  <li><a class="dropdown-item Cancelled" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Cancelled</a></li>
+                                <% } %>
+                                <% if(product.orderStatus==='Delivered') {%>
+                                <li><a class="dropdown-item Cancelled" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Return Requested</a></li>
+                                <% } %> 
+                                <% if(product.orderStatus==='Return Requested' ) {%>
+                                <li><a class="dropdown-item Cancelled" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Return Approved</a></li>
+                                <% } %>
+                                <% if(product.orderStatus==='Return Approved' ) {%>
+                                <li><a class="dropdown-item Cancelled" data-orderId="<%= order._id %>"  data-productId="<%= product.productId %>" >Returned</a></li>
+                                <% } %>
+                              </ul>
+                            </div>
 														<div>
 															<span class="h6 text-secondary mr-1"> sold by : </span>
 															<span class="h6 text-secondary mr-1">
@@ -124,9 +156,6 @@
 														<div>
 															<span class="h6 text-secondary mr-1"> Total product price : </span>
 															<span class="h6 text-secondary mr-1">₹<%= product.price%> </span>
-														</div>
-														<div class="d-flex justify-content-start rounded-pill">
-															<button data-productId="<%= product._id %>" class="btn btn-outline-danger cancelSingleProductBtn">Cancel</button>
 														</div>
 													</div>
 									
@@ -195,7 +224,8 @@
     <!-- * category script -->
     <% scriptBlock= `
       <script src="/static/admin/assets/js/pages-account-settings-account.js"></script>
-      <script src="/static/admin/scripts/category.js"></script>
+      <script src="/static/admin/scripts/orderDetailAdmin.js"></script>
+
     `    
     %>
     

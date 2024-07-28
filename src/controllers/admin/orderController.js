@@ -1,11 +1,15 @@
 
 const CustomError = require("../../constants/CustomError")
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/httpStatusCodes")
+const { OK, BAD_REQUEST, NOT_FOUND, GONE, CONFLICT } = require("../../constants/httpStatusCodes")
 const { viewAdminPage } = require("../../constants/pageConfid")
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues, validatePaymentTransactions } = require("../../constants/statusValues")
 const { getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
 const orderModel = require("../../model/orderModel")
 const mongoose = require('mongoose')
+const productModel = require("../../model/productModel")
+const walletModel = require("../../model/walletModel")
+const couponModel = require("../../model/couponModel")
+const { getOrderTotal, cancelOrReturnWholeOrder } = require("../../helpers/orderHelpers")
 
 
 const getAllOrdersAdminPageController = async (req, res, next) => {
@@ -89,7 +93,7 @@ const getAllOrdersAdminPageController = async (req, res, next) => {
 }
 
 const changeOrderStatusController = async (req, res, next) => {
-  const { status, orderId } = req.body
+  const { status, orderId, noCheck = false } = req.body
   try {
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       throw new CustomError('invalid orderId', BAD_REQUEST)
@@ -98,8 +102,10 @@ const changeOrderStatusController = async (req, res, next) => {
     if (!currentOrder) {
       throw new CustomError('order not found', NOT_FOUND)
     }
+    const userId = currentOrder.userId
+
     // * status values
-    if (!validateOrderStatusTransactions[currentOrder.orderStatus].includes(status)) {
+    if (!noCheck && !validateOrderStatusTransactions[currentOrder.orderStatus].includes(status)) {
       throw new CustomError('invalid status update', BAD_REQUEST)
     }
 
@@ -112,17 +118,34 @@ const changeOrderStatusController = async (req, res, next) => {
       paymentStatus = paymentStatusValues.Failed
     }
 
-    const updatedOrder = await orderModel.findOneAndUpdate(
+
+    const filteredProductIds = currentOrder.products
+      .filter((product) => {
+        console.log(product.orderStatus, " ", status);
+        return validateOrderStatusTransactions[product.orderStatus].includes(status);
+      })
+      .map(product => product.productId.toString());
+
+    console.log("filteredProductIds ")
+    console.log(filteredProductIds)
+
+    // * getOrder total , increase stock and refund money
+   const updatedOrder = await cancelOrReturnWholeOrder({
+      userId: currentOrder.userId,
+      orderId,
+      order: currentOrder,
+      orderStatus: status,
+      paymentStatus
+    })
+    // console.log(updatedOrder)
+
+    const lastUpdatedOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
+      { $set: { "products.$[elem].orderStatus": status } },
       {
-        $set: {
-          orderStatus: status,
-          paymentStatus,
-          "products.$[].orderStatus": status
-        },
+        arrayFilters: [{ "elem.productId": { $in: filteredProductIds } }]
       }
     )
-
 
     res.status(OK).json({ message: "status changed", order: updatedOrder })
   } catch (error) {
@@ -179,10 +202,131 @@ const getOrderDetailsAdminPageController = async (req, res, next) => {
   }
 }
 
-const cancelSingleOrderController = async (req, res, next) => {
-  const { productId } = req.body
+const singleOrderStatusChangeController = async (req, res, next) => {
+  const { productId, orderId, status } = req.body
   try {
-      
+    if (!mongoose.isObjectIdOrHexString(productId)
+      || !mongoose.isObjectIdOrHexString(orderId)
+    ) {
+      throw new CustomError('invalid productId or orderId', BAD_REQUEST)
+    }
+
+    const order = await orderModel.findOne({ _id: orderId })
+
+    let count = 0
+    let length = order.products.length
+    const orderProductDetails = order.products.filter((product) => {
+      if (
+        product.orderStatus === 'Cancelled'
+        || product.orderStatus === 'Returned Requested'
+        || product.orderStatus === 'Return Approved'
+        || product.orderStatus === 'Returned'
+      ) {
+        count++
+      }
+
+      console.log(product.productId)
+      return product.productId.toString() === productId;
+    })
+
+    if (count === length) {
+      throw new CustomError('all orders in process of return or cancelled', GONE)
+    }
+
+
+    if (!validateOrderStatusTransactions[orderProductDetails?.[0]?.orderStatus].includes(status)) {
+      throw new CustomError('invalid order status', CONFLICT)
+    }
+
+
+    // * total calculation
+    const deliveryFee = 10
+    let orderActualTotal = 0
+    orderActualTotal += deliveryFee
+    order.products.map((product) => {
+      if (product.orderStatus !== 'Cancelled'
+        && product.orderStatus !== 'Return Requested'
+        && product.orderStatus !== 'Return Approved'
+        && product.orderStatus !== 'Returned'
+      ) {
+        orderActualTotal += product.price
+      }
+    })
+
+    console.log('orderActualTotal = ', orderActualTotal)
+    let orderTotal = 0
+    if (order.coupon) {
+      const coupon = await couponModel.findOne({ code: order.coupon })
+      if (coupon.discountType === 'percentage') {
+        const discountAmount = (orderActualTotal * coupon.discountValue) / 100;
+        orderTotal = orderActualTotal > (coupon.minCartAmount)
+          ? orderActualTotal - discountAmount
+          : orderActualTotal
+
+      } else {
+        orderTotal = orderActualTotal >= (coupon.discountValue * 2)
+          ? orderActualTotal - coupon.discountValue
+          : orderActualTotal
+      }
+    } else {
+      orderTotal = orderActualTotal
+    }
+    console.log(orderProductDetails)
+    console.log("orderTotal =  ", orderTotal)
+
+
+    console.log("status code")
+    console.log(orderProductDetails?.[0]?.orderStatus)
+    console.log(order.paymentStatus)
+    // * payment return
+    let updatedOrder
+    if (order.paymentStatus === 'Completed'
+      && orderProductDetails?.[0]?.orderStatus === 'Return Approved'
+    ) {
+
+      // * increasing product quantity
+      const updatedProduct = await productModel.findOneAndUpdate(
+        { _id: productId },
+        { $inc: { stock: orderProductDetails?.[0].quantity } },
+        { new: true }
+      )
+
+      updatedOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId, "products.productId": productId },
+        {
+          $set: {
+            total: orderTotal,
+            'products.$.orderStatus': status,
+          }
+        },
+        { new: true }
+      )
+
+      const updatedWallet = await walletModel.findOneAndUpdate(
+        { userId: order.userId },
+        {
+          $inc: { balance: orderProductDetails?.[0].price },
+          $push: {
+            transactions: {
+              amount: orderProductDetails?.[0].price,
+              credit: true,
+              debit: false,
+            }
+          }
+        },
+      )
+      console.log('wallet updated')
+    } else {
+      updatedOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId, "products.productId": productId },
+        { $set: { 'products.$.orderStatus': status, } },
+        { new: true }
+      )
+    }
+
+
+
+    res.status(OK).json({ message: `order status changed to ${status}` })
   } catch (error) {
     next(error)
   }
@@ -193,5 +337,5 @@ module.exports = {
   changeOrderStatusController,
   changePaymentStatusController,
   getOrderDetailsAdminPageController,
-  cancelSingleOrderController
+  singleOrderStatusChangeController
 }

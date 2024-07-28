@@ -19,7 +19,7 @@ const {
   getAllCategoriesForDropDown
 } = require('../../controllers/admin/categoryController')
 const multer = require("multer")
-const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController, getOrderDetailsAdminPageController, cancelSingleOrderController } = require('../../controllers/admin/orderController')
+const { getAllOrdersAdminPageController, changeOrderStatusController, changePaymentStatusController, getOrderDetailsAdminPageController, cancelSingleOrderController, singleOrderStatusChangeController } = require('../../controllers/admin/orderController')
 const { getCropperController } = require('../../controllers/admin/cropController')
 const { createCouponController,
   deleteCouponController,
@@ -85,7 +85,7 @@ router.get('/order/details', getOrderDetailsAdminPageController)
 router.patch('/order/orderstatus', changeOrderStatusController)
 router.patch('/order/paymentstatus', changePaymentStatusController)
 
-router.patch('/order/product/cancel',cancelSingleOrderController)
+router.patch('/order/single/status', singleOrderStatusChangeController)
 
 
 // * coupons

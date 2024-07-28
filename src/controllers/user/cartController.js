@@ -13,6 +13,7 @@ const CC = require('currency-converter-lt')
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
 const walletModel = require("../../model/walletModel")
 const { getCartWithDetailsAggregation, cartCheckoutAggregation } = require("../../helpers/aggregationPipelines")
+const { cancelOrReturnWholeOrder } = require("../../helpers/orderHelpers")
 
 let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
 
@@ -214,165 +215,6 @@ const getCheckoutPageController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
-
-    // const cartWithDetails = await cartModel.aggregate([
-    //   {
-    //     $match: {
-    //       userId: user.userId
-    //     }
-    //   },
-    //   {
-    //     $unwind: "$products"
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "products",
-    //       localField: "products.productId",
-    //       foreignField: "_id",
-    //       as: "productDetails"
-    //     }
-    //   },
-    //   {
-    //     $unwind: "$productDetails"
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 1,
-    //       userId: 1,
-    //       coupon: 1,
-    //       "products.quantity": 1,
-    //       "products.productId": 1,
-    //       productName: "$productDetails.name",
-    //       image: {
-    //         $arrayElemAt: [
-    //           "$productDetails.image.path",
-    //           0
-    //         ]
-    //       },
-    //       soldBy:
-    //         "$productDetails.productInfo.soldBy",
-    //       stock: "$productDetails.stock",
-    //       productTotalPrice: "$products.price"
-    //     }
-    //   },
-    //   {
-    //     $group: {
-    //       _id: "$_id",
-    //       userId: {
-    //         $first: "$userId"
-    //       },
-    //       appliedCoupon: {
-    //         $first: "$coupon"
-    //       },
-    //       products: {
-    //         $push: {
-    //           productId: "$products.productId",
-    //           name: "$productName",
-    //           quantity: "$products.quantity",
-    //           price: "$products.price",
-    //           image: "$image",
-    //           soldBy: "$soldBy",
-    //           stock: "$stock"
-    //         }
-    //       },
-    //       totalItems: {
-    //         $sum: 1
-    //       },
-    //       totalQuantity: {
-    //         $sum: "$products.quantity"
-    //       },
-    //       subTotalPrice: {
-    //         $sum: "$productTotalPrice"
-    //       }
-    //     }
-    //   },
-    //   {
-    //     $addFields: {
-    //       deliveryFee: deliveryFee,
-    //       totalPrice: {
-    //         $add: ["$subTotalPrice", deliveryFee]
-    //       }
-    //     }
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "addresses",
-    //       localField: "userId",
-    //       foreignField: "userId",
-    //       as: "addresses"
-    //     }
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "usedcoupons",
-    //       localField: "userId",
-    //       foreignField: "userId",
-    //       as: "usedcoupons"
-    //     }
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "coupons",
-    //       let: {
-    //         usedCoupons: "$usedcoupons"
-    //       },
-    //       pipeline: [
-    //         {
-    //           $match: {
-    //             $expr: {
-    //               $not: {
-    //                 $in: [
-    //                   "$_id",
-    //                   {
-    //                     $reduce: {
-    //                       input: "$$usedCoupons",
-    //                       initialValue: [],
-    //                       in: {
-    //                         $setUnion: [
-    //                           "$$value",
-    //                           "$$this.coupons"
-    //                         ]
-    //                       }
-    //                     }
-    //                   }
-    //                 ]
-    //               }
-    //             }
-    //           }
-    //         }
-    //       ],
-    //       as: "unusedCoupons"
-    //     }
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "coupons",
-    //       localField: "appliedCoupon",
-    //       foreignField: "code",
-    //       as: "appliedCouponDetails"
-    //     }
-    //   },
-    //   {
-    //     $project: {
-    //       totalItems: 1,
-    //       totalQuantity: 1,
-    //       subTotalPrice: 1,
-    //       deliveryFee: 1,
-    //       totalPrice: 1,
-    //       unusedCoupons: 1,
-    //       appliedCouponDetails: { $arrayElemAt: ["$appliedCouponDetails", 0] },
-    //       addresses: {
-    //         $filter: {
-    //           input: "$addresses",
-    //           as: "address",
-    //           cond: {
-    //             $eq: ["$$address.isDeleted", false]
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // ]);
 
     const cart = await cartModel.findOne({ userId: user.userId })
     let total = 0
@@ -659,44 +501,14 @@ const cancelOrderController = async (req, res, next) => {
       throw new CustomError('already cancelled or returned', BAD_REQUEST)
     }
 
-
     // * increasing stock
-    for (const item of order.products) {
-      const product = await productModel.findById(item.productId);
-      if (!product) {
-        throw new CustomError(`Product not found for ID: ${item.productId}`, NOT_FOUND);
-      }
-      product.stock += item.quantity;
-      await product.save();
-    }
-
-    const cancelledOrder = await orderModel.findOneAndUpdate(
-      { _id: orderId },
-      {
-        $set: {
-          orderStatus,
-          paymentStatus
-        }
-      },
-      { new: true }
-    )
-
-    if (cancelledOrder.paymentMethod !== 'cod') {
-      const updatedWallet = await walletModel.findOneAndUpdate(
-        { userId: user.userId },
-        {
-          $inc: { balance: cancelledOrder.total },
-          $push: {
-            transactions: {
-              amount: cancelledOrder.total,
-              credit: true,
-              debit: false
-            }
-          }
-        }
-      )
-    }
-
+    const cancelledOrder = await cancelOrReturnWholeOrder({
+      userId: user.userId,
+      orderId,
+      order: order,
+      orderStatus: orderStatusValues.Cancelled,
+      paymentStatus,
+    })
 
     // console.log(cancelledOrder)
     res.status(OK).json({ message: "order cancelled", order: cancelledOrder })
@@ -704,6 +516,35 @@ const cancelOrderController = async (req, res, next) => {
     next(error)
   }
 }
+
+
+const returnOrderController = async (req, res, next) => {
+  const { orderId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    if (!mongoose.isObjectIdOrHexString(orderId)) {
+      throw new CustomError("invalid orderId", BAD_REQUEST)
+    }
+    const order = await orderModel.findOne({ _id: orderId })
+    if (order.orderStatus !== orderStatusValues.Delivered) {
+      throw new CustomError("cannot return the order thats not delivered", BAD_REQUEST)
+    }
+
+    if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.ReturnRequested)) {
+      throw new CustomError('already cancelled or returned', BAD_REQUEST)
+    }
+
+    const cancelledOrder = await orderModel.findOneAndUpdate(
+      { _id: orderId },
+      { $set: { orderStatus: 'Return Requested'} },
+      { new: true }
+    )
+    res.status(OK).json({ message: "order return request", order: cancelledOrder })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 // * single order 
 const cancelSingleOrderOrderController = async (req, res, next) => {
@@ -833,75 +674,6 @@ const returnSingleOrderOrderController = async (req, res, next) => {
       throw new CustomError('all orders returned', GONE)
     }
 
-    // ! move this part to orderStatus==='Return Approved" part
-
-    // // * total calculation
-    // const deliveryFee = 10
-    // let orderActualTotal = 0
-    // orderActualTotal += deliveryFee
-    // order.products.map((product) => {
-    //   if (product.orderStatus !== 'Cancelled' 
-    //     && product.orderStatus !== 'Return Requested' 
-    //     && product.orderStatus !== 'Return Approved' 
-    //     && product.orderStatus !== 'Returned' 
-    //   ) {
-    //     orderActualTotal += product.price
-    //   }
-    // })
-
-    // console.log('orderActualTotal = ', orderActualTotal)
-    // let orderTotal = 0
-    // if (order.coupon) {
-    //   const coupon = await couponModel.findOne({ code: order.coupon })
-    //   if (coupon.discountType === 'percentage') {
-    //     const discountAmount = (orderActualTotal * coupon.discountValue) / 100;
-    //     orderTotal = orderActualTotal > (coupon.minCartAmount)
-    //       ? orderActualTotal - discountAmount
-    //       : orderActualTotal
-
-    //   } else {
-    //     orderTotal = orderActualTotal >= (coupon.discountValue * 2)
-    //       ? orderActualTotal - coupon.discountValue
-    //       : orderActualTotal
-    //   }
-    // } else {
-    //   orderTotal = orderActualTotal
-    // }
-    // // console.log(orderProductDetails)
-    // console.log("orderTotal =  ", orderTotal)
-
-    // // * increasing product quantity
-    // const updatedProduct = await productModel.findOneAndUpdate(
-    //   { _id: productId },
-    //   { $inc: { stock: orderProductDetails?.[0].quantity } },
-    //   { new: true }
-    // )
-
-    // // * payment return
-    // if (order.paymentStatus !== 'Completed') {
-    //   const updatedWallet = await walletModel.findOneAndUpdate(
-    //     { userId: user.userId },
-    //     {
-    //       $inc: { balance: orderProductDetails?.[0].price },
-    //       $push: {
-    //         transactions: {
-    //           amount: orderProductDetails?.[0].price,
-    //           credit: true,
-    //           debit: false,
-    //         }
-    //       }
-    //     },
-    //   )
-    //   console.log('wallet updated')
-    // }
-
-    // const updateOrder = await orderModel.findOneAndUpdate(
-    //   { _id: orderId },
-    //   { $set: { total: orderTotal } },
-    //   { new: true }
-    // )
-    // ! move this part to orderStatus==='Return Approved" part
-
     res.status(OK).json({ message: 'single product cancelled', order: order })
   } catch (error) {
     next(error)
@@ -909,65 +681,6 @@ const returnSingleOrderOrderController = async (req, res, next) => {
 }
 // * single order  end
 
-
-const returnOrderController = async (req, res, next) => {
-  const { orderId } = req.body
-  try {
-    const user = JSON.parse(req.cookies.user)
-    if (!mongoose.isObjectIdOrHexString(orderId)) {
-      throw new CustomError("invalid orderId", BAD_REQUEST)
-    }
-    const order = await orderModel.findOne({ _id: orderId })
-    if (order.orderStatus !== orderStatusValues.Delivered) {
-      throw new CustomError("cannot return the order thats not delivered", BAD_REQUEST)
-    }
-
-    if (!validateOrderStatusTransactions[order.orderStatus].includes(orderStatusValues.ReturnRequested)) {
-      throw new CustomError('already cancelled or returned', BAD_REQUEST)
-    }
-
-    // * increasing stock
-    for (const item of order.products) {
-      const product = await productModel.findById(item.productId);
-      if (!product) {
-        throw new CustomError(`Product not found for ID: ${item.productId}`, NOT_FOUND);
-      }
-      product.stock += item.quantity;
-      await product.save();
-    }
-
-    await walletModel.findOneAndUpdate(
-      { userId: user.userId },
-      {
-        $push: {
-          transactions: {
-            amount: order.total,
-            debit: false,
-            credit: true,
-            date: new Date()
-          }
-        },
-        $inc: {
-          balance: order.total
-        }
-      },
-      { new: true }
-    )
-
-    const cancelledOrder = await orderModel.findOneAndUpdate(
-      { _id: orderId },
-      {
-        $set: {
-          orderStatus: 'Return Requested',
-        }
-      },
-      { new: true }
-    )
-    res.status(OK).json({ message: "order return request", order: cancelledOrder })
-  } catch (error) {
-    next(error)
-  }
-}
 
 
 const applyCouponController = async (req, res, next) => {
