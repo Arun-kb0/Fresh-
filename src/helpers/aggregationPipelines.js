@@ -68,7 +68,9 @@ const getProductsAggregation = async ({ sort, skip, limit, userId = '' }) => {
         wishlist: 0,
       }
     },
-    { $sort: { createdAt: -1 } }
+    { $sort: sort },
+    { $skip: skip },
+    { $limit: limit }
   ])
   return products
 }
@@ -735,7 +737,7 @@ const getCartWithDetailsAggregation = async ({ userId, deliveryFee }) => {
   return (result && result.length > 0) ? result[0] : null
 }
 
-const cartCheckoutAggregation = async ({ userId}) => {
+const cartCheckoutAggregation = async ({ userId }) => {
   const result = await cartModel.aggregate([
     {
       $match: {
@@ -892,12 +894,12 @@ const cartCheckoutAggregation = async ({ userId}) => {
       }
     }
   ])
-  return (result && result.length>0) ? result[0]  : null
+  return (result && result.length > 0) ? result[0] : null
 }
 
 
-const getOrderDetailsAggregation = async ({orderId}) => {
-  const result  = await orderModel.aggregate([
+const getOrderDetailsAggregation = async ({ orderId }) => {
+  const result = await orderModel.aggregate([
     {
       $match: {
         _id: orderId
