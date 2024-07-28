@@ -52,14 +52,16 @@ const getOrderTotal = async ({ deliveryFee = 10, order }) => {
 }
 
 
-const cancelOrReturnWholeOrder = async ({ userId, orderId, order, orderStatus, paymentStatus }) => {
+const cancelOrReturnWholeOrder = async ({ userId, orderId, order, orderStatus, paymentStatus,noCheck=false }) => {
   try {
+    // ! Returned cod Completed
     const paymentMethod = order.paymentMethod
     console.log('cancelOrReturnWholeOrder')
     console.log(orderStatus, paymentMethod, paymentStatus)
     if (
       (paymentMethod !== 'cod' && orderStatus === orderStatusValues.Cancelled)
       || (paymentStatus === paymentStatusValues.Refunded && orderStatus === orderStatusValues.Returned)
+      || (paymentStatus === paymentStatusValues.Completed && orderStatus === orderStatusValues.Returned)
     ) {
       for (const item of order.products) {
         const product = await productModel.findById(item.productId);
@@ -76,7 +78,7 @@ const cancelOrReturnWholeOrder = async ({ userId, orderId, order, orderStatus, p
           $inc: { balance: order.total },
           $push: {
             transactions: {
-              amount: order.total,
+              amount: noCheck ? order.total - 10 : order.total,
               credit: true,
               debit: false
             }

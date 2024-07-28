@@ -130,12 +130,13 @@ const changeOrderStatusController = async (req, res, next) => {
     console.log(filteredProductIds)
 
     // * getOrder total , increase stock and refund money
-   const updatedOrder = await cancelOrReturnWholeOrder({
+    const updatedOrder = await cancelOrReturnWholeOrder({
       userId: currentOrder.userId,
       orderId,
       order: currentOrder,
       orderStatus: status,
-      paymentStatus
+      paymentStatus,
+      noCheck:noCheck
     })
     // console.log(updatedOrder)
 
@@ -224,11 +225,10 @@ const singleOrderStatusChangeController = async (req, res, next) => {
       ) {
         count++
       }
-
-      console.log(product.productId)
       return product.productId.toString() === productId;
     })
 
+    console.log("count , length", count, length)
     if (count === length) {
       throw new CustomError('all orders in process of return or cancelled', GONE)
     }
@@ -239,21 +239,22 @@ const singleOrderStatusChangeController = async (req, res, next) => {
     }
 
 
+    console.log('products length ' ,order.products.length )
     // * total calculation
     const deliveryFee = 10
     let orderActualTotal = 0
     orderActualTotal += deliveryFee
     order.products.map((product) => {
-      if (product.orderStatus !== 'Cancelled'
-        && product.orderStatus !== 'Return Requested'
-        && product.orderStatus !== 'Return Approved'
-        && product.orderStatus !== 'Returned'
+      if (product.orderStatus === 'Cancelled'
+        || product.orderStatus === 'Returned'
+        || product.orderStatus === 'Return Approved'
       ) {
+
+      } else {
         orderActualTotal += product.price
       }
     })
 
-    console.log('orderActualTotal = ', orderActualTotal)
     let orderTotal = 0
     if (order.coupon) {
       const coupon = await couponModel.findOne({ code: order.coupon })
@@ -271,7 +272,8 @@ const singleOrderStatusChangeController = async (req, res, next) => {
     } else {
       orderTotal = orderActualTotal
     }
-    console.log(orderProductDetails)
+    // console.log(orderProductDetails)
+    console.log('orderActualTotal = ', orderActualTotal)
     console.log("orderTotal =  ", orderTotal)
 
 

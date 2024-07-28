@@ -42,7 +42,7 @@ $(function () {
       },
       error: function (xhr, status, error) {
         if (xhr.status === 410) {
-          updateOrderAjaxCall({orderId,status:value})
+          updateOrderAjaxCall({ orderId, status: value })
           return
         } else if (xhr.status === 409) {
           window.location.reload()
@@ -195,7 +195,7 @@ $(function () {
 
   // * handle all orders call
   function updateOrderAjaxCall({ orderId, status }) {
-    const data = { orderId , status,noCheck:true}
+    const data = { orderId, status, noCheck: true }
     $.ajax({
       url: '/admin/order/orderstatus',
       method: 'PATCH',
