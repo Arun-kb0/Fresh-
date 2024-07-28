@@ -735,7 +735,7 @@ const cancelSingleOrderOrderController = async (req, res, next) => {
 
     // * total calculation
     const deliveryFee = 10
-    let orderActualTotal =0
+    let orderActualTotal = 0
     orderActualTotal += deliveryFee
     order.products.map((product) => {
       if (product.orderStatus !== orderStatusValues.Cancelled) {
@@ -805,14 +805,104 @@ const returnSingleOrderOrderController = async (req, res, next) => {
   try {
     const order = await orderModel.findOneAndUpdate(
       { _id: orderId, 'products.productId': productId },
-      {
-        $set: {
-          'products.$.orderStatus': 'Return Requested'
-        }
-      },
+      { $set: { 'products.$.orderStatus': 'Return Requested' } },
       { new: true }
     )
-    res.status(OK).json({ message: 'single product cancelled', order })
+    if (!order) {
+      throw new CustomError('order not found', BAD_REQUEST)
+    }
+    if (order.orderStatus !== 'Delivered') {
+      throw new CustomError('already returned', BAD_REQUEST)
+    }
+
+    let count = 0
+    let length = order.products.length
+    const orderProductDetails = order.products.filter((product) => {
+      if (
+        product.orderStatus === 'Cancelled'
+        || product.orderStatus === 'Return Requested'
+        || product.orderStatus === 'Return Approved'
+        || product.orderStatus === 'Returned'
+      ) {
+        count++
+      }
+      return product.productId.toString() === productId;
+    })
+
+    if (count === length) {
+      throw new CustomError('all orders returned', GONE)
+    }
+
+    // ! move this part to orderStatus==='Return Approved" part
+
+    // // * total calculation
+    // const deliveryFee = 10
+    // let orderActualTotal = 0
+    // orderActualTotal += deliveryFee
+    // order.products.map((product) => {
+    //   if (product.orderStatus !== 'Cancelled' 
+    //     && product.orderStatus !== 'Return Requested' 
+    //     && product.orderStatus !== 'Return Approved' 
+    //     && product.orderStatus !== 'Returned' 
+    //   ) {
+    //     orderActualTotal += product.price
+    //   }
+    // })
+
+    // console.log('orderActualTotal = ', orderActualTotal)
+    // let orderTotal = 0
+    // if (order.coupon) {
+    //   const coupon = await couponModel.findOne({ code: order.coupon })
+    //   if (coupon.discountType === 'percentage') {
+    //     const discountAmount = (orderActualTotal * coupon.discountValue) / 100;
+    //     orderTotal = orderActualTotal > (coupon.minCartAmount)
+    //       ? orderActualTotal - discountAmount
+    //       : orderActualTotal
+
+    //   } else {
+    //     orderTotal = orderActualTotal >= (coupon.discountValue * 2)
+    //       ? orderActualTotal - coupon.discountValue
+    //       : orderActualTotal
+    //   }
+    // } else {
+    //   orderTotal = orderActualTotal
+    // }
+    // // console.log(orderProductDetails)
+    // console.log("orderTotal =  ", orderTotal)
+
+    // // * increasing product quantity
+    // const updatedProduct = await productModel.findOneAndUpdate(
+    //   { _id: productId },
+    //   { $inc: { stock: orderProductDetails?.[0].quantity } },
+    //   { new: true }
+    // )
+
+    // // * payment return
+    // if (order.paymentStatus !== 'Completed') {
+    //   const updatedWallet = await walletModel.findOneAndUpdate(
+    //     { userId: user.userId },
+    //     {
+    //       $inc: { balance: orderProductDetails?.[0].price },
+    //       $push: {
+    //         transactions: {
+    //           amount: orderProductDetails?.[0].price,
+    //           credit: true,
+    //           debit: false,
+    //         }
+    //       }
+    //     },
+    //   )
+    //   console.log('wallet updated')
+    // }
+
+    // const updateOrder = await orderModel.findOneAndUpdate(
+    //   { _id: orderId },
+    //   { $set: { total: orderTotal } },
+    //   { new: true }
+    // )
+    // ! move this part to orderStatus==='Return Approved" part
+
+    res.status(OK).json({ message: 'single product cancelled', order: order })
   } catch (error) {
     next(error)
   }

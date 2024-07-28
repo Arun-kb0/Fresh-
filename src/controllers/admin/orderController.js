@@ -118,9 +118,12 @@ const changeOrderStatusController = async (req, res, next) => {
         $set: {
           orderStatus: status,
           paymentStatus,
-        }
+          "products.$[].orderStatus": status
+        },
       }
     )
+
+
     res.status(OK).json({ message: "status changed", order: updatedOrder })
   } catch (error) {
     next(error)

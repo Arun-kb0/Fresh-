@@ -64,12 +64,14 @@ $(function () {
     const orderId = $(this).attr('data-orderId')
 
     const parent = $(this).parent().parent()
-    const singleOrderStatus = parent.find('.singleProductStatus')
-    
-    console.log('single status')
-    console.log(singleOrderStatus)
+    const currentSingleOrderStatus = parent.find('.singleProductStatus')
+    const cancelBtn = $(this)
+    const returnBtn = parent.find('.returnSingleProductBtn')
+    const orderTotal = $("#orderTotal")
 
     console.log(productId)
+    console.log(orderId)
+
     $.ajax({
       url: '/cart/order/single/return',
       method: 'PATCH',
@@ -80,9 +82,18 @@ $(function () {
           return
         }
         console.log(data)
-
+        currentSingleOrderStatus
+          .text('Return Requested')
+          .addClass('text-white bg-warning')
+        cancelBtn.hide()
+        returnBtn.hide()
+        orderTotal.text(data.order?.total)
       },
       error: function (xhr, status, error) {
+        if (xhr.status === 410) {
+          returnOrderAjaxCall({ orderId })
+          return
+        }
         const res = JSON.parse(xhr.responseText)
         showAlert(res.message)
         console.log(error)
@@ -371,6 +382,27 @@ $(function () {
       }
     })
 
+  }
+
+  function returnOrderAjaxCall({ orderId }) {
+    $.ajax({
+      url: '/cart/order/return',
+      method: "PATCH",
+      data: { orderId },
+      success: function (data) {
+        if (data?.order) {
+          window.location.reload()
+        } else {
+          console.log("invalid data")
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+
+    })
   }
 
 })

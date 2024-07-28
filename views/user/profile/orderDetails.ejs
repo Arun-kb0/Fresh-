@@ -129,13 +129,13 @@
 								<button 
 									data-orderId="<%= order._id %>"
 									data-productId="<%= product.productId %>" 
-								 class="btn btn-outline-danger rounded-pill cancelSingleProductBtn mr-3">Cancel</button>
+								 	class="btn btn-outline-danger rounded-pill cancelSingleProductBtn mr-3">Cancel</button>
 								 <% } %>
 								<% if(order.orderStatus==='Delivered') {%>
 								<button 
 									data-orderId="<%= order._id %>"
 									data-productId="<%= product.productId %>"
-								  class="btn btn-outline-primary rounded-pill returnSingleProductBtn mr-3">Return
+								  class="btn btn-outline-primary rounded-pill returnSingleProductBtn mr-3"> Return
 								</button>
 								<% } %>
 							</div>
