@@ -46,7 +46,7 @@ const getCategoriesController = async (req, res, next) => {
           }
         }
       },
-      { $sort: { name: 1 } },
+      { $sort: { createdAt: -1 } },
       { $skip: startIndex },
       { $limit: LIMIT },
     ])
@@ -325,7 +325,7 @@ const deleteCategoryController = async (req, res, next) => {
 
 const getAllCategoriesForDropDown = async (req, res, next) => {
   try {
-    const categories = await categoryModel.find({ isDeleted: false })
+    const categories = await (await categoryModel.find({ isDeleted: false }))
     res.status(OK).json({ message: "get categories success", categories })
   } catch (error) {
     next(error)

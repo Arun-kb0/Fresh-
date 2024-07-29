@@ -56,17 +56,14 @@ const getProductController = async (req, res, next) => {
           name: 1
         }
       },
-      {
-        $skip: startIndex
-      },
-      {
-        $limit: LIMIT
-      }
+      { $sort: { createdAt: -1 } },
+      { $skip: startIndex },
+      { $limit: LIMIT }
     ])
 
 
     console.log("products array length ", products.length)
-    
+
     res.render('admin/products/productsTable', {
       ...viewAdminPage,
       products: products,
@@ -215,7 +212,7 @@ const editProductController = async (req, res, next) => {
 }
 
 // * create
-const getCreateProductController = async (req, res,next) => {
+const getCreateProductController = async (req, res, next) => {
   try {
     const subCategory = await subCategoryModel.find({ isDeleted: false })
     res.render('admin/products/editProduct', { isEdit: false, ...viewAdminPage, subCategory })
