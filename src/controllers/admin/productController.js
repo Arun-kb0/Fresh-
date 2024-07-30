@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const CustomError = require("../../constants/CustomError")
 const { BAD_REQUEST, OK, NOT_FOUND, NOT_ACCEPTABLE, CONFLICT } = require("../../constants/httpStatusCodes")
-const { viewAdminPage } = require("../../constants/pageConfid")
+const { viewAdminPage, viewPageNotFound } = require("../../constants/pageConfid")
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const productModel = require("../../model/productModel")
 const subCategoryModel = require("../../model/subCategoryModel")
@@ -79,11 +79,11 @@ const getProductController = async (req, res, next) => {
 const getEditProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
-
   try {
-    if (!productId) {
-      const message = 'product required for editing'
-      throw new CustomError(message, BAD_REQUEST)
+    if (!mongoose.isObjectIdOrHexString(productId)) {
+      console.log('invalid product id')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: true })
+      return
     }
     const productObjectId = mongoose.Types.ObjectId.createFromHexString(productId)
     const product = await productModel.aggregate([

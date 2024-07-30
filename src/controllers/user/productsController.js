@@ -1,6 +1,6 @@
 const CustomError = require("../../constants/CustomError")
 const { NO_CONTENT, OK, NOT_FOUND } = require("../../constants/httpStatusCodes")
-const { viewUsersPage } = require("../../constants/pageConfid")
+const { viewUsersPage, viewPageNotFound } = require("../../constants/pageConfid")
 const productModel = require('../../model/productModel')
 const categoryModel = require('../../model/categoryModel')
 const subcategoryModel = require('../../model/subCategoryModel')
@@ -163,6 +163,11 @@ const getSingleProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
   try {
+    if (!mongoose.isObjectIdOrHexString(productId)) {
+      console.log('invalid product Id')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: false })
+      return
+    }
     const productObjId = mongoose.Types.ObjectId.createFromHexString(productId)
     const userId = req?.cookies?.user
       ? JSON.parse(req.cookies.user).userId

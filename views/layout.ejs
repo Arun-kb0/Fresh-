@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   
   <!-- * USER  -->
-  <% if(!isAdmin && !isAuthPage) { %>
+  <% if((!isAdmin && !isAuthPage) || isPageNotFound) { %>
     <!-- * CSS -->
     <link rel="shortcut icon" type="image/png" href="/static/user/assets/img/favicon.png">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
@@ -51,7 +51,7 @@
 
 
     <!-- * ADMIN AND AUTH  -->
-    <% } else if(isAdmin || isAuthPage) { %>
+    <% } else if((isAdmin || isAuthPage) && !isPageNotFound ) { %>
       <!-- * CSS -->
       <link rel="icon" type="image/x-icon" href="/static/admin/assets/img/favicon/favicon.ico" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -84,11 +84,12 @@
 
 <body >
 
-  <% if(!isAuthPage && isAdmin) {%>
+  <% if(!isAuthPage && isAdmin && !isPageNotFound) {%>
     <%- include('admin/components/adminNavbar') %>
     <%- include('admin/components/adminSidebar') %>
-    <% } else if(!isAuthPage && !isAdmin ){ %>
+    <% } else if(!isAuthPage && !isAdmin && !isPageNotFound){ %>
     <%- include('user/components/navbar') %>
+    
   <% } %>
 
 

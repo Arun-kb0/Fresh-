@@ -1,7 +1,7 @@
 
 const CustomError = require("../../constants/CustomError")
 const { OK, BAD_REQUEST, NOT_FOUND, GONE, CONFLICT } = require("../../constants/httpStatusCodes")
-const { viewAdminPage } = require("../../constants/pageConfid")
+const { viewAdminPage, viewPageNotFound } = require("../../constants/pageConfid")
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues, validatePaymentTransactions } = require("../../constants/statusValues")
 const { getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
 const orderModel = require("../../model/orderModel")
@@ -191,6 +191,12 @@ const changePaymentStatusController = async (req, res, next) => {
 const getOrderDetailsAdminPageController = async (req, res, next) => {
   let { orderId } = await req.query
   try {
+    if (!mongoose.isObjectIdOrHexString(orderId)) {
+      console.log('invalid order id')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: true })
+      return
+    }
+
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
     const orderDetails = await getOrderDetailsAggregation({ orderId })
 

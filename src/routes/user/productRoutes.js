@@ -27,4 +27,6 @@ router.get('/products/toprated', getTopRatedProductsController)
 router.get('/products', getProductsProductsPageController)
 router.get('/products/search', getProductSearchResultController)
 
+
+
 module.exports = router

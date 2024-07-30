@@ -1,6 +1,6 @@
 const CustomError = require("../constants/CustomError")
 const { BAD_REQUEST, OK, NOT_FOUND, NO_CONTENT, CONFLICT } = require("../constants/httpStatusCodes")
-const { viewAdminPage } = require("../constants/pageConfid")
+const { viewAdminPage, viewPageNotFound } = require("../constants/pageConfid")
 const { uploadImageToFirebase } = require("../helpers/uploadImage")
 const categoryModel = require("../model/categoryModel")
 const offerModel = require("../model/offerModel")
@@ -183,6 +183,12 @@ const getCreateOfferPageController = async (req, res, next) => {
   const { isProductOffer, isSubcategoryOffer, isCategoryOffer } = req.query
 
   try {
+    if (!isProductOffer && !isSubcategoryOffer && !isCategoryOffer) {
+      console.log('invalid query params')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: true })
+      return
+    }
+
     const categories = await categoryModel.find({ isDeleted: false }).select('_id name')
     const subcategories = await subCategoryModel.find({ isDeleted: false }).select('_id name')
     const products = await productModel.find({ isDeleted: false }).select('_id name')

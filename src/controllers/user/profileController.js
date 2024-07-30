@@ -1,7 +1,7 @@
 const { sessionCookieMaxAge } = require("../../config/sessionConfig")
 const CustomError = require("../../constants/CustomError")
 const { OK, NOT_FOUND, BAD_REQUEST } = require("../../constants/httpStatusCodes")
-const { viewUsersPage } = require("../../constants/pageConfid")
+const { viewUsersPage, viewPageNotFound } = require("../../constants/pageConfid")
 const addressModel = require("../../model/addressModel")
 const productModel = require("../../model/productModel")
 const userModel = require("../../model/userModel")
@@ -256,7 +256,9 @@ const getOrderDetailsPageController = async (req, res, next) => {
   let { orderId } = req.query
   try {
     if (!mongoose.isObjectIdOrHexString(orderId)) {
-      throw new CustomError('invalid orderId', BAD_REQUEST)
+      console.log('invalid order Id')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: false })
+      return
     }
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
     const orderDetails = await getOrderDetailsAggregation({orderId})

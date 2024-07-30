@@ -351,15 +351,15 @@ const orderUsingPaypalController = async (req, res, next) => {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
 
-    const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
-    cart = await cartModel.findOneAndUpdate(
-      { userId: user.userId },
-      { $set: { total: total } },
-      { new: true }
-    )
+    // const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
+    // cart = await cartModel.findOneAndUpdate(
+    //   { userId: user.userId },
+    //   { $set: { total: total } },
+    //   { new: true }
+    // )
 
     const request = new paypal.orders.OrdersCreateRequest()
-    let totalInUsd = await currencyConverter.convert(total)
+    let totalInUsd = await currencyConverter.convert(cart.total)
     totalInUsd = totalInUsd.toFixed(2)
 
     console.log("totalInUsd ", totalInUsd)

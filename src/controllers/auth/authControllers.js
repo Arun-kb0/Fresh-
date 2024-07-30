@@ -11,6 +11,7 @@ const mongoose = require('mongoose')
 const { sessionCookieMaxAge } = require('../../config/sessionConfig')
 const walletModel = require('../../model/walletModel')
 const { addAmountToWalletController } = require('../user/walletController')
+const { viewAuthPage, viewAdminAuthPage } = require('../../constants/pageConfid')
 
 // * auth check
 const authenticate = async (username, password, modal) => {
@@ -40,7 +41,7 @@ const getAdminLoginPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/login', { isAdmin: true, isAuthPage: true })
+    res.render('auth/login', { ...viewAdminAuthPage })
   } catch (error) {
     next(error)
   }
@@ -89,7 +90,7 @@ const getLoginPageController = async (req, res) => {
       return
     }
 
-    res.render('auth/login', { isAdmin: false, isAuthPage: true })
+    res.render('auth/login', { ...viewAuthPage })
   } catch (error) {
     console.log(error)
   }
@@ -128,7 +129,7 @@ const getSignUpPageController = async (req, res, next) => {
         : res.redirect('/')
       return
     }
-    res.render('auth/signup', { isAuthPage: true, isAdmin: false })
+    res.render('auth/signup', { ...viewAuthPage })
   } catch (error) {
     next(error)
   }
@@ -161,7 +162,7 @@ const signUpController = async (req, res, next) => {
 // * otp controllers
 const getVerifyPageController = async (req, res, next) => {
   try {
-    res.render('auth/verifyOtp', { isAuthPage: true, isAdmin: false })
+    res.render('auth/verifyOtp', { ...viewAuthPage })
   } catch (error) {
     next(error)
   }

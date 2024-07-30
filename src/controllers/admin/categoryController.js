@@ -4,7 +4,7 @@ const { BAD_REQUEST,
   NOT_MODIFIED,
   METHOD_NOT_ALLOWED
 } = require('../../constants/httpStatusCodes')
-const { viewAdminPage } = require("../../constants/pageConfid")
+const { viewAdminPage, viewPageNotFound } = require("../../constants/pageConfid")
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const categoryModel = require("../../model/categoryModel")
 const productModel = require("../../model/productModel")
@@ -67,6 +67,11 @@ const getEditCategoryController = async (req, res, next) => {
   const { categoryId, subcategory } = req.query
   console.log(categoryId,subcategory)
   try {
+    if (!mongoose.isObjectIdOrHexString(categoryId)) {
+      console.log('invalid category id')
+      res.render('user/notfound/notFound', { ...viewPageNotFound, backToAdmin: true })
+      return
+    }
     const categoryObjectId = mongoose.Types.ObjectId.createFromHexString(categoryId)
     if (subcategory) {
       const category = await subCategoryModel.findOne({ _id: categoryObjectId, isDeleted: false })
