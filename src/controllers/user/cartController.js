@@ -219,7 +219,7 @@ const getCheckoutPageController = async (req, res, next) => {
     const cart = await cartModel.findOne({ userId: user.userId })
     let total = 0
     if (cart?.coupon) {
-      const coupon = await couponModel.findOne({ _id: cart.couponId })
+      const coupon = await couponModel.findOne({ _id: cart.couponId , isDeleted:false })
       let cartTotal = getCartTotal({ cart, deliveryFee })
       total = calculateDiscount({ total: cartTotal, coupon })
     } else {
@@ -703,11 +703,12 @@ const applyCouponController = async (req, res, next) => {
     if (cart.coupon) {
       throw new CustomError('coupon already added remove to add another', CONFLICT)
     }
-
     if (total < coupon.minCartAmount) {
-      throw new CustomError(`${coupon.minCartAmount} is required to apply this coupon`, BAD_REQUEST)
+      throw new CustomError(`₹${coupon.minCartAmount} is required to apply this coupon`, BAD_REQUEST)
     }
-
+    if (total > coupon?.maxCartAmount) {
+      throw new CustomError(`₹${coupon.maxCartAmount} is max limit of this coupon`, BAD_REQUEST)
+    }
     if (coupon.usedCount >= coupon.usageLimit) {
       throw new CustomError('coupon limit exceeded', GONE)
     }

@@ -201,8 +201,11 @@
 						<a data-code="<%= coupon.code %>" name="<%= coupon.code %>"  class="couponBtns d-flex justify-content-center border-1 border-success p-1">
 							<span class="text-success h6 "> 
 								get 
-								<%= coupon.discountType ==='amount' ? '₹' : '%' %>
-								<%= coupon.discountValue %>OFF 
+								<% if (coupon.discountType==='amount'){ %>
+									₹<%= coupon.discountValue %> OFF
+								<% }else{%>
+									<%= coupon.discountValue %>% OFF
+								<% } %>
 							</span>
 						</a>
 						<% j++ %>

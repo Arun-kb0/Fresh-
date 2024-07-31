@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 const couponSchema = new Schema({
   code: { type: String, required: true },
   minCartAmount: { type: Number, required: true },
+  maxCartAmount: { type: Number, required: true },
   discountValue: { type: Number, required: true },
   discountType: { type: String, required: true },
   startDate: { type: Date, required: true },

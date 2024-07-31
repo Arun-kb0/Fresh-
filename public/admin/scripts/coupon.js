@@ -6,6 +6,7 @@ $(function () {
   const code = $("#code")
   const usageLimit = $("#usageLimit")
   const minCartAmount = $("#minCartAmount")
+  const maxCartAmount = $("#maxCartAmount")
   const discountValue = $("#discountValue")
   const submitBtn = $("#submitBtn")
   const startDate = $("#startDate")
@@ -16,6 +17,7 @@ $(function () {
 
   code.on('input', checkCode)
   minCartAmount.on("input", checkAmountAndDiscount)
+  maxCartAmount.on("input", checkAmountAndDiscount)
   discountValue.on("input", checkAmountAndDiscount)
   usageLimit.on("input", checkAmountAndDiscount)
 
@@ -29,10 +31,16 @@ $(function () {
     if (!checkCode(code)
       || !checkAmountAndDiscount(discountValue)
       || !checkAmountAndDiscount(minCartAmount)
+      || !checkAmountAndDiscount(maxCartAmount)
       || !checkAmountAndDiscount(usageLimit)
       || discountType.val() === ""
     ) {
       showAlert('invalid fields')
+      return
+    }
+
+    if (parseFloat(minCartAmount.val()) >= parseFloat(maxCartAmount.val())) {
+      showAlert('min cart amount should be less than max')
       return
     }
 

@@ -856,7 +856,8 @@ const cartCheckoutAggregation = async ({ userId }) => {
                     }
                   ]
                 }
-              }
+              },
+              isDeleted:false // adding not deleted 
             }
           }
         ],
