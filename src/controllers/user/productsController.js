@@ -310,7 +310,8 @@ const getProductsProductsPageController = async (req, res, next) => {
     const total = await productModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)
 
-
+    console.log('query params of sort products page')
+    console.log(categoryId, subcategoryId, sortValue)
 
     const categories = await categoryModel.find({ isDeleted: false })
     const subcategories = await subcategoryModel.find({ isDeleted: false })
@@ -365,7 +366,7 @@ const getProductsProductsPageController = async (req, res, next) => {
         } else {
           fieldName = getSortQueryField('', 'createdAt')
         }
-        sortQuery = { [fieldName]: 1 }
+        sortQuery = { [fieldName]: -1 }
         break;
       case 'popularity':
         if (categoryId) {
@@ -396,6 +397,7 @@ const getProductsProductsPageController = async (req, res, next) => {
         categories,
         subcategories,
         title,
+        radioBtnValue: sortValue ? sortValue : 'aToz' ,
         page: Number(page),
         numberOfPages
       })
@@ -510,6 +512,7 @@ const getProductsProductsPageController = async (req, res, next) => {
       categories,
       subcategories,
       title,
+      radioBtnValue:sortValue,
       page: Number(page),
       numberOfPages
     })

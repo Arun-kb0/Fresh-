@@ -23,6 +23,13 @@
 	</div>
 	<!--PreLoader Ends-->
 
+	<!-- * alert -->
+	<div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+		<div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+		</div>
+	</div>
+	<!-- * alert end -->
+
 	<!-- * breadcrumbs -->
 	<div class="container">
 		<h3>Home /<span class="orangeTextColor text-capitalize"> <%= title %> </span></h3>
@@ -64,6 +71,12 @@
 								categories
 							</button>
 							<ul class="dropdown-menu w-100" id="categoryDropdown">
+								<li>
+									<a data-id='<%= null %>' class="dropdown-item text-danger">   
+										<i class="fa-solid fa-circle-xmark"></i>
+										<span class="h6 text-danger"> Remove </span>
+									</a>
+								</li>
 								<% for(const category of categories) {%>
 									<li><a class="dropdown-item" data-id="<%= category._id %>" ><%= category.name %></a></li>
 								<% } %>
@@ -77,6 +90,12 @@
 								subcategories
 							</button>
 							<ul class="dropdown-menu w-100" id="subcategoryDropdown">
+								<li>
+									<a data-id='<%= null %>' class="dropdown-item text-danger">
+										<i class="fa-solid fa-circle-xmark"></i>
+										<span class="h6 text-danger"> Remove </span>
+									</a>
+								</li>
 								<% for(const subcategory of subcategories) {%>
 									<li><a class="dropdown-item" data-id="<%= subcategory._id %>">
 											<%= subcategory.name %>
@@ -90,51 +109,66 @@
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="aToz" name="sortRadioBtn" id="flexRadioDefault1">
-							<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault1">
+							<input class="form-check-input" type="radio" value="aToz" name="sortRadioBtn" id="flexRadioDefault1" 
+								<%= radioBtnValue==='aToz' ? 'checked' :'' %>
+							 >
+							<label class="form-check-label text-capitalize mx-2"  for="flexRadioDefault1">
 								a to z
 							</label>
 						</div>
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="price" name="sortRadioBtn" id="flexRadioDefault5">
-							<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault5">
+							<input class="form-check-input" type="radio" value="price" name="sortRadioBtn" id="flexRadioDefault5"
+								<%= radioBtnValue==='price' ? 'checked' :'' %>
+							> 
+							<label class="form-check-label text-capitalize mx-2"  for="flexRadioDefault5">
 								price low to high
 							</label>
 						</div>
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="priceHighToLow" name="sortRadioBtn" id="flexRadioDefault6">
-							<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault6">
+							<input class="form-check-input"  type="radio" value="priceHighToLow" name="sortRadioBtn" id="flexRadioDefault6"
+								<%= radioBtnValue==='priceHighToLow' ? 'checked' :'' %>
+							>
+							<label class="form-check-label text-capitalize mx-2"  for="flexRadioDefault6">
 								price high to low
 							</label>
 						</div>
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="rating" name="sortRadioBtn" id="flexRadioDefault2">
-							<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault2">
+							<input class="form-check-input" type="radio" value="rating" name="sortRadioBtn" id="flexRadioDefault2" 
+								<%= radioBtnValue==='rating' ? 'checked' :'' %>
+							>
+							<label class="form-check-label text-capitalize mx-2"  for="flexRadioDefault2">
 								rating
 							</label>
 						</div>
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="newArrivals" name="sortRadioBtn"  id="flexCheckDefault3">
-							<label class="form-check-label text-capitalize mx-2" for="flexCheckDefault3">
+							<input class="form-check-input" type="radio" value="newArrivals" name="sortRadioBtn"  id="flexCheckDefault3"
+								<%= radioBtnValue==='newArrivals' ? 'checked' :'' %>
+							>
+							<label class="form-check-label text-capitalize mx-2"  for="flexCheckDefault3">
 								new arrivals
 							</label>
 						</div>
 					</li>
 					<li class="list-group-item">
 						<div class="form-check d-flex align-items-center">
-							<input class="form-check-input" type="radio" value="popularity" name="sortRadioBtn" id="flexCheckDefault4">
+							<input class="form-check-input" type="radio" value="popularity" name="sortRadioBtn" id="flexCheckDefault4"
+								<%= radioBtnValue==='popularity' ? 'checked' :'' %>
+							>
 							<label class="form-check-label text-capitalize mx-2" for="flexCheckDefault4">
 								popular
 							</label>
 						</div>
+					</li>
+					<li class="list-group-item d-flex justify-content-center">
+						<button id="sortBtn"  class="btn btn-info rounded-pill">Apply</button>
 					</li>
 				</ul>
 			</div>
