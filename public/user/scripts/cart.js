@@ -1,10 +1,10 @@
 $(function () {
 
-  const pathsNotNeedDelegation = [
+  const pathsNeedDelegation = [
     '/'
   ]
 
-  if (pathsNotNeedDelegation.includes(window.location.pathname)) {
+  if (pathsNeedDelegation.includes(window.location.pathname)) {
     // * event delegation for dynamically added btn
     $(document).on('click', '.addToCartBtn', handleAddToCart);
     $(document).on('click', '.addToWishlistBtn', handleAddToWishlist);
@@ -132,6 +132,11 @@ $(function () {
       data: { productId },
       success: function (data) {
         console.log(data)
+        if(!data.product){
+          console.log('no data found')
+          return
+        }
+        showAlert(`${data.product.name} added to cart`)
       },
       error: function (xhr, status, error) {
         const res = JSON.parse(xhr.responseText)

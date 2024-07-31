@@ -147,7 +147,7 @@ const addToCartController = async (req, res, next) => {
         { new: true, upsert: true }
       ).populate('products.productId', 'image productInfo.soldBy stock');
     }
-    res.status(OK).json({ message: "item added", cart: updatedCart })
+    res.status(OK).json({ message: "item added", product})
   } catch (error) {
     next(error)
   }

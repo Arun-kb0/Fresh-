@@ -22,6 +22,13 @@
 	</div>
 	<!--PreLoader Ends-->
 
+	<!-- * alert -->
+	<div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+		<div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+		</div>
+	</div>
+	<!-- * alert end -->
+
 	<!-- * breadcrumbs -->
 	<div class="container">
 		<h3>My profile /<span class="orangeTextColor"> Wishlist </span></h3>
@@ -105,9 +112,9 @@
 									<%= item.peopleRated %>
 								</span>
 							</div>
-							<button class="btn btn-outline-secondary rounded-pill addToCartBtn" data-id="<%= item._id %>"
+							<button class="btn btn-outline-info rounded-pill addToCartBtn" data-id="<%= item._id %>"
 								data-price="<%= item.finalPrice %>">
-								<span>Add</span>
+								<span>Add to Cart</span>
 							</button>
 						</div>
 					</div>

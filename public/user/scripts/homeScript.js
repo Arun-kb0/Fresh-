@@ -136,8 +136,8 @@ $(function () {
                   </div>
                   <span class="text-secondary">${item.peopleRated}</span>
                 </div>
-                <button class="btn btn-outline-secondary rounded-pill addToCartBtn" data-id="${item._id}" data-price="${item.finalPrice}">
-                  <span>Add</span>
+                <button class="btn btn-outline-info rounded-pill addToCartBtn" data-id="${item._id}" data-price="${item.finalPrice}">
+                  <span>Add to Cart</span>
                 </button>
               </div>
             </div>
