@@ -161,8 +161,9 @@ const signUpController = async (req, res, next) => {
 
 // * otp controllers
 const getVerifyPageController = async (req, res, next) => {
+  const { isPasswordChange = false } = req.query
   try {
-    res.render('auth/verifyOtp', { ...viewAuthPage })
+    res.render('auth/verifyOtp', { ...viewAuthPage, isPasswordChange })
   } catch (error) {
     next(error)
   }
@@ -171,7 +172,7 @@ const getVerifyPageController = async (req, res, next) => {
 // * verify otp
 const verifyEmailController = async (req, res, next) => {
   const { username, otp, _id } = req.body
-  console.log(username, otp)
+  console.log(username, otp, _id)
   try {
     if (!mongoose.isObjectIdOrHexString(_id) || typeof otp !== 'string' || otp.length !== 4) {
       throw new CustomError("invalid otp or email", BAD_REQUEST)
@@ -205,7 +206,7 @@ const verifyEmailController = async (req, res, next) => {
 
     // * adding amount on valid referral
     const referredUser = await userModel.findOne({ referralCode })
-    
+
     // console.log("referralCode ", referralCode)
     // console.log("referredUser ")
     // console.log(referredUser)
@@ -322,6 +323,111 @@ const oauthSuccessController = async (req, res, next) => {
 }
 
 
+const forgotPasswordController = async (req, res, next) => {
+  const { username } = req.body
+  try {
+    const result = await sendOtpToEmail({ email: username, isPasswordChange: true })
+    const passwordOtpData = {
+      _id: result.data._id,
+      username: result.data.username,
+    }
+    console.log("passwordOtpData ")
+    console.log(passwordOtpData)
+    res.status(OK).json({ message: 'otp send to email', passwordOtpData })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const validateOtpForChangePasswordController = async (req, res, next) => {
+  const { username, otp, _id } = req.body
+  try {
+    if (!mongoose.isObjectIdOrHexString(_id) || typeof otp !== 'string' || otp.length !== 4) {
+      throw new CustomError("invalid otp or email", BAD_REQUEST)
+    }
+    const otpUserVerificationRecord = await otpVerificationModal.findOne({ _id })
+    if (!otpUserVerificationRecord || otpUserVerificationRecord.length === 0) {
+      const message = "user has been verified already or otp doc notfound please sign up again"
+      throw new CustomError(message, NOT_FOUND)
+    }
+    const { expiresAt } = otpUserVerificationRecord
+    const hashedOtp = otpUserVerificationRecord.otp
+    if (expiresAt < Date.now()) {
+      throw new CustomError("OTP has expired please request again", GONE)
+    }
+
+    const isValidOtp = await bcrypt.compare(otp, hashedOtp)
+    if (!isValidOtp) {
+      throw new CustomError("Invalid OTP. check your inbox", GONE)
+    }
+
+    const user =await  userModel.findOne({ username:username })
+    const sessionUser = {
+      userId: user.userId,
+      name: user.name,
+      username: username,
+      isAdmin: false,
+      provider: null
+    }
+    req.session.user = sessionUser
+    req.session.isAuthorized = true
+    res.cookie(
+      'user',
+      JSON.stringify(sessionUser),
+      { maxAge: 1000 * 60 * 5 }
+    )
+    res.status(OK).json({ message: 'email verified' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getPasswordChangePageController = async (req, res, next) => {
+  try {
+    const user = req.cookies.user
+    if (!user) {
+      res.redirect('/auth/login')
+      return
+    }
+    res.render('auth/forgotPassword', { ...viewAuthPage })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const changePasswordController = async (req, res, next) => {
+  const { password } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    if (!user) {
+      throw new CustomError('invalid user', BAD_REQUEST)
+    }
+    if (password.length < 6) {
+      throw new CustomError('password must be 6 characters', BAD_REQUEST)
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const updatedUser = await userModel.findOneAndUpdate(
+      { userId: user.userId },
+      { $set: { password: hashedPassword } },
+      { new: true }
+    )
+    // * destroy session
+    await req.session.destroy()
+    res.clearCookie('connect.sid')
+    res.clearCookie('user')
+
+    // console.log("user")
+    // console.log(user)
+    // console.log("updatedUser")
+    // console.log(updatedUser)
+
+    res.status(OK).json({ message: 'password changed' })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 module.exports = {
   getAdminLoginPageController,
@@ -338,5 +444,8 @@ module.exports = {
   logoutController,
 
   oauthSuccessController,
-
+  forgotPasswordController,
+  validateOtpForChangePasswordController,
+  getPasswordChangePageController,
+  changePasswordController
 }

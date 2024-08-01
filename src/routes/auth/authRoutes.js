@@ -10,6 +10,10 @@ const {
   resendOtpController,
   logoutController,
   oauthSuccessController,
+  forgotPasswordController,
+  validateOtpForChangePasswordController,
+  getPasswordChangePageController,
+  changePasswordController,
 } = require('../../controllers/auth/authControllers')
 const passport = require('passport')
 
@@ -71,5 +75,11 @@ router.get('/facebook/callback',
 )
 
 
+// * change Password routes
+router.post('/password/forgot',forgotPasswordController)
+router.post('/password/validate',validateOtpForChangePasswordController)
+router.route('/password/change')
+  .get(getPasswordChangePageController)
+  .post(changePasswordController)
 
 module.exports = router

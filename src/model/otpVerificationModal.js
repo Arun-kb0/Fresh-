@@ -4,8 +4,8 @@ const Schema = mongoose.Schema
 
 const UserOtpVerificationSchema = new Schema({
   username: { type: String, required: true },
-  name: { type: String, required: true },
-  password: { type: String, required: true },
+  name: { type: String },
+  password: { type: String },
   referralCode:{type:String,default:null},
   otp: { type: String, required: true },
   createdAt: { type: Date, required: true },

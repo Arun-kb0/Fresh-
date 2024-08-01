@@ -5,7 +5,7 @@ const { nodeMailerTransporter } = require('../config/nodeMailerConfig')
 
 
 // * send otp function
-const sendOtpToEmail = async({ email, name, password, referralCode=null }) => {
+const sendOtpToEmail = async ({ email, name, password, referralCode = null, isPasswordChange=false }) => {
   try {
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`
     const html = `
@@ -24,16 +24,27 @@ const sendOtpToEmail = async({ email, name, password, referralCode=null }) => {
       subject: "verify email",
       html: html
     }
+
     const hashedOtp = await bcrypt.hash(otp, 10)
-    const newOtpVerification = await otpVerificationModal.create({
-      username: email,
-      name,
-      password,
-      referralCode,
-      otp: hashedOtp,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 1 * 60 * 1000
-    })
+    let newOtpVerification={}
+    if (isPasswordChange) {
+      newOtpVerification = await otpVerificationModal.create({
+        username: email,
+        otp: hashedOtp,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 1 * 60 * 1000
+      })
+    } else {
+      newOtpVerification = await otpVerificationModal.create({
+        username: email,
+        name,
+        password,
+        referralCode,
+        otp: hashedOtp,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 1 * 60 * 1000
+      })
+    }
     
     await nodeMailerTransporter.sendMail(mailOptions)
     return ({
@@ -45,10 +56,11 @@ const sendOtpToEmail = async({ email, name, password, referralCode=null }) => {
       }
     })
   } catch (error) {
-    return ({
-      status: "failed",
-      message: error.message
-    })
+    throw error
+    // return ({
+    //   status: "failed",
+    //   message: error.message
+    // })
   }
 }
 

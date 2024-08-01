@@ -18,9 +18,12 @@ $(function () {
   if (isVerifyOtp) {
     startTimer()
     otp.on("input", checkOtp)
-    form.on("submit", handleOtpVerification)
-    resendOtp.on("click", handleResendOtp)
-
+    if (isPasswordChange) {
+      form.on("submit", handlePasswordOtpVerification)
+    } else {
+      form.on("submit", handleOtpVerification)
+      resendOtp.on("click", handleResendOtp)
+    }
   } else {
     name.on("input", checkName)
     email.on("input", checkEmail)
@@ -29,6 +32,43 @@ $(function () {
     form.on("submit", handleSignup)
   }
 
+
+  // * password otp verification
+  function handlePasswordOtpVerification(e) {
+    e.preventDefault()
+    console.log("otp")
+
+    if (!checkOtp()) {
+      showAlert("invalid otp")
+      return
+    }
+    const otpData = JSON.parse(localStorage.getItem('passwordOtpData'))
+    const data = {
+      _id: otpData._id,
+      username: otpData?.username,
+      otp: otp.val().trim()
+    }
+
+    $.ajax({
+      url: '/auth/password/validate',
+      method: 'POST',
+      data:data,
+      success: function (data) {
+        if (!data) {
+          console.log('data not found')
+        }
+        console.log(data)
+        window.location.href = '/auth/password/change'
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        setErrorFor(otp, "invalid otp ")
+        console.log(res.message)
+        console.log(error)
+      }
+    })
+
+  }
 
   // * timer function
   function startTimer() {
@@ -93,16 +133,18 @@ $(function () {
     e.preventDefault()
     console.log("otp")
 
+    let data
     if (!checkOtp()) {
       showAlert("invalid otp")
       return
     }
     const otpData = JSON.parse(localStorage.getItem('otpVerificationData'))
-    const data = {
+    data = {
       _id: otpData._id,
       username: otpData?.username,
       otp: otp.val().trim()
     }
+
 
     $.ajax({
       url: "/auth/verifyemail",
@@ -145,7 +187,7 @@ $(function () {
       name: name.val().trim(),
       username: email.val().trim(),
       password: password.val(),
-      referralCode:referralCode.val().trim()
+      referralCode: referralCode.val().trim()
     }
 
     $.ajax({

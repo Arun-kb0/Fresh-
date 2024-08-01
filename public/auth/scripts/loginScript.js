@@ -7,12 +7,45 @@ $(function () {
   const submitBtn = $("#submitBtn")
   const serverErrorMessage = $("#serverErrorMessage")
 
+  const forgotPasswordBtn = $("#forgotPasswordBtn")
 
   email.on("input", checkEmail)
   password.on("input", checkPassword)
   form.on("submit", handleLogin)
 
+  forgotPasswordBtn.on('click',handleForgotPassword)
+
   console.log("isAdmin", isAdmin)
+
+  function handleForgotPassword() {
+    if (!checkEmail()) {
+      showAlert("invalid email")
+      return
+    }
+    const data = {
+      username: email.val().trim(),
+    }
+    $.ajax({
+      url: '/auth/password/forgot',
+      method: 'POST',
+      data: data,
+      success: function (data) {
+        if (!data.passwordOtpData) {
+          console.log(' data no found')
+          return
+        }
+        console.log(data.passwordOtpData)
+        localStorage.setItem('passwordOtpData', JSON.stringify(data.passwordOtpData))
+        window.location.href ='/auth/verifyemail?isPasswordChange=true'
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        setErrorFromServer(res.message)
+        console.log(error)
+      }
+      
+    })
+  }
 
   function handleLogin(e) {
     e.preventDefault()
@@ -62,6 +95,8 @@ $(function () {
       }
     })
   }
+
+
 
 
   // * check inputs functions
