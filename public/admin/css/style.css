@@ -8,6 +8,10 @@
 
 }
 
+.orangeTextColor {
+  color: #F28123
+}
+
 .orderDetailsImage {
   width: 160px;
   height: 160;
@@ -63,4 +67,17 @@
 .offersNames {
   max-height: 200px;
   overflow-y: scroll;
+}
+
+
+/* * login */
+
+.glassy-div {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: #333;
 }
