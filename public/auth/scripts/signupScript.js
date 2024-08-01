@@ -20,6 +20,7 @@ $(function () {
     otp.on("input", checkOtp)
     if (isPasswordChange) {
       form.on("submit", handlePasswordOtpVerification)
+      resendOtp.on('click', handlePasswordOtpResend)
     } else {
       form.on("submit", handleOtpVerification)
       resendOtp.on("click", handleResendOtp)
@@ -32,6 +33,41 @@ $(function () {
     form.on("submit", handleSignup)
   }
 
+
+  // * password otp resend
+
+  function handlePasswordOtpResend() {
+    startTimer()
+    const otpData = JSON.parse(localStorage.getItem('passwordOtpData'))
+    const data = {
+      _id: otpData._id,
+      email: otpData.username,
+    }
+    $.ajax({
+      url: "/auth/resendotp",
+      type: "POST",
+      data: JSON.stringify(data),
+      contentType: "application/json",
+      success: function (resData) {
+        console.log(resData)
+        if (resData?.data) {
+          localStorage.removeItem("passwordOtpData")
+          localStorage.setItem("passwordOtpData", JSON.stringify(resData.data))
+          showAlert('otp send to email')
+        } else {
+          window.location.href = "/auth/login"
+        }
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 400) {
+          window.location.href = '/auth/login'
+        }
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
 
   // * password otp verification
   function handlePasswordOtpVerification(e) {
@@ -52,7 +88,7 @@ $(function () {
     $.ajax({
       url: '/auth/password/validate',
       method: 'POST',
-      data:data,
+      data: data,
       success: function (data) {
         if (!data) {
           console.log('data not found')
@@ -100,7 +136,6 @@ $(function () {
       _id: otpData._id,
       email: otpData.username,
     }
-
     $.ajax({
       url: "/auth/resendotp",
       type: "POST",

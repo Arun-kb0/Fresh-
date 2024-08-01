@@ -389,7 +389,7 @@ const getPasswordChangePageController = async (req, res, next) => {
       res.redirect('/auth/login')
       return
     }
-    res.render('auth/forgotPassword', { ...viewAuthPage })
+    res.render('auth/resetPassword', { ...viewAuthPage })
   } catch (error) {
     next(error)
   }
