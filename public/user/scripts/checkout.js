@@ -1,8 +1,17 @@
 $(function () {
   appliedCoupon
 
+  let addressId = ''
+  let paymentMethod = 'cod'
+  let addressTitle = 'Address 1'
+
   const addressRadioBtn = $("#addressRadioBtn")
   const paymentRadioBtn = $("#paymentRadioBtn")
+
+  const priceDetailsPaymentMethod = $("#priceDetailsPaymentMethod")
+  const priceDetailsAddress = $("#priceDetailsAddress")
+  const showPaymentSectionBtn = $('#showPaymentSectionBtn')
+  const showAddressSectionBtn = $("#showAddressSectionBtn")
 
   const couponBtn = $("a.couponBtns")
   const removeCouponBtn = $("#removeCouponBtn")
@@ -22,21 +31,30 @@ $(function () {
   applyCouponBtn.on("click", handleCoupon)
   paymentBtn.on("click", handlePayment)
 
+  priceDetailsAddress.text(addressTitle)
+  priceDetailsPaymentMethod.text(paymentMethod)
 
-  let addressId = ''
-  let paymentMethod = ''
+  // * payment and address section scroll on click
+  // * payment Details container btn
+  showPaymentSectionBtn.on('click', scrollToPaymentSection)
+  showAddressSectionBtn.on('click', scrollToAddress)
+
+
   selectPaymentBtn.on("click", function () {
-    paymentMethod = $('input[name="paymentRadioBtn"]:checked')
-      .next('label')
-      .attr('name')
-      .trim()
+    const checkedRadioButton = $('input[name="paymentRadioBtn"]:checked')
+    paymentMethod = checkedRadioButton.next('label').attr('name').trim()
+    const title = checkedRadioButton.attr('data-title')
+    priceDetailsPaymentMethod.text(paymentMethod)
+    showAlert(`payment method ${title} selected`)
     console.log(paymentMethod)
   })
 
   selectAddressBtn.on("click", function () {
-    addressId = $('input[name="addressRadioBtn"]:checked')
-      .attr('data-addressId')
-      .trim()
+    const checkedRadioButton = $('input[name="addressRadioBtn"]:checked');
+    addressId = checkedRadioButton.attr('data-addressId').trim();
+    addressTitle = checkedRadioButton.attr('data-title');
+    priceDetailsAddress.text(addressTitle)
+    showAlert(`${addressTitle} selected`)
     console.log(addressId)
   })
 
@@ -134,6 +152,10 @@ $(function () {
       return
     }
 
+    if (paymentMethod === 'paypal') {
+      scrollToPaypalSection()
+    }
+    
     switch (paymentMethod) {
       case 'cod':
         placeOrderUsingCod(addressId)
@@ -197,6 +219,30 @@ $(function () {
       showingCouponBtn.remove()
     }
   }
+
+  // * scroll functions
+  function scrollToPaymentSection() {
+    const offset = 200
+    $('html, body').animate({
+      scrollTop: $('#paymentMethodContainer').offset().top - offset
+    }, 500)
+  }
+
+  function scrollToAddress() {
+    const offset = 250
+    $('html, body').animate({
+      scrollTop: $('#addressContainer').offset().top - offset
+    }, 500)
+  }
+
+  function scrollToPaypalSection() {
+    const offset = 500
+    $('html, body').animate({
+      scrollTop: $('#paypalSection').offset().top - offset
+    }, 500)
+  }
+
+  // * scroll functions end
 
 
   // * paypal code

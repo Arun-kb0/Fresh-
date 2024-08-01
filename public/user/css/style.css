@@ -120,7 +120,8 @@
 }
 
 .singleProductContainer,
-.profileContainer {
+.profileContainer
+{
   position: relative !important;
   min-height: 100vh;
   justify-content: center;
@@ -183,7 +184,7 @@
 
 #priceDetails {
   height: auto;
-  max-height: 355px;
+  max-height: 500px;
   overflow: auto;
 }
 
@@ -200,6 +201,19 @@
 .form-check-input {
   width: 20px;
   height: 20px;
+}
+
+.userCheckoutCartContainer{
+  position: relative !important;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+#priceDetailsContainer {
+  position: sticky !important;
+  top: 150px;
+  left: 0;
+  align-self: flex-start;
 }
 
 
