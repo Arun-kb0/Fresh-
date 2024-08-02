@@ -34,8 +34,16 @@
           <!-- Content -->
 
           <div class="container-xxl flex-grow-1 container-p-y">
+
+            <!-- * alert -->
+            <div class="position-fixed col-10 d-flex justify-content-center" style="z-index: 10;">
+              <div class="alert alert-info fade show  w-auto d-none " role="alert" id="bsAlert">
+              </div>
+            </div>
+            <!-- * alert end -->
+
             <div class="row">
-              <div class="col-lg-8 mb-4 order-0">
+              <div class="col-lg-8 mb-4 order-0 bg-white shadow ro">
                 <div class="card">
                   <div class="d-flex align-items-end row">
                     <div class="col-sm-7">
@@ -113,11 +121,11 @@
                   </div>
                 </div>
               </div>
-              <!-- Total Revenue -->
-              <div class="col-12 col-lg-8 order-2 order-md-3 order-lg-2 mb-4">
+              <!-- * Total Revenue chart-->
+              <div class="col-12 col-lg-8 order-2 order-md-3 order-lg-2 mb-4 bg-white rounded-3 shadow">
                 <canvas id="revenueChart" height="120px"></canvas>
               </div>
-              <!--/ Total Revenue -->
+              <!-- * Total Revenue chart end -->
               <div class="col-12 col-md-8 col-lg-4 order-3 order-md-2">
                 <div class="row">
                   <div class="col-6 mb-4">
@@ -170,8 +178,7 @@
                       </div>
                     </div>
                   </div>
-                  <!-- </div>
-    <div class="row"> -->
+                
                   <div class="col-12 mb-4">
                     <div class="card">
                       <div class="card-body">
@@ -196,96 +203,48 @@
               </div>
             </div>
             <div class="row">
-              <!-- Order Statistics -->
-              <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
-                <div class="card h-100">
-                  <div class="card-header d-flex align-items-center justify-content-between pb-0">
-                    <div class="card-title mb-0">
-                      <h5 class="m-0 me-2">Order Statistics</h5>
-                      <small class="text-muted">42.82k Total Sales</small>
-                    </div>
+              <!-- * sales per category-->
+              <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4  p-2 bg-white rounded-3 shadow">
+                <h5 class="text-primary text-center text-uppercase fw-bolder">Category wise sales </h5>
+                <div class="d-flex m-3 mb-1">
+                  <div class="mt-2 px-2 mb-3 ">
                     <div class="dropdown">
-                      <button class="btn p-0" type="button" id="orederStatistics" data-bs-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                        <i class="bx bx-dots-vertical-rounded"></i>
+                      <button id="dayDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        day
                       </button>
-                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics">
-                        <a class="dropdown-item" href="javascript:void(0);">Select All</a>
-                        <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                      </div>
+                      <ul class="dropdown-menu " id="dayDropdown">
+                
+                      </ul>
                     </div>
                   </div>
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                      <div class="d-flex flex-column align-items-center gap-1">
-                        <h2 class="mb-2">8,258</h2>
-                        <span>Total Orders</span>
-                      </div>
-                      <div id="orderStatisticsChart"></div>
+                  <div class="mt-2 px-2 mb-3">
+                    <div class="dropdown">
+                      <button id="monthDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        month
+                      </button>
+                      <ul class="dropdown-menu " id="monthDropdown">
+                
+                      </ul>
                     </div>
-                    <ul class="p-0 m-0">
-                      <li class="d-flex mb-4 pb-1">
-                        <div class="avatar flex-shrink-0 me-3">
-                          <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-mobile-alt"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                          <div class="me-2">
-                            <h6 class="mb-0">Electronic</h6>
-                            <small class="text-muted">Mobile, Earbuds, TV</small>
-                          </div>
-                          <div class="user-progress">
-                            <small class="fw-semibold">82.5k</small>
-                          </div>
-                        </div>
-                      </li>
-                      <li class="d-flex mb-4 pb-1">
-                        <div class="avatar flex-shrink-0 me-3">
-                          <span class="avatar-initial rounded bg-label-success"><i class="bx bx-closet"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                          <div class="me-2">
-                            <h6 class="mb-0">Fashion</h6>
-                            <small class="text-muted">T-shirt, Jeans, Shoes</small>
-                          </div>
-                          <div class="user-progress">
-                            <small class="fw-semibold">23.8k</small>
-                          </div>
-                        </div>
-                      </li>
-                      <li class="d-flex mb-4 pb-1">
-                        <div class="avatar flex-shrink-0 me-3">
-                          <span class="avatar-initial rounded bg-label-info"><i class="bx bx-home-alt"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                          <div class="me-2">
-                            <h6 class="mb-0">Decor</h6>
-                            <small class="text-muted">Fine Art, Dining</small>
-                          </div>
-                          <div class="user-progress">
-                            <small class="fw-semibold">849k</small>
-                          </div>
-                        </div>
-                      </li>
-                      <li class="d-flex">
-                        <div class="avatar flex-shrink-0 me-3">
-                          <span class="avatar-initial rounded bg-label-secondary"><i class="bx bx-football"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                          <div class="me-2">
-                            <h6 class="mb-0">Sports</h6>
-                            <small class="text-muted">Football, Cricket Kit</small>
-                          </div>
-                          <div class="user-progress">
-                            <small class="fw-semibold">99</small>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
                   </div>
+                  <div class="mt-2 px-2  mr-2 mb-3">
+                    <div class="dropdown ">
+                      <button id="yearDropdownBtn" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        year
+                      </button>
+                      <ul class="dropdown-menu" id="yearDropdown">
+                
+                      </ul>
+                    </div>
+                  </div>
+                
                 </div>
+                <canvas id="orderPaymentTypes" height="217"></canvas>
               </div>
-              <!--/ Order Statistics -->
+              <!-- * sales per category -->
 
               <!-- Expense Overview -->
               <div class="col-md-6 col-lg-4 order-1 mb-4">
@@ -496,20 +455,20 @@
     <div class="layout-overlay layout-menu-toggle"></div>
   </div>
 
-
+  <h1>
+    <%= ordersPerCategories.categoryNames %>
+  </h1>
   
-  <script>
-    window.totalRegisters = <%= JSON.stringify(totalRegisters) %>
-    window.totalProducts = <%= JSON.stringify(totalProducts) %>
-    window.totalOrders = <%= JSON.stringify(totalOrders) %>
-  </script>
-  
-
   <% scriptBlock=`<script src="/static/admin/assets/vendor/libs/apex-charts/apexcharts.js">
     </script>
     <script src="/static/admin/assets/js/dashboards-analytics.js"></script>
 
-  
+    <script>
+      window.totalRegisters = ${JSON.stringify(totalRegisters)};
+      window.totalProducts = ${JSON.stringify(totalProducts)};
+      window.totalOrders = ${JSON.stringify(totalOrders)};
+      window.ordersPerCategories = ${JSON.stringify(ordersPerCategories)};
+    </script>
     <script src="/static/admin/scripts/adminDashboard.js"></script>
     `
     %>

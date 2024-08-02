@@ -1,5 +1,5 @@
 const express = require('express')
-const { getAdminHomeController } = require('../../controllers/admin/homeController')
+const { getAdminHomeController, getOrdersPerCategoryController } = require('../../controllers/admin/homeController')
 const { getUserEditController, getUsersController, blockUserController } = require('../../controllers/admin/usersContoller')
 const {
   getProductController,
@@ -44,6 +44,8 @@ const upload = multer({
 
 router.route('/')
   .get(getAdminHomeController)
+
+router.get('/categoryWiseOrders', getOrdersPerCategoryController)
 
 // * crop image
 router.get('/image/crop', getCropperController)

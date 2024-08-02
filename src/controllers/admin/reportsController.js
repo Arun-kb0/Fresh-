@@ -45,7 +45,6 @@ const getSalesReportController = async (req, res, next) => {
       endDate = new Date(year, 11, 31, 23, 59, 59, 999)
     }
 
-
     const result = await getSalesReportAggregation({
       startDate,
       endDate,
