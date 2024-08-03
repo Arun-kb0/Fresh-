@@ -147,7 +147,7 @@ const addToCartController = async (req, res, next) => {
         { new: true, upsert: true }
       ).populate('products.productId', 'image productInfo.soldBy stock');
     }
-    res.status(OK).json({ message: "item added", product})
+    res.status(OK).json({ message: "item added", product })
   } catch (error) {
     next(error)
   }
@@ -219,7 +219,7 @@ const getCheckoutPageController = async (req, res, next) => {
     const cart = await cartModel.findOne({ userId: user.userId })
     let total = 0
     if (cart?.coupon) {
-      const coupon = await couponModel.findOne({ _id: cart.couponId , isDeleted:false })
+      const coupon = await couponModel.findOne({ _id: cart.couponId, isDeleted: false })
       let cartTotal = getCartTotal({ cart, deliveryFee })
       total = calculateDiscount({ total: cartTotal, coupon })
     } else {
@@ -265,6 +265,10 @@ const orderUsingCodController = async (req, res, next) => {
     const cart = await cartModel.findOne({ userId: user.userId });
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
+    }
+
+    if (cart.total > 1000) {
+      throw new CustomError('change payment method to make payment above 1000',BAD_REQUEST)
     }
 
     // * decreasing stock
@@ -536,7 +540,7 @@ const returnOrderController = async (req, res, next) => {
 
     const cancelledOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
-      { $set: { orderStatus: 'Return Requested'} },
+      { $set: { orderStatus: 'Return Requested' } },
       { new: true }
     )
     res.status(OK).json({ message: "order return request", order: cancelledOrder })

@@ -22,15 +22,20 @@
 	</div>
 	<!--PreLoader Ends-->
 
+
 	<!-- * breadcrumbs -->
 	<div class="container">
-		<h3>My profile / My orders / <span class="orangeTextColor"> order details </span></h3>
+		<% if(isInvoiceDownload) {%>
+			<h1>Invoice</h1>
+			<% }else{ %>
+				<h3>My profile / My orders / <span class="orangeTextColor"> order details </span></h3>
+				<% } %>
 	</div>
 	<!-- * end breadcrumbs -->
 
 
 
-
+	<% if(!isInvoiceDownload){ %>
 	<!-- search area -->
 	<div class="search-area">
 		<div class="container">
@@ -49,191 +54,229 @@
 		</div>
 	</div>
 	<!-- end search arewa -->
+	 <% } %>
 
 	<!-- * orders details-->
 	<div class="container my-5">
-		
+
 		<!-- * address , payment, order summery -->
 		<section class="card">
-			<div class="card-body d-flex justify-content-between">
+			
+			<div class="card-body d-flex justify-content-between <%= isInvoiceDownload ? 'flex-column mb-2' : 'flex-row'  %>">
 				<div class="d-flex flex-column mx-2">
-					<span class="text-secondary h5">Shipping Address</span>
-					<% for(const field in order.addressDetails ) {%>
-						<% if(field!=='userId' && field!=='_id' && field!=='isDeleted' && field!=='__v') {%>
-							<span class="text-secondary"> <%= order.addressDetails[field] %> </span>
-						<% } %>
+					<% if(isInvoiceDownload) {%>
+						<h3>address details</h3>
+					<% } else { %>
+						<span class="text-secondary h5">Shipping Address</span>
 					<% } %>
+					<% for(const field in order.addressDetails ) {%>
+						<% if(field!=='userId' && field!=='_id' && field!=='isDeleted' && field!=='__v' ) {%>
+							<span class="text-secondary">
+								<%= order.addressDetails[field] %>
+							</span>
+							<% } %>
+								<% } %>
 				</div>
 
 				<div class="d-flex flex-column mx-2">
-					<span class="text-secondary h5">Payment method</span>
-					<span class="text-secondary "> <%= order.paymentMethod %></span>
+					<% if(isInvoiceDownload) {%>
+						<h3>Payment method</h3>
+					<% } else { %>
+							<span class="text-secondary h5">Payment method</span>
+					<% } %>
+					<span class="text-secondary ">
+						<%= order.paymentMethod %>
+					</span>
 					<div class="d-flex justify-content-between">
 						<span class="text-secondary pr-2">Payment status</span>
-						<span class="text-secondary paymentStatus"> <%= order.paymentStatus %></span>
+						<span class="text-secondary paymentStatus">
+							<%= order.paymentStatus %>
+						</span>
 					</div>
 				</div>
 
 				<div class="d-flex flex-column mx-2">
-					<span class="text-secondary h5">Order summery</span>
+					<% if(isInvoiceDownload) {%>
+						<h3>Order summery</h3>
+						<% } else { %>
+							<span class="text-secondary h5">Order summery</span>
+						<% } %>
 					<div class="d-flex justify-content-between">
-							<span class="text-secondary pr-2">Order status</span>
-							<span class="text-secondary orderStatus"><%= order.orderStatus %></span>
+						<span class="text-secondary pr-2">Order status</span>
+						<span class="text-secondary orderStatus">
+							<%= order.orderStatus %>
+						</span>
 					</div>
 					<div class="d-flex justify-content-between">
 						<span class="text-secondary h6 text-capitalize">total</span>
-						<span id="orderTotal"  class="text-secondary h6 "> ₹<%= order.total %></span>
+						<span id="orderTotal" class="text-secondary h6 "> ₹<%= order.total %></span>
 					</div>
-				</div>
+					<% if(!isInvoiceDownload && order.orderStatus==='Delivered'){ %>
+						<button id="invoiceDownloadBtn" class="btn btn-outline-info rounded-pill">Download invoice</button>
+					<% } %>
+					</div>
 
 			</div>
 		</section>
 		<!-- * address , payment, order summery end -->
 
+		<% if(isInvoiceDownload) {%>
+			<h3>product details</h3>
+		<% } %>
 		<!-- * ordered items -->
 		<% for(const product of order.products) {%>
 			<section class="card mt-4 shadow-sm ">
-			
+
 				<div class="card-body d-flex">
-						<div class=" d-flex shadow rounded m-3 col-2 orderDetailsImageContainer">
-							<img class="p-1 orderDetailsImage"  src="<%= product.image[0].path %>" alt="">
-						</div> 
-
-					<div class="d-flex flex-column mx-3 justify-content-start col-6">
-							<span class="h5 text-secondary mr-1"><%= product.name %> </span>
-							<div>
-								<span class="h6 text-secondary mr-1"> order status : </span>
-								<span class=" h6 text-secondary mr-1 p-1 px-3 rounded singleProductStatus"> <%= product?.orderStatus %> </span>
-							</div>
-							<div>
-								<span class="h6 text-secondary mr-1"> sold by : </span>
-								<span class="h6 text-secondary mr-1"><%= product.soldBy%></span>
-							</div>
-							<div>
-								<span class="h6 text-secondary mr-1">Price : </span>
-								<span class="h6 text-secondary mr-1">₹<%= product.finalPrice %> </span>
-							</div>
-							<div>
-								<span class="h6 text-secondary mr-1">Quantity : </span>
-								<span class="h6 text-secondary mr-1"><%= product.quantity %> </span>
-							</div>
-							<div>
-								<span class="h6 text-secondary mr-1"> Total product price : </span>
-								<span class="h6 text-secondary mr-1">₹<%= product.price %> </span>
-							</div>
-							<div class="d-flex justify-content-start ">
-
-								<% if(order.orderStatus==='Pending' || order.orderStatus==='Shipped'
-									|| product.orderStatus==='Pending' || product.orderStatus==='Shipped'
-								) {%>
-								<button 
-									data-orderId="<%= order._id %>"
-									data-productId="<%= product.productId %>" 
-								 	class="btn btn-outline-danger rounded-pill cancelSingleProductBtn mr-3">Cancel</button>
-								 <% } %>
-								<% if(order.orderStatus==='Delivered') {%>
-								<button 
-									data-orderId="<%= order._id %>"
-									data-productId="<%= product.productId %>"
-								  class="btn btn-outline-primary rounded-pill returnSingleProductBtn mr-3"> Return
-								</button>
-								<% } %>
-							</div>
-						</div>
-						
-						<div class="d-flex justify-content-end w-100 align-items-start">
-							<a href="/product?productId=<%= product.productId  %>" class="btn btn-outline-info rounded-pill" >View product</a>
-						</div>
-						
+					<% if(!isInvoiceDownload) {%>
+					<div class=" d-flex shadow rounded m-3 col-2 orderDetailsImageContainer">
+						<img class="p-1 orderDetailsImage" src="<%= product.image[0].path %>" alt="">
 					</div>
+					<% } %>
+					<div class="d-flex flex-column mx-3 justify-content-start col-6">
+						<span class="h5 text-secondary mr-1">
+							<%= product.name %>
+						</span>
+						<div>
+							<span class="h6 text-secondary mr-1"> order status : </span>
+							<span class=" h6 text-secondary mr-1 p-1 px-3 rounded singleProductStatus">
+								<%= product?.orderStatus %>
+							</span>
+						</div>
+						<div>
+							<span class="h6 text-secondary mr-1"> sold by : </span>
+							<span class="h6 text-secondary mr-1">
+								<%= product.soldBy%>
+							</span>
+						</div>
+						<div>
+							<span class="h6 text-secondary mr-1">Price : </span>
+							<span class="h6 text-secondary mr-1">₹<%= product.finalPrice %> </span>
+						</div>
+						<div>
+							<span class="h6 text-secondary mr-1">Quantity : </span>
+							<span class="h6 text-secondary mr-1">
+								<%= product.quantity %>
+							</span>
+						</div>
+						<div>
+							<span class="h6 text-secondary mr-1"> Total product price : </span>
+							<span class="h6 text-secondary mr-1">₹<%= product.price %> </span>
+						</div>
+						<div class="d-flex justify-content-start ">
+						
+						<% if(!isInvoiceDownload) {%>
+							<% if(order.orderStatus==='Pending' || order.orderStatus==='Shipped' || product.orderStatus==='Pending' ||
+								product.orderStatus==='Shipped' ) {%>
+								<button data-orderId="<%= order._id %>" data-productId="<%= product.productId %>"
+									class="btn btn-outline-danger rounded-pill cancelSingleProductBtn mr-3">Cancel</button>
+								<% } %>
+								<% if(order.orderStatus==='Delivered' ) {%>
+										<button data-orderId="<%= order._id %>" data-productId="<%= product.productId %>"
+											class="btn btn-outline-primary rounded-pill returnSingleProductBtn mr-3"> Return
+										</button>
+								<% } %>
+						<% } %>
+						</div>
+					</div>
+
+					<% if(!isInvoiceDownload) { %>
+						<div class="d-flex justify-content-end w-100 align-items-start">
+							<a href="/product?productId=<%= product.productId  %>" class="btn btn-outline-info rounded-pill">View
+								product</a>
+						</div>
+					<% } %>
+				</div>
 			</section>
-		<% } %>
-		<!-- * ordered items end -->
+			<% } %>
+				<!-- * ordered items end -->
 
 	</div>
 	<!-- * orders -->
 
 
+	<% if(!isInvoiceDownload) {%>
+		<!-- footer -->
+		<div class="footer-area">
+			<div class="container">
 
-	<!-- footer -->
-	<div class="footer-area">
-		<div class="container">
-
-			<div class="col-lg-3 col-md-6">
-				<div class="footer-box about-widget">
-					<h2 class="widget-title">About us</h2>
-					<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-						laudantium, totam rem aperiam, eaque ipsa quae.</p>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box about-widget">
+						<h2 class="widget-title">About us</h2>
+						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+							laudantium, totam rem aperiam, eaque ipsa quae.</p>
+					</div>
 				</div>
-			</div>
-			<div class="col-lg-3 col-md-6">
-				<div class="footer-box get-in-touch">
-					<h2 class="widget-title">Get in Touch</h2>
-					<ul>
-						<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-						<li>support@fruitkha.com</li>
-						<li>+00 111 222 3333</li>
-					</ul>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-6">
-				<div class="footer-box pages">
-					<h2 class="widget-title">Pages</h2>
-					<ul>
-						<li><a href="index.html">Home</a></li>
-						<li><a href="about.html">About</a></li>
-						<li><a href="services.html">Shop</a></li>
-						<li><a href="news.html">News</a></li>
-						<li><a href="contact.html">Contact</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-6">
-				<div class="footer-box subscribe">
-					<h2 class="widget-title">Subscribe</h2>
-					<p>Subscribe to our mailing list to get the latest updates.</p>
-					<form action="index.html">
-						<input type="email" placeholder="Email">
-						<button type="submit"><i class="fas fa-paper-plane"></i></button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	</div>
-	<!-- end footer -->
-
-	<!-- copyright -->
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.<br>
-						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
-					</p>
-				</div>
-				<div class="col-lg-6 text-right col-md-12">
-					<div class="social-icons">
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box get-in-touch">
+						<h2 class="widget-title">Get in Touch</h2>
 						<ul>
-							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+							<li>support@fruitkha.com</li>
+							<li>+00 111 222 3333</li>
 						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box pages">
+						<h2 class="widget-title">Pages</h2>
+						<ul>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="about.html">About</a></li>
+							<li><a href="services.html">Shop</a></li>
+							<li><a href="news.html">News</a></li>
+							<li><a href="contact.html">Contact</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box subscribe">
+						<h2 class="widget-title">Subscribe</h2>
+						<p>Subscribe to our mailing list to get the latest updates.</p>
+						<form action="index.html">
+							<input type="email" placeholder="Email">
+							<button type="submit"><i class="fas fa-paper-plane"></i></button>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+		</div>
+		<!-- end footer -->
+
+		<!-- copyright -->
+		<div class="copyright">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-6 col-md-12">
+						<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.<br>
+							Distributed By - <a href="https://themewagon.com/">Themewagon</a>
+						</p>
+					</div>
+					<div class="col-lg-6 text-right col-md-12">
+						<div class="social-icons">
+							<ul>
+								<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+								<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+								<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+								<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+								<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<%}%>
 
 
-	<% scriptBlock=`
-	 	<script src="/static/user/scripts/user.js"></script>
-		<script src="/static/user/scripts/orders.js"></script>
+			<% scriptBlock=` <script src="/static/user/scripts/user.js">
+				</script>
+				<script src="/static/user/scripts/orders.js"></script>
 
-		`
-		%>
+				`
+				%>
 
 </body>
 

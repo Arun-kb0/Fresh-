@@ -10,6 +10,7 @@ $(function () {
   const cancelSingleProductBtn = $(".cancelSingleProductBtn")
   const returnSingleProductBtn = $(".returnSingleProductBtn")
 
+  const invoiceDownloadBtn = $("#invoiceDownloadBtn")
 
   orderCancelBtn.on("click", handleCancelOrder)
   orderReturnBtn.on("click", handleReturnOrder)
@@ -17,6 +18,16 @@ $(function () {
   cancelSingleProductBtn.on('click', handleCancelSingleOrder)
   returnSingleProductBtn.on('click', handleReturnSingleOrder)
   
+  invoiceDownloadBtn.on('click',handleDownloadInvoice)
+
+  function handleDownloadInvoice() {
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString)
+    const orderId = urlParams.get('orderId')
+    console.log(orderId)
+    const url = `/profile/orderdetails?orderId=${orderId}&isInvoiceDownload=true`
+    window.location.href= url
+  }
 
   function handleCancelSingleOrder() {
     const productId = $(this).attr('data-productId')

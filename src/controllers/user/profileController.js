@@ -12,6 +12,9 @@ const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
 const { getProductsAggregation, getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
 const walletModel = require("../../model/walletModel")
+const htmlToPdf = require('html-pdf-node')
+const ejs = require('ejs')
+const path = require('path')
 
 
 const getProfileController = async (req, res, next) => {
@@ -253,7 +256,7 @@ const getAllOrdersPageController = async (req, res, next) => {
 }
 
 const getOrderDetailsPageController = async (req, res, next) => {
-  let { orderId } = req.query
+  let { orderId, isInvoiceDownload =false} = req.query
   try {
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       console.log('invalid order Id')
@@ -262,8 +265,30 @@ const getOrderDetailsPageController = async (req, res, next) => {
     }
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
     const orderDetails = await getOrderDetailsAggregation({orderId})
+    
+    // * invoice pdf download
+    if (isInvoiceDownload) {
+      const filePath = path.join(__dirname, '../../../views/user/profile/orderDetails.ejs')
+      const renderedFile = await ejs.renderFile(filePath, {
+        ...viewUsersPage,
+        order: orderDetails,
+        isInvoiceDownload:true
+      })
+      const file = { content: renderedFile }
+      const options = { format: 'A4' }
+      const pdfBuffer = await htmlToPdf.generatePdf(file, options)
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment;filename="invoice.pdf"');
+      res.status(OK).send(pdfBuffer);
+      return
+    }
 
-    res.render('user/profile/orderDetails', { ...viewUsersPage, order: orderDetails })
+
+    res.render('user/profile/orderDetails', {
+      ...viewUsersPage,
+      order: orderDetails,
+      isInvoiceDownload:false
+    })
   } catch (error) {
     next(error)
   }
