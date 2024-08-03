@@ -101,6 +101,11 @@ $(function () {
             beginAtZero: true
           }
         }
+      },
+      plugins: {
+        beforeDraw: function (chartInstance) {
+          chartInstance.chart.canvas.style.height = '200px';
+        }
       }
     });
   };
