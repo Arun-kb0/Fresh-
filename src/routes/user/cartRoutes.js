@@ -13,7 +13,10 @@ const {
   orderSuccessPaypalController,
   removeCouponController,
   cancelSingleOrderOrderController,
-  returnSingleOrderOrderController
+  returnSingleOrderOrderController,
+  orderFailedPaypalController,
+  getPaymentFailedPageController,
+  getPaymentSuccessPageController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -38,6 +41,10 @@ router.patch('/order/return',returnOrderController)
 
 router.post('/order/paypal', orderUsingPaypalController)
 router.post('/order/paypal/success', orderSuccessPaypalController)
+router.post('/order/paypal/failed', orderFailedPaypalController)
+
+router.get('/order/failed', getPaymentFailedPageController)
+router.get('/order/success', getPaymentSuccessPageController)
 
 router.patch('/order/single/cancel', cancelSingleOrderOrderController)
 router.patch('/order/single/return', returnSingleOrderOrderController)

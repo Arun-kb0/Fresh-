@@ -1,5 +1,5 @@
 const { OK, BAD_REQUEST, NOT_FOUND, CREATED, CONFLICT, GONE } = require("../../constants/httpStatusCodes")
-const { viewUsersPage } = require("../../constants/pageConfid")
+const { viewUsersPage, viewPageNotFound } = require("../../constants/pageConfid")
 const cartModel = require("../../model/cartModel")
 const productModel = require("../../model/productModel")
 const CustomError = require('../../constants/CustomError')
@@ -268,7 +268,7 @@ const orderUsingCodController = async (req, res, next) => {
     }
 
     if (cart.total > 1000) {
-      throw new CustomError('change payment method to make payment above 1000',BAD_REQUEST)
+      throw new CustomError('change payment method to make payment above 1000', BAD_REQUEST)
     }
 
     // * decreasing stock
@@ -354,13 +354,6 @@ const orderUsingPaypalController = async (req, res, next) => {
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
-
-    // const total = cart.products.reduce((sum, item) => sum + item.price, 0) + deliveryFee
-    // cart = await cartModel.findOneAndUpdate(
-    //   { userId: user.userId },
-    //   { $set: { total: total } },
-    //   { new: true }
-    // )
 
     const request = new paypal.orders.OrdersCreateRequest()
     let totalInUsd = await currencyConverter.convert(cart.total)
@@ -472,6 +465,101 @@ const orderSuccessPaypalController = async (req, res, next) => {
     }
 
     res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    next(error)
+  }
+}
+
+const orderFailedPaypalController = async (req, res, next) => {
+  const { addressId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const cart = await cartModel.findOne({ userId: user.userId })
+    console.log(cart.products.length)
+
+    if (!cart) {
+      throw new CustomError('cart not found', NOT_FOUND)
+    }
+
+    // * decreasing stock
+    for (const item of cart.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError('Product not found', BAD_REQUEST);
+      }
+      if (product.stock < item.quantity) {
+        throw new CustomError(`Insufficient stock for product: ${product.name}`, BAD_REQUEST);
+      }
+      product.stock -= item.quantity;
+      console.log(product)
+      await product.save();
+    }
+
+    const newOrder = await orderModel.create({
+      addressId: addressId,
+      orderStatus: 'Pending',
+      products: cart.products,
+      total: cart.total,
+      paymentMethod: 'online',
+      paymentStatus: 'Failed',
+      userId: user.userId,
+      coupon: cart?.coupon ? cart.coupon : null,
+      paymentDetails: {
+        paymentSource: 'paypal',
+      }
+    });
+
+    console.log(cart.total)
+    console.log(newOrder.total)
+
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          products: [],
+          coupon: null,
+          couponId: null,
+          total: 0
+        }
+      }
+    )
+    if (cart.couponId) {
+      console.log('cart.couponId ', cart.couponId)
+      await usedCouponsModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          userId: user.userId,
+          $addToSet: {
+            coupons: cart.couponId
+          }
+        },
+        { upsert: true, }
+      )
+
+      await couponModel.findOneAndUpdate(
+        { _id: cart.couponId },
+        { $inc: { usageLimit: 1 } }
+      )
+    }
+
+    res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+const getPaymentFailedPageController = async (req, res, next) => {
+  try {
+    res.render('user/cart/paymentFailed', { ...viewPageNotFound, backToAdmin: true })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getPaymentSuccessPageController = async (req, res, next) => {
+  try {
+    res.render('user/cart/paymentSuccess', { ...viewPageNotFound, backToAdmin: true })
   } catch (error) {
     next(error)
   }
@@ -808,6 +896,9 @@ module.exports = {
   orderUsingCodController,
   orderUsingPaypalController,
   orderSuccessPaypalController,
+  orderFailedPaypalController,
+  getPaymentFailedPageController,
+  getPaymentSuccessPageController,
 
   cancelOrderController,
   returnOrderController,
