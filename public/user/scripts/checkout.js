@@ -18,8 +18,8 @@ $(function () {
 
   const selectPaymentBtn = $("#selectPaymentBtn")
   const selectAddressBtn = $("#selectAddressBtn")
-  const paymentBtn = $(".paymentBtn")
   const paypalSection = $("#paypalSection")
+  const paymentBtn = $(".paymentBtn")
 
   const applyCouponBtn = $("#applyCouponBtn")
 
@@ -50,7 +50,6 @@ $(function () {
     paypalSection.hide()
     if (paymentMethod === 'paypal') {
       console.log(paypalSection.html())
-      // paypalSection.removeClass('d-none').addClass('d-flex')
       paypalSection.show()
     }
     console.log(paymentMethod)

@@ -272,7 +272,8 @@ const getOrderDetailsPageController = async (req, res, next) => {
       const renderedFile = await ejs.renderFile(filePath, {
         ...viewUsersPage,
         order: orderDetails,
-        isInvoiceDownload:true
+        isInvoiceDownload:true,
+        paypalClientId: process.env.PAYPAL_CLIENT_ID,
       })
       const file = { content: renderedFile }
       const options = { format: 'A4' }
@@ -287,7 +288,8 @@ const getOrderDetailsPageController = async (req, res, next) => {
     res.render('user/profile/orderDetails', {
       ...viewUsersPage,
       order: orderDetails,
-      isInvoiceDownload:false
+      isInvoiceDownload: false,
+      paypalClientId: process.env.PAYPAL_CLIENT_ID,
     })
   } catch (error) {
     next(error)

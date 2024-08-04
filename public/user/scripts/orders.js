@@ -1,5 +1,7 @@
 $(function () {
 
+  let paymentMethod 
+
   const orderStatus = $(".orderStatus")
   const paymentStatus = $('.paymentStatus')
   const createdAt = $(".createdAt")
@@ -11,6 +13,15 @@ $(function () {
   const returnSingleProductBtn = $(".returnSingleProductBtn")
 
   const invoiceDownloadBtn = $("#invoiceDownloadBtn")
+  const paymentMethodContainer = $("#paymentMethodContainer")
+  const continuePaymentBtn = $("#continuePaymentBtn")
+  const selectPaymentBtn = $("#selectPaymentBtn")
+  const paypalSection = $("#paypalSection")
+  const paymentBtn = $(".paymentBtn")
+
+  
+  paymentMethodContainer.hide()
+  paypalSection.hide()
 
   orderCancelBtn.on("click", handleCancelOrder)
   orderReturnBtn.on("click", handleReturnOrder)
@@ -18,7 +29,32 @@ $(function () {
   cancelSingleProductBtn.on('click', handleCancelSingleOrder)
   returnSingleProductBtn.on('click', handleReturnSingleOrder)
   
-  invoiceDownloadBtn.on('click',handleDownloadInvoice)
+  invoiceDownloadBtn.on('click', handleDownloadInvoice)
+  continuePaymentBtn.on('click',showPaymentSection)
+  paymentBtn.on('click',handlePaymentContinue)
+
+  function showPaymentSection() {
+    paymentMethodContainer.toggle()
+  }
+
+  function handlePaymentContinue() {
+    console.log(paymentMethod)
+  }
+
+
+  selectPaymentBtn.on("click", function () {
+    const checkedRadioButton = $('input[name="paymentRadioBtn"]:checked')
+    paymentMethod = checkedRadioButton.next('label').attr('name').trim()
+    const title = checkedRadioButton.attr('data-title')
+    showAlert(`payment method ${title} selected`)
+    paypalSection.hide()
+    if (paymentMethod === 'paypal') {
+      console.log(paypalSection.html())
+      paypalSection.show()
+    }
+    console.log(paymentMethod)
+  })
+
 
   function handleDownloadInvoice() {
     const queryString = window.location.search
@@ -415,5 +451,92 @@ $(function () {
 
     })
   }
+
+
+
+  // * paypal code
+  window.paypal
+    .Buttons({
+      style: {
+        shape: "rect",
+        layout: "vertical",
+        color: "gold",
+        label: "paypal",
+      },
+      message: {
+        amount: 100,
+      },
+      async createOrder() {
+        try {
+          const response = await fetch("/cart/order/paypal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ addressId , isContinuePayment:true,orderId })
+          });
+
+          const orderData = await response.json();
+          console.log(orderData)
+          if (orderData.id) {
+            return orderData.id;
+          }
+          const errorDetail = orderData?.details?.[0];
+          const errorMessage = errorDetail
+            ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
+            : JSON.stringify(orderData);
+
+          throw new Error(errorMessage);
+        } catch (error) {
+          console.log("payment error catched on createOrder ")
+          console.error(error);
+          window.location.href = '/cart/order/failed'
+        }
+      },
+      async onApprove(data, actions) {
+        try {
+          console.log(data)
+          console.log(actions)
+          const orderData = await actions.order.capture()
+          const errorDetail = orderData?.details?.[0];
+          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+            return actions.restart();
+          } else if (errorDetail) {
+            throw new Error(`${errorDetail.description} (${orderData.debug_id})`);
+          } else if (!orderData.purchase_units) {
+            throw new Error(JSON.stringify(orderData));
+          } else {
+            const transaction =
+              orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
+              orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
+            console.log(transaction)
+            console.log(
+              "Capture result",
+              orderData,
+              JSON.stringify(orderData, null, 2)
+            );
+            if (!transaction || transaction?.status !== "COMPLETED") {
+              throw new Error(`payment capture ${transaction?.status}`)
+            }
+
+            const response = await fetch(`/cart/order/paypal/success`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...data, addressId ,isContinuePayment:true, dbOrderId:orderId})
+            });
+            window.location.href = '/cart/order/success'
+          }
+        } catch (error) {
+          console.log("payment error catched on onApprove ")
+          console.error(error);
+          const response = await fetch('/cart/order/paypal/failed', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ addressId , orderId })
+          });
+          window.location.href = '/cart/order/failed'
+        }
+      },
+    })
+    .render("#paypal-button-container");
+
 
 })

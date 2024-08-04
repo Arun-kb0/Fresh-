@@ -334,7 +334,7 @@ const orderUsingCodController = async (req, res, next) => {
 
 
 const orderUsingPaypalController = async (req, res, next) => {
-  const { addressId } = req.body
+  const { addressId, isContinuePayment=false,orderId } = req.body
   try {
     console.log(" addressId ", addressId)
     const user = JSON.parse(req.cookies.user)
@@ -350,7 +350,16 @@ const orderUsingPaypalController = async (req, res, next) => {
     }
 
 
-    let cart = await cartModel.findOneAndUpdate({ userId: user.userId });
+    let cart
+    if (isContinuePayment) {
+      if (!mongoose.isObjectIdOrHexString(orderId)) {
+        throw new CustomError('invalid order id',BAD_REQUEST)
+      }
+      cart = await orderModel.findOne({_id:orderId})
+    } else {
+      cart = await cartModel.findOneAndUpdate({ userId: user.userId }); 
+    }
+    
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
@@ -386,13 +395,21 @@ const orderUsingPaypalController = async (req, res, next) => {
   }
 }
 
+
 const orderSuccessPaypalController = async (req, res, next) => {
-  const { paymentID, payerID, orderID, paymentSource, addressId } = req.body
+  const { paymentID, payerID, orderID, paymentSource, addressId, isContinuePayment = false, dbOrderId } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
-    const cart = await cartModel.findOne({ userId: user.userId })
+    let cart
+    if (isContinuePayment) {
+      if (!mongoose.isObjectIdOrHexString(dbOrderId)) {
+        throw new CustomError('invalid order id',BAD_REQUEST)
+      }
+      cart = await orderModel.findOne({ _id: dbOrderId })
+    } else {
+      cart = await cartModel.findOne({ userId: user.userId })
+    }
 
-    console.log('one')
     console.log(cart.products.length)
 
     if (!cart) {
@@ -413,6 +430,17 @@ const orderSuccessPaypalController = async (req, res, next) => {
       await product.save();
     }
     console.log('two')
+
+    if (isContinuePayment) {
+      const newOrder = await orderModel.findOneAndUpdate(
+        { _id: dbOrderId },
+        { $set: { paymentStatus: 'Completed' } },
+        {new:true}
+      )
+      res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+      return
+    }
+
 
     const newOrder = await orderModel.create({
       addressId: addressId,
