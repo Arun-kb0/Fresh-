@@ -165,12 +165,11 @@ $(function () {
       case 'cod':
         placeOrderUsingCod(addressId)
         break
-      case 'paypal':
-        paypalSection
-          .removeClass('d-none')
-          .addClass('d-flex')
-        // placeOrderUsingCod()
-        break
+      // case 'paypal':
+      //   paypalSection
+      //     .removeClass('d-none')
+      //     .addClass('d-flex')
+      //   break
       case 'wallet':
         // placeOrderUsingCod()
         break

@@ -17,7 +17,6 @@ $(function () {
   const continuePaymentBtn = $("#continuePaymentBtn")
   const selectPaymentBtn = $("#selectPaymentBtn")
   const paypalSection = $("#paypalSection")
-  const paymentBtn = $(".paymentBtn")
 
   
   paymentMethodContainer.hide()
@@ -31,14 +30,9 @@ $(function () {
   
   invoiceDownloadBtn.on('click', handleDownloadInvoice)
   continuePaymentBtn.on('click',showPaymentSection)
-  paymentBtn.on('click',handlePaymentContinue)
 
   function showPaymentSection() {
     paymentMethodContainer.toggle()
-  }
-
-  function handlePaymentContinue() {
-    console.log(paymentMethod)
   }
 
 
@@ -48,11 +42,24 @@ $(function () {
     const title = checkedRadioButton.attr('data-title')
     showAlert(`payment method ${title} selected`)
     paypalSection.hide()
-    if (paymentMethod === 'paypal') {
-      console.log(paypalSection.html())
-      paypalSection.show()
-    }
+    // if (paymentMethod === 'paypal') {
+    //   console.log(paypalSection.html())
+    //   paypalSection.show()
+    // }
     console.log(paymentMethod)
+    switch (paymentMethod) {
+      case 'cod':
+        placeOrderUsingCod(addressId)
+        break
+      case 'wallet':
+        // placeOrderUsingCod()
+        break
+      case 'paypal':
+        paypalSection.show()
+        break
+      default:
+        console.log("invalid payment option value")
+    }
   })
 
 
@@ -452,6 +459,28 @@ $(function () {
     })
   }
 
+
+  // * cod payment function
+  function placeOrderUsingCod(addressId) {
+    $.ajax({
+      url: '/cart/order/cod',
+      method: 'POST',
+      data: { addressId ,orderId , isContinuePayment:true},
+      success: function (data) {
+        if (data.order) {
+          console.log(data.order)
+          window.location.href = '/profile/orders'
+        } else {
+          console.log('no order found')
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
 
 
   // * paypal code

@@ -248,7 +248,7 @@ const getCheckoutPageController = async (req, res, next) => {
 
 
 const orderUsingCodController = async (req, res, next) => {
-  const { addressId } = req.body
+  const { addressId ,isContinuePayment=false , orderId} = req.body
   try {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
@@ -262,7 +262,16 @@ const orderUsingCodController = async (req, res, next) => {
       throw new CustomError('Address not found', BAD_REQUEST);
     }
 
-    const cart = await cartModel.findOne({ userId: user.userId });
+    let cart
+    if (isContinuePayment) {
+      if (!mongoose.isObjectIdOrHexString(orderId)) {
+        throw new CustomError('invalid orderId',BAD_REQUEST)
+      }
+      cart = await orderModel.findOne({_id:orderId})
+    } else {
+      cart = await cartModel.findOne({ userId: user.userId });
+    }
+    
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
@@ -283,6 +292,23 @@ const orderUsingCodController = async (req, res, next) => {
       product.stock -= item.quantity;
       await product.save();
     }
+
+    // * return here
+    if (isContinuePayment) {
+      const newOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId },
+        {
+          $set: {
+            paymentMethod: 'cod',
+            paymentStatus: 'Pending',
+          }
+        },
+        { new: true }
+      )
+      res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+      return
+    }
+    
 
     const newOrder = await orderModel.create({
       addressId: address._id,
