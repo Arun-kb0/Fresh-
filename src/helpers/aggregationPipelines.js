@@ -643,11 +643,13 @@ const getSalesReportAggregation = async ({ startDate, endDate, sort, skip, limit
 }
 
 
-const getWalletWithSortedTransactionsAggregation = async ({ userId }) => {
+const getWalletWithSortedTransactionsAggregation = async ({ userId, skip=0, limit=10 }) => {
   const wallet = await walletModel.aggregate([
     { $match: { userId: userId } },
     { $unwind: "$transactions" },
     { $sort: { "transactions.date": -1 } },
+    { $skip: skip },
+    { $limit: limit },
     {
       $group: {
         _id: "$_id",
@@ -857,7 +859,7 @@ const cartCheckoutAggregation = async ({ userId }) => {
                   ]
                 }
               },
-              isDeleted:false // adding not deleted 
+              isDeleted: false // adding not deleted 
             }
           }
         ],

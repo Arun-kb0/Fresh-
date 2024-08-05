@@ -1,6 +1,13 @@
 $(function (){
   const date = $(".date")
 
+  // * pagination btns
+  const prevBtn = $("#prevBtn")
+  const nextBtn = $("#nextBtn")
+
+  prevBtn.on('click', handlePrev)
+  nextBtn.on('click', handleNext)
+
 
   // * createdAt to readable date string
   date.each(function () {
@@ -19,5 +26,31 @@ $(function (){
   })
 
 
+
+  // * pagination
+  let { page, numberOfPages } = pageDetails
+  if (numberOfPages === page) {
+    nextBtn.prop("disabled", true)
+  }
+  if (1 === page) {
+    prevBtn.prop("disabled", true)
+  }
+
+  function handleNext() {
+    if (numberOfPages > page) {
+      page++
+      console.log(page)
+      window.location.href = `/profile/wallet?page=${page}`
+    }
+  }
+
+  function handlePrev() {
+    if (1 < page) {
+      page--
+      console.log(page)
+      window.location.href = `/profile/wallet?page=${page}`
+    }
+  }
+  // * pagination end
 
 })

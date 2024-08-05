@@ -6,10 +6,20 @@ const walletModel = require("../../model/walletModel")
 
 
 const getWalletController = async (req, res, next) => {
+  const { page = 1 } = req.query
   try {
     const user = JSON.parse(req.cookies.user)
-    // let wallet = await walletModel.findOne({ userId: user.userId })
-    let wallet = await getWalletWithSortedTransactionsAggregation({userId:user.userId})
+    const LIMIT = 10
+    const startIndex = (Number(page) - 1) * LIMIT
+    const currentWallet = await walletModel.find({ userId: user.userId })
+    const total = currentWallet ? currentWallet[0]?.transactions.length : 0
+    const numberOfPages = Math.ceil(total / LIMIT)
+
+    let wallet = await getWalletWithSortedTransactionsAggregation({
+      userId: user.userId,
+      skip: startIndex,
+      limit: LIMIT
+    })
     if (!wallet) {
       wallet = await walletModel.create({
         userId: user.userId,
@@ -18,7 +28,9 @@ const getWalletController = async (req, res, next) => {
     }
     res.render('user/profile/wallet', {
       ...viewUsersPage,
-      wallet
+      wallet,
+      page,
+      numberOfPages
     })
   } catch (error) {
     next(error)
@@ -29,8 +41,8 @@ const addAmountToWalletController = async (req, res, next) => {
   const { creditAmount } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
-    if (!creditAmount || creditAmount < 10 ) {
-      throw new CustomError('amount must be grater than 10',BAD_REQUEST)
+    if (!creditAmount || creditAmount < 10) {
+      throw new CustomError('amount must be grater than 10', BAD_REQUEST)
     }
     const wallet = await walletModel.findOneAndUpdate(
       { userId: user.userId },
@@ -49,7 +61,7 @@ const addAmountToWalletController = async (req, res, next) => {
       },
       { new: true }
     )
-    res.status(OK).json({message:'amount added to wallet', wallet})
+    res.status(OK).json({ message: 'amount added to wallet', wallet })
   } catch (error) {
     next(error)
   }
