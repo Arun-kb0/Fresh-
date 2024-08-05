@@ -35,8 +35,8 @@ const getProfileController = async (req, res, next) => {
       userId
     })
 
-    const wallet = await walletModel.findOne({ userId})
-    const user = await userModel.findOne({ userId})
+    const wallet = await walletModel.findOne({ userId })
+    const user = await userModel.findOne({ userId })
 
     res.render('user/profile/profile', {
       ...viewUsersPage,
@@ -187,8 +187,14 @@ const editUserController = async (req, res, next) => {
 
 
 const getAllOrdersPageController = async (req, res, next) => {
+  const { page = 1 } = req.query
   try {
     const user = JSON.parse(req.cookies.user)
+    const LIMIT = 10
+    const startIndex = (Number(page) - 1) * LIMIT
+    const total = await orderModel.countDocuments({ userId: user.userId })
+    const numberOfPages = Math.ceil(total / LIMIT)
+
     const ordersWithProducts = await orderModel.aggregate([
       {
         $match: {
@@ -242,21 +248,26 @@ const getAllOrdersPageController = async (req, res, next) => {
           createdAt: 1
         }
       },
-      {
-        $sort: { createdAt: -1 }
-      }
+      { $sort: { createdAt: -1 } },
+      { $skip: startIndex },
+      { $limit: LIMIT }
     ])
     console.log('image')
     console.log(ordersWithProducts[0].products[0]?.image[0])
     // res.status(OK).json({ orders:ordersWithProducts[0] })
-    res.render('user/profile/orders', { orders: ordersWithProducts, ...viewUsersPage })
+    res.render('user/profile/orders', {
+      ...viewUsersPage,
+      orders: ordersWithProducts, 
+      page,
+      numberOfPages
+    })
   } catch (error) {
     next(error)
   }
 }
 
 const getOrderDetailsPageController = async (req, res, next) => {
-  let { orderId, isInvoiceDownload =false} = req.query
+  let { orderId, isInvoiceDownload = false } = req.query
   try {
     if (!mongoose.isObjectIdOrHexString(orderId)) {
       console.log('invalid order Id')
@@ -264,15 +275,15 @@ const getOrderDetailsPageController = async (req, res, next) => {
       return
     }
     orderId = mongoose.Types.ObjectId.createFromHexString(orderId)
-    const orderDetails = await getOrderDetailsAggregation({orderId})
-    
+    const orderDetails = await getOrderDetailsAggregation({ orderId })
+
     // * invoice pdf download
     if (isInvoiceDownload) {
       const filePath = path.join(__dirname, '../../../views/user/profile/orderDetails.ejs')
       const renderedFile = await ejs.renderFile(filePath, {
         ...viewUsersPage,
         order: orderDetails,
-        isInvoiceDownload:true,
+        isInvoiceDownload: true,
         paypalClientId: process.env.PAYPAL_CLIENT_ID,
       })
       const file = { content: renderedFile }

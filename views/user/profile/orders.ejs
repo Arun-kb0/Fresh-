@@ -111,6 +111,25 @@
 					</div>
 			</section>
 			<% } %>
+
+			<!-- *pagination  -->
+			<div class="d-flex justify-content-center align-items-center p-2 ">
+				<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
+					<i class="fa-solid fa-chevron-left fa-xs"></i>
+				</button>
+				<div id="pageInfoContainer">
+					<span>
+						<%= page %> out of
+					</span>
+					<span>
+						<%= numberOfPages %>
+					</span>
+				</div>
+				<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+					<i class="fa-solid fa-chevron-right"></i>
+				</button>
+			</div>
+			<!-- *pagination end -->
 	</div>
 	<!-- * orders -->
 
@@ -188,6 +207,12 @@
 		</div>
 	</div>
 
+	<script>
+		const pageDetails = {
+			page: parseInt("<%= page %>"),
+			numberOfPages: parseInt("<%= numberOfPages %>"),
+		} 
+	</script>
 
 	<% scriptBlock=` <script src="/static/user/scripts/user.js">
 		</script>
