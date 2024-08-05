@@ -9,6 +9,13 @@ $(function () {
   const subcategoryDropdownBtn = $("#subcategoryDropdownBtn")
   const sortBtn = $("#sortBtn")
 
+  // * pagination btns
+  const prevBtn = $("#prevBtn")
+  const nextBtn = $("#nextBtn")
+
+  prevBtn.on('click', handlePrev)
+  nextBtn.on('click', handleNext)
+
   sortBtn.on('click', handleSort)
 
 
@@ -75,6 +82,48 @@ $(function () {
       window.location.href = `/products?${name}=${id}&sortValue=${sortValue}`
     }
   }
+
+
+
+  // * pagination
+  let { page, numberOfPages } = pageDetails
+  if (numberOfPages === page) {
+    nextBtn.prop("disabled", true)
+  }
+  if (1 === page) {
+    prevBtn.prop("disabled", true)
+  }
+
+  function handleNext() {
+    if (numberOfPages > page) {
+      page++
+      console.log(page)
+      const queryString = window.location.search;
+      if (queryString) {
+        const params = new URLSearchParams(queryString);
+        params.set('page', page);
+        window.location.href = `${window.location.pathname}?${params.toString()}`;  
+      } else {
+        window.location.href = `/products?page=${page}`
+      }
+    }
+  }
+
+  function handlePrev() {
+    if (1 < page) {
+      page--
+      console.log(page)
+      const queryString = window.location.search;
+      if (queryString) {
+        const params = new URLSearchParams(queryString);
+        params.set('page', page);
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
+      } else {
+        window.location.href = `/products?page=${page}`
+      }
+    }
+  }
+  // * pagination end
 
 
 })

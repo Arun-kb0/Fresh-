@@ -5,7 +5,7 @@ const productModel = require('../../model/productModel')
 const categoryModel = require('../../model/categoryModel')
 const subcategoryModel = require('../../model/subCategoryModel')
 const { default: mongoose } = require("mongoose")
-const { getProductsAggregation} = require('../../helpers/aggregationPipelines')
+const { getProductsAggregation } = require('../../helpers/aggregationPipelines')
 
 
 
@@ -172,7 +172,7 @@ const getSingleProductController = async (req, res, next) => {
     const userId = req?.cookies?.user
       ? JSON.parse(req.cookies.user).userId
       : ''
-    
+
     const product = await productModel.aggregate([
       {
         $match: {
@@ -280,7 +280,7 @@ const getSingleProductController = async (req, res, next) => {
       }
     ])
 
-    
+
     const suggestions = await getProductsAggregation({
       sort: { peopleRated: -1 },
       skip: 0,
@@ -306,9 +306,9 @@ const getProductsProductsPageController = async (req, res, next) => {
 
   try {
     const LIMIT = 10
-    const startIndex = (Number(page) - 1) * LIMIT
-    const total = await productModel.countDocuments({ isDeleted: false })
-    const numberOfPages = Math.ceil(total / LIMIT)
+    let startIndex = (Number(page) - 1) * LIMIT
+    let total = await productModel.countDocuments({ isDeleted: false })
+    let numberOfPages = Math.ceil(total / LIMIT)
 
     console.log('query params of sort products page')
     console.log(categoryId, subcategoryId, sortValue)
@@ -397,7 +397,7 @@ const getProductsProductsPageController = async (req, res, next) => {
         categories,
         subcategories,
         title,
-        radioBtnValue: sortValue ? sortValue : 'aToz' ,
+        radioBtnValue: sortValue ? sortValue : 'aToz',
         page: Number(page),
         numberOfPages
       })
@@ -407,60 +407,69 @@ const getProductsProductsPageController = async (req, res, next) => {
     let products
     if (categoryId) {
       const categoryObjId = mongoose.Types.ObjectId.createFromHexString(categoryId)
-      const result = await categoryModel.aggregate(
-        [
-          {
-            $match: {
-              isDeleted: false,
-              _id: categoryObjId
-            }
-          },
-          {
-            $lookup: {
-              from: "subcategories",
-              localField: "_id",
-              foreignField: "parentId",
-              as: "subcategories"
-            }
-          },
-          {
-            $unwind: "$subcategories"
-          },
-          {
-            $lookup: {
-              from: "products",
-              localField: "subcategories._id",
-              foreignField: "categoryId",
-              as: "products"
-            }
-          },
-          {
-            $unwind: "$products"
-          },
-          {
-            $addFields: {
-              "products.lowercaseName": {
-                $toLower: "$products.name"
-              }
-            }
-          },
-          // { $sort: { "products.lowercaseName": 1 } },
-          { $sort: sortQuery },
-          {
-            $group: {
-              _id: "$_id",
-              image: {
-                $first: "$image"
-              },
-              name: {
-                $first: "$name"
-              },
-              allProducts: {
-                $push: "$products"
-              }
+      const subcategoryDocs = await subcategoryModel
+        .find({ parentId: categoryId })
+        .select('_id')
+        .lean()
+      const subcategoryIds = subcategoryDocs.map(subcategory => subcategory._id)
+      startIndex = (Number(page) - 1) * LIMIT
+      total = await productModel.countDocuments({ categoryId: { $in: subcategoryIds }, isDeleted: false })
+      numberOfPages = Math.ceil(total / LIMIT)
+
+      const result = await categoryModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+            _id: categoryObjId
+          }
+        },
+        {
+          $lookup: {
+            from: "subcategories",
+            localField: "_id",
+            foreignField: "parentId",
+            as: "subcategories"
+          }
+        },
+        {
+          $unwind: "$subcategories"
+        },
+        {
+          $lookup: {
+            from: "products",
+            localField: "subcategories._id",
+            foreignField: "categoryId",
+            as: "products"
+          }
+        },
+        {
+          $unwind: "$products"
+        },
+        {
+          $addFields: {
+            "products.lowercaseName": {
+              $toLower: "$products.name"
             }
           }
-        ])
+        },
+        { $sort: sortQuery },
+        { $skip: startIndex },
+        { $limit: LIMIT },
+        {
+          $group: {
+            _id: "$_id",
+            image: {
+              $first: "$image"
+            },
+            name: {
+              $first: "$name"
+            },
+            allProducts: {
+              $push: "$products"
+            }
+          }
+        }
+      ])
       if (!result || result.length === 0) {
         handleEmptyData()
         return
@@ -469,6 +478,10 @@ const getProductsProductsPageController = async (req, res, next) => {
       products = result[0].allProducts
     } else if (subcategoryId) {
       const subcategoryObjId = mongoose.Types.ObjectId.createFromHexString(subcategoryId)
+      startIndex = (Number(page) - 1) * LIMIT
+      total = await productModel.countDocuments({ categoryId: subcategoryId, isDeleted: false })
+      numberOfPages = Math.ceil(total / LIMIT)
+
       products = await productModel.aggregate([
         {
           $match: {
@@ -512,7 +525,7 @@ const getProductsProductsPageController = async (req, res, next) => {
       categories,
       subcategories,
       title,
-      radioBtnValue:sortValue,
+      radioBtnValue: sortValue,
       page: Number(page),
       numberOfPages
     })
