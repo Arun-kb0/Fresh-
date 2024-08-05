@@ -57,91 +57,94 @@
 	</div>
 	<!-- * alert end -->
 
-	<% if(cart) {%>
+	<% if (cart) {%>
 
 		<!-- * user cart -->
-		<div class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 ">
+		<div class="d-flex justify-content-center">
+			<div class="position-relative container d-block d-sm-flex  col-12 my-5 userCheckoutCartContainer">
+				<!-- <div class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 "> -->
 
-			<!-- * card section -->
-			<section class="col-7 ">
-				<% for(const item of cart.products) {%>
-					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+				<!-- * card section -->
+				<section class="col-xl-7 col-lg-8 col-md-8 col-sm-8  col-12 order-2 order-sm-1 ">
+					<% for(const item of cart.products) {%>
+						<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+							<div class="px-2 d-flex justify-content-center align-items-center">
+								<img class="cartImage shadow-sm rounded-3 m-2" src="<%= item.image[0] %>" class="card-img-top"
+									alt="...">
+							</div>
+							<div class="card-body">
+								<h5 class="card-title" id="name">
+									<%= item.name %>
+								</h5>
+								<% if(item.stock> 0) {%>
+									<small class="text-secondary" id="stock">In stock</small>
+									<% } else { %>
+										<small class="text-danger" id="stock">out of stock</small>
+										<% } %>
+											<p class="text-secondary">sold by <span>
+													<%= item?.soldBy %>
+												</span>
+											</p>
 
+											<h5 class="priceTextColor" id="price">₹<%= item.price %>
+											</h5>
 
-
-						<img class="cartImage shadow-sm rounded-3 m-2" src="<%= item.image[0] %>" class="card-img-top" alt="...">
-						<div class="card-body">
-							<h5 class="card-title" id="name">
-								<%= item.name %>
-							</h5>
-							<% if(item.stock> 0) {%>
-								<small class="text-secondary" id="stock">In stock</small>
-								<% } else { %>
-									<small class="text-danger" id="stock">out of stock</small>
-									<% } %>
-										<p class="text-secondary">sold by <span>
-												<%= item?.soldBy %>
-											</span>
-										</p>
-
-										<h5 class="priceTextColor" id="price">₹<%= item.price %>
-										</h5>
-
-										<div class="d-flex flex-wrap justify-content-between align-items-center">
-											<div class="h-25">
-												<a class="btn btn-outline-info rounded-circle m-1 incQtyBtn" name="incQtyBtn">
-													<i class="fa-solid fa-plus"></i>
-												</a>
-												<input type="number" data-productId=<%=item.productId %>
-												value="<%= item.quantity %>" disabled
-													class="w-25 h-25 col-2 text-center">
-													<a class="btn btn-outline-info rounded-circle m-1 decQtyBtn" name="decQtyBtn">
-														<i class="fa-solid fa-minus"></i>
+											<div class="d-flex flex-wrap justify-content-between align-items-center">
+												<div class="h-25 ">
+													<a class="btn btn-outline-info rounded-circle m-1 incQtyBtn" name="incQtyBtn">
+														<i class="fa-solid fa-plus"></i>
 													</a>
-											</div>
+													<input type="number" data-productId=<%=item.productId %>
+													value="<%= item.quantity %>" disabled
+														class="w-25 h-25 col-2 text-center">
+														<a class="btn btn-outline-info rounded-circle m-1 decQtyBtn" name="decQtyBtn">
+															<i class="fa-solid fa-minus"></i>
+														</a>
+												</div>
 
-											<div>
-												<a class="btn btn-outline-danger rounded-circle m-1 deleteCartItemBtn"
-													data-productId=<%=item.productId %> >
-													<i class="fa-solid fa-trash"></i>
-												</a>
-												<a href="#" class="btn btn-outline-info rounded-circle m-1">
-													<i class="fa-solid fa-bookmark"></i>
-												</a>
-												<a href="#" class="btn btn-outline-info rounded-pill m-1">See more like this</a>
-												<a href="#" class="btn btn-outline-info rounded-circle m-1">
-													<i class="fa-solid fa-share-nodes"></i>
-												</a>
-											</div>
+												<div class="d-block d-sm-flex">
+													<a class="btn btn-outline-danger rounded-circle m-1 deleteCartItemBtn"
+														data-productId=<%=item.productId %> >
+														<i class="fa-solid fa-trash"></i>
+													</a>
+													<a href="#" class="btn btn-outline-info rounded-circle m-1">
+														<i class="fa-solid fa-bookmark"></i>
+													</a>
+													<a href="#" class="btn btn-outline-info rounded-pill m-1">See more like this</a>
+													<a href="#" class="btn btn-outline-info rounded-circle m-1">
+														<i class="fa-solid fa-share-nodes"></i>
+													</a>
+												</div>
 
-										</div>
+											</div>
+							</div>
 						</div>
-					</div>
-					<% } %>
-			</section>
+						<% } %>
+				</section>
 
-			<!-- * price details -->
-			<section id="priceDetails"
-				class="position-sticky d-flex flex-column justify-content-start p-2 mx-2  col-2">
-				<div class=" shadow rounded-3 p-3">
-					<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
-							<%=cart.totalItems %>
-						</span></h6>
-					<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
-							<%=cart.subTotalPrice %>
-						</span></h6>
-					<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
-							<%= cart.deliveryFee %>
-						</span></h6>
-					<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total">
-							<%=cart.totalPrice %>
-						</span></h5>
+				<!-- * price details -->
+				<!-- <section id="priceDetails" class="position-sticky d-flex flex-column justify-content-start p-2 mx-2  col-2"> -->
+				<section id="priceDetails"
+					class="position-relative mt-3 d-flex flex-column justify-content-center justify-content-sm-start p-2 mx-sm-2 mx-4 mt-4 col-md-3 col-sm-5 col-12 order-1 order-sm-2">
+					<div class=" shadow rounded-3 p-3">
+						<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
+								<%=cart.totalItems %>
+							</span></h6>
+						<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
+								<%=cart.subTotalPrice %>
+							</span></h6>
+						<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
+								<%= cart.deliveryFee %>
+							</span></h6>
+						<h5 class="priceTextColor">Total : ₹<span class="fs-5" id="total">
+								<%=cart.totalPrice %>
+							</span></h5>
 						<a href="/cart/checkout" class="btn btn-info rounded-pill">checkout</a>
-				</div>
-			</section>
+					</div>
+				</section>
 
+			</div>
 		</div>
-
 		<% } else{ %>
 			<!-- * cart empty section -->
 			<section
@@ -156,8 +159,6 @@
 			<!-- * cart empty section end-->
 
 			<% } %>
-
-
 
 
 

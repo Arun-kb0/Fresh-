@@ -59,201 +59,208 @@
 
 
 	<!-- * user cart -->
-	<div class="position-relative container d-sm-flex justify-content-center  flex-sm-row flex-cloumn col-12 my-5 userCheckoutCartContainer">
+	<div class="d-flex justify-content-center ">
 
-		<!-- * address and payment -->
-		<div class="col-7">
-			<!-- * addresses -->
-			<section class="col-12 form-check" id="addressContainer">
-				<h4 class="addressTitle rounded-top p-2 text-center text-info">Your addresses</h4>
-				<% let i=1 %>
-					<% for(const item of checkoutCart.addresses){ %>
-						<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+		<div	class="position-relative container d-block d-sm-flex  col-12 my-5 userCheckoutCartContainer">
 
-							<div class="card-body mx-3 d-flex flex-column ">
-								<input class="form-check-input" type="radio" name="addressRadioBtn" data-addressId="<%= item._id %>"
-									data-title="Address <%= i %>" id="<%= 'addressRadioBtn'+i %>" <%=i===1 ? 'checked' : '' %>
-								>
-								<label class="form-check-label h6 mx-3 mt-1" for="<%= 'addressRadioBtn'+i %>">
-									Address <%= i++ %>
-								</label>
+			<!-- * address and payment -->
+			<div class="col-md-7 col-sm-8  col-12 order-2 order-sm-1">
+				<!-- * addresses -->
+				<section class="col-12 form-check" id="addressContainer">
+					<h4 class="addressTitle rounded-top p-2 text-center text-info">Your addresses</h4>
+					<% let i=1 %>
+						<% for(const item of checkoutCart.addresses){ %>
+							<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
 
-								<span class="text-secondary fs-5 ">
-									<%= item.name %>
-								</span>
-								<span class="text-secondary fs-5 ">
-									<%= item.flatNo %>
-								</span>
-								<span class="text-secondary fs-5 ">
-									<%= item.phone %>
-								</span>
-								<span class="text-secondary fs-5 ">
-									<%= item.email %>
-								</span>
-								<span class="text-secondary fs-5 ">
-									<%= item.place %> ,
-										<%= item.city %> ,
-											<%= item.state %> ,
-												<%= item.country %> ,
-								</span>
-								<span class="text-secondary">
-									<%= item.pinCode %>
-								</span>
+								<div class="card-body mx-3 d-flex flex-column ">
+									<input class="form-check-input" type="radio" name="addressRadioBtn" data-addressId="<%= item._id %>"
+										data-title="Address <%= i %>" id="<%= 'addressRadioBtn'+i %>" <%=i===1 ? 'checked' : '' %>
+									>
+									<label class="form-check-label h6 mx-3 mt-1" for="<%= 'addressRadioBtn'+i %>">
+										Address <%= i++ %>
+									</label>
 
+									<span class="text-secondary fs-5 ">
+										<%= item.name %>
+									</span>
+									<span class="text-secondary fs-5 ">
+										<%= item.flatNo %>
+									</span>
+									<span class="text-secondary fs-5 ">
+										<%= item.phone %>
+									</span>
+									<span class="text-secondary fs-5 ">
+										<%= item.email %>
+									</span>
+									<span class="text-secondary fs-5 ">
+										<%= item.place %> ,
+											<%= item.city %> ,
+												<%= item.state %> ,
+													<%= item.country %> ,
+									</span>
+									<span class="text-secondary">
+										<%= item.pinCode %>
+									</span>
+
+								</div>
 							</div>
+							<% } %>
+
+								<div class="d-flex justify-content-center mb-3 mt-2">
+									<a class="btn btn-outline-secondary rounded-pill" href="/profile/address">Add new Address</a>
+								</div>
+								<div class="d-flex justify-content-center">
+									<button id="selectAddressBtn" class="btn btn-outline-info btn-lg rounded-pill px-3 p-1"> Select
+										address</button>
+								</div>
+				</section>
+				<!-- * addresses end -->
+
+				<!-- * payment -->
+				<section class="col-12 my-5 form-check" id="paymentMethodContainer">
+					<h4 class="addressTitle rounded-top p-2 text-center text-info">Payment</h4>
+					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+						<div class="card-body mx-3 d-flex flex-column">
+							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn1"
+								data-title="Wallet" checked>
+							<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn1" name="wallet"
+								id="paymentRadioBtnLabel">
+								wallet
+							</label>
+							<span class="text-secondary h6 mx-2">
+								Available amount : ₹2000
+							</span>
 						</div>
-						<% } %>
-
-							<div class="d-flex justify-content-center mb-3 mt-2">
-								<a class="btn btn-outline-secondary rounded-pill" href="/profile/address">Add new Address</a>
-							</div>
-							<div class="d-flex justify-content-center">
-								<button id="selectAddressBtn" class="btn btn-outline-info btn-lg rounded-pill px-3 p-1"> Select
-									address</button>
-							</div>
-			</section>
-			<!-- * addresses end -->
-
-			<!-- * payment -->
-			<section class="col-12 my-5 form-check" id="paymentMethodContainer">
-				<h4 class="addressTitle rounded-top p-2 text-center text-info">Payment</h4>
-				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
-					<div class="card-body mx-3 d-flex flex-column">
-						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn1"
-							data-title="Wallet" checked>
-						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn1" name="wallet"
-							id="paymentRadioBtnLabel">
-							wallet
-						</label>
-						<span class="text-secondary h6 mx-2">
-							Available amount : ₹2000
-						</span>
 					</div>
-				</div>
-				<hr class="my-1">
+					<hr class="my-1">
 
-				<h5>Other payment methods</h5>
-				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
-					<div class="card-body mx-3 d-flex flex-column">
-						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn2"
-							data-title="Paypal" checked>
-						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn2" name="paypal"
-							id="paymentRadioBtnLabel2">
-							Paypal
-						</label>
-						<span class="text-info h6 mx-2">
-							<i class="fa-brands fa-cc-mastercard fa-2x "></i>
-							<i class="fa-solid fa-credit-card fa-2x ml-1"></i>
-							<i class="fa-brands fa-google-pay fa-2x ml-1"></i>
-							<i class="fa-brands fa-amazon-pay fa-2x ml-1"></i>
-							<i class="fa-brands fa-apple-pay fa-2x ml-1"></i>
-						</span>
+					<h5>Other payment methods</h5>
+					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+						<div class="card-body mx-3 d-flex flex-column">
+							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn2"
+								data-title="Paypal" checked>
+							<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn2" name="paypal"
+								id="paymentRadioBtnLabel2">
+								Paypal
+							</label>
+							<span class="text-info h6 mx-2">
+								<i class="fa-brands fa-cc-mastercard fa-2x "></i>
+								<i class="fa-solid fa-credit-card fa-2x ml-1"></i>
+								<i class="fa-brands fa-google-pay fa-2x ml-1"></i>
+								<i class="fa-brands fa-amazon-pay fa-2x ml-1"></i>
+								<i class="fa-brands fa-apple-pay fa-2x ml-1"></i>
+							</span>
+						</div>
 					</div>
-				</div>
 
-				<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
-					<div class="card-body mx-3 d-flex flex-column">
-						<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn3" data-title="COD"
-							checked>
-						<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn3" name="cod" id="paymentRadioBtnLabel3">
-							Pay on delivery / Cash on delivery
-						</label>
-						<span class="text-secondary h6 mx-2">
-							Cash , upi and cards accepted
-						</span>
+					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+						<div class="card-body mx-3 d-flex flex-column">
+							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn3" data-title="COD"
+								checked>
+							<label class="form-check-label h6  mx-3 mt-1" for="paymentRadioBtn3" name="cod"
+								id="paymentRadioBtnLabel3">
+								Pay on delivery / Cash on delivery
+							</label>
+							<span class="text-secondary h6 mx-2">
+								Cash , upi and cards accepted
+							</span>
+						</div>
 					</div>
-				</div>
+					<div class="d-flex justify-content-center">
+						<button id="selectPaymentBtn" class="btn btn-outline-info btn-lg rounded-pill px-3 p-1">Select this payment
+							method</button>
+					</div>
+				</section>
+				<!-- * payment end -->
+
 				<div class="d-flex justify-content-center">
-					<button id="selectPaymentBtn" class="btn btn-outline-info btn-lg rounded-pill px-3 p-1">Select this payment
-						method</button>
+					<button class="btn btn-info btn-lg rounded-pill px-3 p-1 paymentBtn">Place order</button>
 				</div>
-			</section>
-			<!-- * payment end -->
 
-			<div class="d-flex justify-content-center">
-				<button class="btn btn-info btn-lg rounded-pill px-3 p-1 paymentBtn">Place order</button>
+				<div class="d-flex justify-content-center">
+					<div id="paypalSection">
+						<div id="paypal-button-container"></div>
+						<p id="result-message"></p>
+					</div>
+				</div>
+
 			</div>
+			<!-- * address and payment end -->
 
-		<div class="d-flex justify-content-center">
-			<div id="paypalSection" >
-				<div id="paypal-button-container"></div>
-				<p id="result-message"></p>
-			</div>
-		</div>
-
-		</div>
-		<!-- * address and payment end -->
-
-
-		<!-- * price details -->
-		<!-- <section id="priceDetails" class="position-relative mt-3 d-flex flex-column justify-content-start p-2 mx-2 col-2"> -->
-		<section class="position-relative mt-3 d-flex flex-column justify-content-start p-2 mx-2 col-3 mt-4" id="priceDetailsContainer">
-			<div class=" col-8  top-0 p-3 shadow rounded-3">
-				<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
-						<%=checkoutCart.totalItems %>
-					</span>
-				</h6>
-				<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
-						<%=checkoutCart.subTotalPrice %>
-					</span>
-				</h6>
-				<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
-						<%= checkoutCart.deliveryFee %>
-					</span>
-				</h6>
-				<div class="my-2">
-					<% let j=0 %>
-						<% for(const coupon of checkoutCart?.unusedCoupons) {%>
-							<a data-code="<%= coupon.code %>" name="<%= coupon.code %>"
-								class="couponBtns d-flex justify-content-center border-1 border-success p-1">
-								<span class="text-success h6 ">
-									get
-									<% if (coupon.discountType==='amount' ){ %>
-										₹<%= coupon.discountValue %> OFF
-											<% }else{%>
-												<%= coupon.discountValue %>% OFF
-													<% } %>
-								</span>
-							</a>
-							<% j++ %>
-								<% if(j>=3){%>
-									<% break %>
-										<% } %>
+			<!-- * price details -->
+			<section
+				class="position-relative mt-3 d-flex flex-column justify-content-center justify-content-sm-start p-2 mx-sm-2 mx-4 mt-4 col-xl-3 col-lg-4 col-md-6 col-sm-5 col-12 order-1 order-sm-2"
+				id="priceDetailsContainer"
+				>
+				<div class=" col-8  top-0 p-3 shadow rounded-3">
+					<h6 class="text-secondary">Total items : <span class="fs-5" id="totalItems">
+							<%=checkoutCart.totalItems %>
+						</span>
+					</h6>
+					<h6 class="text-secondary">Subtotal : ₹<span class="fs-5" id="subTotal">
+							<%=checkoutCart.subTotalPrice %>
+						</span>
+					</h6>
+					<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
+							<%= checkoutCart.deliveryFee %>
+						</span>
+					</h6>
+					<div class="my-2">
+						<% let j=0 %>
+							<% for(const coupon of checkoutCart?.unusedCoupons) {%>
+								<a data-code="<%= coupon.code %>" name="<%= coupon.code %>"
+									class="couponBtns d-flex justify-content-center border-1 border-success p-1">
+									<span class="text-success h6 ">
+										get
+										<% if (coupon.discountType==='amount' ){ %>
+											₹<%= coupon.discountValue %> OFF
+												<% }else{%>
+													<%= coupon.discountValue %>% OFF
+														<% } %>
+									</span>
+								</a>
+								<% j++ %>
+									<% if(j>=3){%>
+										<% break %>
 											<% } %>
+												<% } %>
+					</div>
+					<h6 class="d-none border-1 border-success">Applied coupon :
+						<span class="fs-5 text-success" id="coupon">
+							<%= appliedCouponDetails?.discountValue %>
+						</span>
+						<a id="removeCouponBtn"><i class="fa-regular fa-circle-xmark"></i></a>
+					</h6>
+					<h6 class="d-none text-secondary text-decoration-line-through ">₹<span class="fs-5v " id="prevTotal">
+						</span>
+					</h6>
+
+					<h5 class="priceTextColor ">Total : ₹<span class="fs-5" id="total">
+							<%=checkoutCart.totalPrice %>
+						</span>
+					</h5>
+					<div class="d-flex justify-content-between my-1 mb-3">
+						<input class="form-control mr-1 w-75" type="text" placeholder="coupon code" />
+						<button class="btn btn-primary rounded-pill" id="applyCouponBtn">Apply</button>
+					</div>
+
+					<div>
+						<h6 class="text-secondary">Address : <span id="priceDetailsAddress" class="text-primary"> </span></h6>
+						<h6 class="text-secondary">payment Method : <span id="priceDetailsPaymentMethod" class="text-primary">
+							</span></h6>
+					</div>
+
+					<button id="showAddressSectionBtn" class="btn btn-outline-info rounded-pill px-3 p-1 my-2 w-100"> Go to
+						address
+						selection</button>
+					<button id="showPaymentSectionBtn" class="btn btn-outline-info rounded-pill px-3 p-1 my-2 w-100">Go to payment
+						selection</button>
+					<button class="btn btn-info rounded-pill w-100 my-2  paymentBtn ">Place order</button>
 				</div>
-				<h6 class="d-none border-1 border-success">Applied coupon :
-					<span class="fs-5 text-success" id="coupon">
-						<%= appliedCouponDetails?.discountValue %>
-					</span>
-					<a id="removeCouponBtn"><i class="fa-regular fa-circle-xmark"></i></a>
-				</h6>
-				<h6 class="d-none text-secondary text-decoration-line-through ">₹<span class="fs-5v " id="prevTotal">
-					</span>
-				</h6>
 
-				<h5 class="priceTextColor ">Total : ₹<span class="fs-5" id="total">
-						<%=checkoutCart.totalPrice %>
-					</span>
-				</h5>
-				<div class="d-flex justify-content-between my-1 mb-3">
-					<input class="form-control mr-1 w-75" type="text" placeholder="coupon code" />
-					<button class="btn btn-primary rounded-pill" id="applyCouponBtn">Apply</button>
-				</div>
+			</section>
 
-				<div>
-					<h6 class="text-secondary">Address :  <span id="priceDetailsAddress" class="text-primary"> </span></h6>
-					<h6 class="text-secondary">payment Method : <span id="priceDetailsPaymentMethod" class="text-primary"> </span></h6>
-				</div>
-
-				<button id="showAddressSectionBtn" class="btn btn-outline-info rounded-pill px-3 p-1 my-2 w-100"> Go to address
-					selection</button>
-				<button id="showPaymentSectionBtn" class="btn btn-outline-info rounded-pill px-3 p-1 my-2 w-100">Go to payment
-					selection</button>
-				<button class="btn btn-info rounded-pill w-100 my-2  paymentBtn ">Place order</button>
-			</div>
-
-		</section>
-
+		</div>
 	</div>
 
 
