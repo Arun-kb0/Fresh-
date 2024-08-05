@@ -61,7 +61,7 @@
 			</div>
 		</div>
 		<!-- * alert end -->
-		 
+
 		<% } %>
 
 			<!-- * orders details-->
@@ -71,9 +71,9 @@
 				<section class="card">
 
 					<div
-						class="card-body d-flex justify-content-between <%= isInvoiceDownload ? 'flex-column mb-2' : 'flex-row'  %>">
+						class="card-body d-md-flex justify-content-between <%= isInvoiceDownload ? 'flex-column mb-2' : 'flex-row'  %>">
 						<div class="d-flex flex-column mx-2">
-							<% if(isInvoiceDownload) {%>
+							<% if (isInvoiceDownload) {%>
 								<h3>address details</h3>
 								<% } else { %>
 									<span class="text-secondary h5">Shipping Address</span>
@@ -129,7 +129,7 @@
 										<% if(!isInvoiceDownload && order.orderStatus==='Delivered' ){ %>
 											<button id="invoiceDownloadBtn" class="btn btn-outline-info rounded-pill">Download
 												invoice</button>
-								<% } %>
+											<% } %>
 						</div>
 
 					</div>
@@ -204,13 +204,13 @@
 					<h3>product details</h3>
 					<% } %>
 						<!-- * ordered items -->
-						<% for(const product of order.products) {%>
+						<% for (const product of order.products) {%>
 							<section class="card mt-4 shadow-sm ">
 
-								<div class="card-body d-flex">
+								<div class="card-body d-md-flex">
 									<% if(!isInvoiceDownload) {%>
-										<div class=" d-flex shadow rounded m-3 col-2 orderDetailsImageContainer">
-											<img class="p-1 orderDetailsImage" src="<%= product.image[0].path %>" alt="">
+										<div class=" d-flex shadow rounded m-3 col-lg-2 col-md-3 col-sm-4  col-12  orderDetailsImageContainer">
+											<img class="p-1 w-100 h-100" src="<%= product.image[0].path %>" alt="">
 										</div>
 										<% } %>
 											<div class="d-flex flex-column mx-3 justify-content-start col-6">
@@ -269,8 +269,8 @@
 												<% } %>
 								</div>
 							</section>
-							<% } %>
-								<!-- * ordered items end -->
+						<% } %>
+						<!-- * ordered items end -->
 
 			</div>
 			<!-- * orders -->
@@ -354,14 +354,13 @@
 				<%}%>
 
 
-					<% scriptBlock=` 
-						<script
-							src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
-							data-sdk-integration-source="developer-studio">
+					<% scriptBlock=` <script
+						src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
+						data-sdk-integration-source="developer-studio">
 						</script>
 
-						<script> var addressId = ${JSON.stringify(order.addressDetails._id) }  </script>
-						<script> var orderId = ${JSON.stringify(order._id) }  </script>
+						<script> var addressId = ${ JSON.stringify(order.addressDetails._id) }  </script>
+						<script> var orderId = ${ JSON.stringify(order._id) }  </script>
 						<script src="/static/user/scripts/user.js">	</script>
 						<script src="/static/user/scripts/orders.js"></script>
 
