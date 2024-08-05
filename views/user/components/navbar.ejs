@@ -1,23 +1,21 @@
 <!-- header -->
 
-<div class="top-header-area navbarColor " id="sticker">
+<div class="top-header-area navbarColor" id="sticker">
   <!-- * top nav start -->
   <div class="container w-100 justify-content-between align-items-center d-lg-flex d-none" id="navbarTop">
     <a href="/">
       <h3 class="orangeTextColor">Fresh</h3>
     </a>
     <div>
-      <h5 class="text-white text-truncate" style="max-width: 200px;">Delivery to Ernakulam 131231 ada</h5>
+      <a class="h5 text-white text-truncate" href="/profile/address" style="max-width: 200px;">Address</a>
     </div>
 
-    <!-- * search bar -->
+    <!-- * search bar --> 
     <div class="input-group mb-3 w-50 rounded-5 ">
       <input type="text" class="form-control rounded-5" id="searchInput" placeholder="search">
-      
       <button  class="input-group-text btn btn-sm"  id="searchBtn">
         <i class="fas fa-search"></i>
       </button>
-
     </div>
 
     <div class="header-icons d-flex">
@@ -26,7 +24,7 @@
           data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fa-solid fa-user "></i>
         </a>
-        <ul class="dropdown-menu  " id="navUserDropdown">
+        <ul class="dropdown-menu" id="navUserDropdown">
           <li id="loginSection">
             <a class="dropdown-item text-dark" href="auth/login">Login</a>
             <a class="dropdown-item text-dark" id="logoutBtn" style="display: none;">Logout</a>
@@ -56,40 +54,14 @@
           <!-- * categories start -->
           <nav class="main-menu h-50">
             <ul>
-              <li class="current-list-item"><a href="#">Home</a>
-                <ul class="sub-menu">
-                  <li><a href="index.html">Static Home</a></li>
-                  <li><a href="index_2.html">Slider Home</a></li>
-                </ul>
-              </li>
-              <li><a href="about.html">Groceries</a></li>
-              <li><a href="#">Home & kitchen</a>
-                <ul class="sub-menu">
-                  <li><a href="404.html">Home & kitchen</a></li>
-                  <li><a href="about.html">Beauty</a></li>
-                  <li><a href="cart.html">Wellness</a></li>
-                  <li><a href="checkout.html">Home improvement</a></li>
-                  <li><a href="contact.html">All categories</a></li>
-                  <li><a href="news.html">News</a></li>
-                  <li><a href="shop.html">Shop</a></li>
-                </ul>
-              </li>
-              <li><a href="news.html">Beauty</a>
-                <ul class="sub-menu">
-                  <li><a href="news.html">News</a></li>
-                  <li><a href="single-news.html">Single News</a></li>
-                </ul>
-              </li>
-              <li><a href="contact.html">Wellness</a></li>
-              <li><a href="shop.html">Home improvement</a>
-                <ul class="sub-menu">
-                  <li><a href="shop.html">All categories</a></li>
-                  <li><a href="checkout.html">Check Out</a></li>
-                  <li><a href="single-product.html">Single Product</a></li>
-                  <li><a href="cart.html">Cart</a></li>
-                </ul>
-              </li>
-              <li><a href="/products">All categories</a>
+              <li><a href="/">Home</a> </li>
+              <li><a href="/profile/wallet">Wallet</a></li>
+              <li><a href="/profile/wishlist">Wishlist</a></li>
+              <li><a href="/cart">Cart</a></li>
+              <li><a href="/profile/coupons">Coupons</a></li>
+              <li><a href="/profile/orders">Orders</a></li>
+              <li><a href="/profile">profile</a></li>
+              <li><a href="/products">All categories</a></li>
               <li></li>
             </ul>
           </nav>
@@ -104,3 +76,22 @@
 
 </div>
 <!-- end header -->
+
+<!-- * search smaller screen-->
+<div class="search-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <span class="close-btn"><i class="fas fa-window-close"></i></span>
+        <div class="search-bar">
+          <div class="search-bar-tablecell">
+            <h3>Search For:</h3>
+            <input id="searchInputSm" type="text" placeholder="Keywords">
+            <button class="btn btn-outline-warning rounded-pill btn-lg" id="searchBtnSm">Search <i class="fas fa-search"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- *search smaller screen end-->

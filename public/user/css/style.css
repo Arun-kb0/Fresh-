@@ -6,11 +6,12 @@
   background-color: #051922
 }
 
-/* 
-.categoryBar{
-  height: auto;
+@media (max-width: 991.98px) {
+  #sticker {
+    padding-bottom: 80px !important;
+  }
+}
 
-} */
 
 .orangeTextColor {
   color: #F28123
