@@ -130,9 +130,9 @@
 
 .productImageSection {
   position: sticky !important;
-  top: 100px;
-  left: 0;
   align-self: flex-start;
+  top: 100px; 
+  left: 0;
 }
 
 .productDetailsList {
@@ -256,6 +256,13 @@
   max-height: 360px;
   min-width: 200px;
 }
+
+.filterSection{
+  max-height: 606px;
+}
+
+
+/* * show all categories end */
 
 .wishlistBtnIcon {
   color: #FF5A5F
