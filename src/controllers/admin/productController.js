@@ -13,7 +13,7 @@ const getProductController = async (req, res, next) => {
   const { page = 1 } = req.query
   try {
 
-    const LIMIT = 6
+    const LIMIT = 10
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await productModel.countDocuments({ isDeleted: false })
     const numberOfPages = Math.ceil(total / LIMIT)

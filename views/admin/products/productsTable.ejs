@@ -87,7 +87,11 @@
                             <%= item.price %>
                           </td>
                           <td>
-                            <%= item?.offer %>
+                            <% if(item.offer?.discountType==='amount') {%>
+                              ₹<%= item?.offer?.discountValue %> OFF
+                            <% }else if(item.offer?.discountType==='percentage') { %>
+                              <%= item?.offer?.discountValue %>% OFF
+                            <% } %>
                           </td>
                           <td>
                             <%= item.finalPrice %>
