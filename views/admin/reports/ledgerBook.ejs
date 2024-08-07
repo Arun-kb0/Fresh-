@@ -64,11 +64,11 @@
                       <% if(ledgerBook) { %>
                       <% for (const item of ledgerBook?.transactions) {%>
                         <tr>
-                          <td>
+                          <td class="createdAt">
                             <%= item.date %>
                           </td>
-                          <td>
-                            <%= item.amount %>
+                          <td class="<%= item.type==='Credit' ? 'text-success' : 'text-danger' %>">
+                            ₹ <%= item.amount %>
                           </td>
                           <td>
                             <%= item.type %>
@@ -77,7 +77,7 @@
                             <%= item.message %>
                           </td>
                           <td>
-                            <%= item.balanceAfterTransaction %>
+                            ₹ <%= item.balanceAfterTransaction %>
                           </td>
                         </tr>
                      <% } %>
