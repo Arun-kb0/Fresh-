@@ -54,7 +54,6 @@ const getOrderTotal = async ({ deliveryFee = 10, order }) => {
 
 const cancelOrReturnWholeOrder = async ({ userId, orderId, order, orderStatus, paymentStatus,noCheck=false }) => {
   try {
-    // ! Returned cod Completed
     const paymentMethod = order.paymentMethod
     console.log('cancelOrReturnWholeOrder')
     console.log(orderStatus, paymentMethod, paymentStatus)

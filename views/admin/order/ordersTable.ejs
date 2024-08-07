@@ -63,17 +63,17 @@
                     <tbody class="table-border-bottom-0">
 
 
-                      <% for (const item of orders){%>
+                      <% for (const item of orders) {%>
                         <tr>
 
                           <td>
                             <div class="orderImageCollection d-flex flex-wrap">
-                              <% let n = item.products.length < 6  ? item.products.length : 6  %>
+                              <% let n = item?.products?.length < 6  ? item?.products?.length : 6  %>
                               <% for(let i=0; i < n ; i++) {%>
                               <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
                                 <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up"
                                   title= "<%= item.name %>">
-                                  <img src="<%= item?.products[i].image[0]?.path %>" alt="<%= item?.products[i].image[0]?.originalName %>" class="rounded-circle" />
+                                  <img src="<%= item?.products?.[i].image?.[0]?.path %>" alt="<%= item?.products?.[i]?.image?.[0]?.originalName %>" class="rounded-circle" />
                                 </li>
                               </ul>
                               <% } %>

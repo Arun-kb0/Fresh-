@@ -10,16 +10,16 @@ const productModel = require("../../model/productModel")
 const walletModel = require("../../model/walletModel")
 const couponModel = require("../../model/couponModel")
 const { getOrderTotal, cancelOrReturnWholeOrder } = require("../../helpers/orderHelpers")
+const { createLedgerBookTransaction } = require("../../helpers/ledgerBookHelpers")
 
 
 const getAllOrdersAdminPageController = async (req, res, next) => {
   const { page = 1 } = req.query
   try {
-    const LIMIT = 4
+    const LIMIT = 10
     const startIndex = (Number(page) - 1) * LIMIT
     const total = await orderModel.countDocuments()
     const numberOfPages = Math.ceil(total / LIMIT)
-
 
     const orderDetails = await orderModel.aggregate([
       {
@@ -75,12 +75,6 @@ const getAllOrdersAdminPageController = async (req, res, next) => {
       { $limit: LIMIT }
     ]);
 
-    // res.status(OK).json({
-    //   orders: orderDetails,
-    //   page: Number(page),
-    //   numberOfPages,
-    // })
-
     res.render('admin/order/ordersTable', {
       ...viewAdminPage,
       orders: orderDetails,
@@ -118,6 +112,24 @@ const changeOrderStatusController = async (req, res, next) => {
       paymentStatus = paymentStatusValues.Failed
     }
 
+    
+
+    if (currentOrder.paymentMethod === 'cod'
+      && status === orderStatusValues.Delivered
+      && paymentStatus === 'Completed') {
+      await createLedgerBookTransaction({
+        amount: currentOrder.total,
+        message: 'Product sold',
+        type: 'Credit'
+      })
+    } else if (status === orderStatusValues.Returned && paymentStatus === 'Refunded') {
+      await createLedgerBookTransaction({
+        amount: currentOrder.total,
+        type:'Debit',
+        message: `order ${status}`,
+      })
+
+    }
 
     const filteredProductIds = currentOrder.products
       .filter((product) => {
@@ -136,9 +148,11 @@ const changeOrderStatusController = async (req, res, next) => {
       order: currentOrder,
       orderStatus: status,
       paymentStatus,
-      noCheck:noCheck
+      noCheck: noCheck
     })
     // console.log(updatedOrder)
+
+
 
     const lastUpdatedOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
@@ -245,7 +259,7 @@ const singleOrderStatusChangeController = async (req, res, next) => {
     }
 
 
-    console.log('products length ' ,order.products.length )
+    console.log('products length ', order.products.length)
     // * total calculation
     const deliveryFee = 10
     let orderActualTotal = 0

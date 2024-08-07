@@ -14,6 +14,7 @@ const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues 
 const walletModel = require("../../model/walletModel")
 const { getCartWithDetailsAggregation, cartCheckoutAggregation } = require("../../helpers/aggregationPipelines")
 const { cancelOrReturnWholeOrder } = require("../../helpers/orderHelpers")
+const { createLedgerBookTransaction } = require("../../helpers/ledgerBookHelpers")
 
 let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
 
@@ -321,7 +322,6 @@ const orderUsingCodController = async (req, res, next) => {
       coupon: cart.coupon ? cart.coupon : null
     });
 
-
     await cartModel.findOneAndUpdate(
       { userId: user.userId },
       {
@@ -463,6 +463,11 @@ const orderSuccessPaypalController = async (req, res, next) => {
         { $set: { paymentStatus: 'Completed' } },
         {new:true}
       )
+      await createLedgerBookTransaction({
+        amount: newOrder.total,
+        message: 'Product sold',
+        type: 'Credit'
+      })
       res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
       return
     }
@@ -484,6 +489,14 @@ const orderSuccessPaypalController = async (req, res, next) => {
         paymentSource,
       }
     });
+
+    await createLedgerBookTransaction({
+      amount: cart.total,
+      message: 'Product sold',
+      type: 'Credit'
+    })
+
+
 
     console.log(cart.total)
     console.log(newOrder.total)
@@ -655,6 +668,16 @@ const cancelOrderController = async (req, res, next) => {
       orderStatus: orderStatusValues.Cancelled,
       paymentStatus,
     })
+
+    if (order.paymentStatus === 'Completed') {
+      await createLedgerBookTransaction({
+        amount: order.total,
+        message: 'order returned',
+        type: "Debit",
+      })
+    }
+    
+    
 
     // console.log(cancelledOrder)
     res.status(OK).json({ message: "order cancelled", order: cancelledOrder })

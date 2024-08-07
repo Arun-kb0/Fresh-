@@ -5,6 +5,7 @@ const { viewAdminPage, viewPageNotFound } = require("../../constants/pageConfid"
 const { uploadImageToFirebase } = require("../../helpers/uploadImage")
 const productModel = require("../../model/productModel")
 const subCategoryModel = require("../../model/subCategoryModel")
+const { createLedgerBookTransaction } = require("../../helpers/ledgerBookHelpers")
 
 
 // * get product list page
@@ -225,10 +226,8 @@ const createProductController = async (req, res, next) => {
   const { name, subCategory, subCategoryId, id, price, finalPrice, rating, peopleRated, stock, ...rest } = req.body
   try {
     console.log(req.files)
-    // console.log(req.body.name)
     const categoryId = subCategoryId
     const files = req.files
-    // console.log(name)
     if (!stock || !price || !finalPrice || !name) {
       const message = "name , stock , price , final price are required"
       throw new CustomError(message, BAD_REQUEST)
@@ -256,7 +255,7 @@ const createProductController = async (req, res, next) => {
     for (const file of files) {
       images.push(await uploadImageToFirebase(file, 'product'))
     }
-    console.log(images)
+    // console.log(images)
 
     product = {
       image: images,
@@ -272,8 +271,13 @@ const createProductController = async (req, res, next) => {
       }
     }
 
-
     const newProduct = await productModel.create(product)
+    await createLedgerBookTransaction({
+      amount: parseFloat(price) * parseFloat(stock),
+      message: 'Product purchase',
+      type:'Debit'
+    })
+
     res.status(OK).json({ message: "new product created", product: newProduct })
   } catch (error) {
     next(error)
