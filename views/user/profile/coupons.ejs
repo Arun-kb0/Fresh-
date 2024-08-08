@@ -41,7 +41,7 @@
 	<!-- * coupons  -->
 	<section class="container mt-3 d-flex flex-wrap ">
 		<% for(const item of coupons) {%>
-		<div class="couponContainer ml-2 rounded shadow-sm p-1" data-code="<%= item.code %>">
+		<div class="couponContainer ml-2 shadow-sm p-1" data-code="<%= item.code %>">
 			<img src="<%= item.image.path %>" alt="">
 		</div>
 		<% } %>

@@ -33,7 +33,7 @@
 
 
   <!-- * user buttons -->
-  <div class=" container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
+  <div class="container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
 
     <section class="container-sm d-flex justify-content-start flex-wrap align-items-center flex-sm-row flex-column ">
 
@@ -46,8 +46,8 @@
         </div>
       </div>
 
-        <div class="col-sm-8 col-12 justify-content-center">
-          <div class="d-flex justify-content-center ">
+        <div class=" col-sm-8 col-12 justify-content-center">
+          <div class="d-flex justify-content-center py-3   walletTransactionsTitle shadow">
             <h5 class="text-secondary">wallet amount : <span class="text-success">
               ₹<%= wallet?.balance %>
             </span> </h6>
@@ -55,7 +55,7 @@
 
           <div class="my-2">
             <% for(const item of wallet?.transactions) {%>
-              <div class="shadow rounded-3 p-2 px-3 my-2 ">
+              <div class="walletTransactions shadow rounded-3 p-2 px-3 my-2 ">
                 <h6 class="<%= item.credit ? 'text-success' : 'text-danger' %>   "> amount : ₹<span> <%= item.amount %> </span> </h6>
                 <h6 class="text-secondary"> date : <span class="date"> <%= item.date %> </span> </h6>
               </div>

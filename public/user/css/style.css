@@ -191,8 +191,9 @@
 
 /* * profile */
 .userBtnCard {
-  background-color: #F0F2F2;
   width: 350px;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED) !important;
 }
 
 .btnTitle {
@@ -296,11 +297,28 @@
   overflow: hidden,
 }
 
+.ordersCard {
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
+.ordersCardTitle {
+  background-color: var(--BODY-BG-LIGHT);
+}
+
+
+/* * orderDetails  */
+
+.orderDetailsSummaryCard {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
 
 /* * coupons */
 .couponContainer {
   width: 150px;
   height: 150px;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
 }
 
 /* * show all categories */
@@ -311,6 +329,8 @@
 
 .filterSection {
   max-height: 606px;
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+  background-color: var(--CARDS-BG_COLOR);
 }
 
 
@@ -318,4 +338,15 @@
 
 .wishlistBtnIcon {
   color: #FF5A5F
+}
+
+/* * wallet */
+.walletTransactionsTitle {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
+.walletTransactions {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
 }

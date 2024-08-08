@@ -51,7 +51,7 @@
 			<div class="container my-5">
 
 				<!-- * address , payment, order summery -->
-				<section class="card">
+				<section class="card orderDetailsSummaryCard">
 
 					<div
 						class="card-body d-md-flex justify-content-between <%= isInvoiceDownload ? 'flex-column mb-2' : 'flex-row'  %>">
@@ -119,6 +119,7 @@
 				</section>
 				<!-- * address , payment, order summery end -->
 
+				<% if(!isInvoiceDownload) {%>
 				<!-- * payment section -->
 				<section class="col-12 my-5 form-check" id="paymentMethodContainer">
 					<h4 class="addressTitle rounded-top p-2 text-center text-info">Payment</h4>
@@ -182,13 +183,14 @@
 
 				</section>
 				<!-- * payment section end -->
+				 <% } %>
 
 				<% if (isInvoiceDownload) {%>
 					<h3>product details</h3>
 					<% } %>
 						<!-- * ordered items -->
 						<% for (const product of order.products) {%>
-							<section class="card mt-4 shadow-sm ">
+							<section class="card mt-4 ordersCard shadow-sm ">
 
 								<div class="card-body d-md-flex">
 									<% if(!isInvoiceDownload) {%>
