@@ -14,6 +14,10 @@ $(function () {
   const monthDropdown = $("#monthDropdown")
   const yearDropdown = $("#yearDropdown")
 
+  const dayDropdownBtn = $("#dayDropdownBtn")
+  const monthDropdownBtn = $("#monthDropdownBtn")
+  const yearDropdownBtn = $("#yearDropdownBtn")
+
   addDayDropdownValues()
   addYearDropdownValues()
   addMonthDropdownValues()
@@ -114,24 +118,28 @@ $(function () {
   dayDropdown.find('.dropdown-item').on('click', function () {
     const day = $(this).text().trim()
     console.log('handle day', day)
-    // const url = `/admin?day=${day}`
-    // window.location.href = url
+    dayDropdownBtn.text(day)
+    monthDropdownBtn.text('Month')
+    yearDropdownBtn.text('Year')
     updateCategoryWiseOrder({ name: 'day', value: day })
   })
 
   monthDropdown.find('.dropdown-item').on('click', function () {
     const month = $(this).attr('data-value')
+    const monthName = $(this).text().trim()
     console.log('handle month', month)
-    // const url = `/admin?month=${month}`
-    // window.location.href = url
+    monthDropdownBtn.text(monthName)
+    dayDropdownBtn.text('Day')
+    yearDropdownBtn.text('Year')
     updateCategoryWiseOrder({ name: 'month', value: month })
   })
 
   yearDropdown.find('.dropdown-item').on('click', function () {
     const year = $(this).text().trim()
     console.log('handle year', year)
-    // const url = `/admin?year=${year}`
-    // window.location.href = url
+    yearDropdownBtn.text(year)
+    monthDropdownBtn.text('Month')
+    dayDropdownBtn.text('Day')
     updateCategoryWiseOrder({name:'year',value:year})
   })
 

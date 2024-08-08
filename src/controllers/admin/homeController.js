@@ -503,7 +503,10 @@ const getOrdersPerCategoryController = async (req, res, next) => {
       endDate: endDate
     })
 
-    res.status(OK).json({ message: 'get category wise order success ', ordersPerCategories })
+    res.status(OK).json({
+      message: 'get category wise order success ',
+      ordersPerCategories
+    })
   } catch (error) {
     next(error)
   }
