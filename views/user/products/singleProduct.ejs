@@ -40,208 +40,208 @@
 
 
 	<!-- * product details -->
-	<div class="container-fluid d-md-flex justify-content-center flex-sm-row flex-cloumn  singleProductContainer">
-		<!-- * image -->
-		<section class="d-flex col-xl-4 col-lg-5 py-5 productImageSection ">
-			<div class="d-block col-3 ">
-				<% for(const image of product.image) {%>
-					<div class="cardStokeSmallImage p-2 my-2 shadow">
-						<img src="<%= image.path %>" alt="<%= image.originalName  %>">
-					</div>
-					<% } %>
-			</div>
-
-			<!-- * zoom content start -->
-			<div class="productMainImageContainer shadow py-2 px-1">
-				<div class="productMainImage shadow-sm  w-100">
-					<img id="productImage" src="<%= product.image[0].path %>" alt="<%= product.image[0].originalName %>">
-					<div id="magnifier"></div>
-				</div>
-				<div class="d-flex justify-content-center">
-					<button class="btn btn-outline-primary rounded-pill w-100 px-3 addToCartBtn" data-id="<%= product._id %>"
-						data-price="<%= product.finalPrice %>"> Add to Cart</button>
-				</div>
-			</div>
-			<!-- * zoom content end -->
-		</section>
-		<!-- * end image -->
-
-		<!-- * details -->
-		<section class="d-flex col-lg-7 col-md-6 col-12 ml-md-4 justify-content-center align-items-center mt-4">
-			<ul class="productDetailsList col-sm-10 col-12">
-				<li>
-					<h6>
-						<%= product.productInfo?.brand %>
-					</h6>
-				</li>
-				<li>
-					<h4>
-						<%= product.name %>
-							</h3>
-				</li>
-				<li>
-					<div class="d-flex justify-content-between py-2 align-items-center">
-						<section class="d-flex align-items-center">
-							<div class="d-flex align-items-center pb-3 pr-5 ">
-								<% for(let i=0;i< 5 ;i++) {%>
-									<% if(i<product.rating) {%>
-										<i class="fa-solid fa-star fa-lg text-warning"></i>
-										<% } else { %>
-											<i class="fa-regular fa-star fa-lg text-warning"></i>
-											<% } %>
-												<% } %>
-							</div>
-							<div>
-								<span class="h5 text-secondary">
-									<%= product.peopleRated %>
-								</span>
-							</div>
-						</section>
-						<section>
-							<a class="addToWishlistBtn ml-3" data-id="<%= product._id %>">
-								<i
-									class="fa-solid fa-heart fa-xl <%= product.isWishlisted ? 'wishlistBtnIcon' : 'text-secondary'   %>"></i>
-							</a>
-							<a class="text-secondary">
-								<i class="fa-solid fa-share-nodes fa-xl"></i>
-							</a>
-						</section>
-					</div>
-				</li>
-				<li>
-					<div class="flex">
-						<h5 class="priceTextColor">
-							₹ <%= product.finalPrice %>
-						</h5>
-						<% if(product.offer && product?.offer?.discountType) {%>
-							<div class="d-flex">
-								<h5 class=" mr-2 text-secondary textLineTrough mr-3">₹<%= product.price %>
-								</h5>
-								<% if(product.offer.discountType==='percentage' ) { %>
-									<h5 class="text-success">
-										<%= product?.offer.discountValue %>% OFF
-									</h5>
-									<% }else { %>
-										<h5 class="text-success">₹<%= product?.offer.discountValue %> OFF</h5>
-										<% } %>
-							</div>
-							<% } %>
-					</div>
-				</li>
-
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<article class="">
-						<h5>Offers (3)</h5>
-						<div>
-							<h6>ADDITIONAL OFFERS</h6>
-							<p>Rs 100 Cashback on the first purchase of Rs 600 Or Above</p>
-							<small>6 Offer/s Available</small>
-						</div>
-						<div>
-							<h6>ADDITIONAL OFFERS</h6>
-							<p>Rs 100 Cashback on the first purchase of Rs 600 Or Above</p>
-							<small>6 Offer/s Available</small>
-						</div>
-						<button class="btn btn-outline-secondary rounded-pill">
-							<span>View all</span>
-						</button>
-					</article>
-				</li>
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<h5>Deliver to</h5>
-					<div>
-						<p>pin <span>address</span></p>
-						<p class="">
-							<% if(product.stock>0) {%>
-								<span class="text-success">In stock</span>
-								<% }else { %>
-									<span class="text-danger">Out of stock</span>
-									<% } %>
-										Delivery Between 21st Jun to 23rd Jun
-						</p>
-					</div>
-				</li>
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<h5 class="">Sold by</h5>
-					<p>
-						<%= product.productInfo?.soldBy %>
-					</p>
-				</li>
-
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<h5>Features & Details</h5>
-					<p class="text-secondary">
-						<%= product.productInfo?.featuresAndDetails %>
-					</p>
-				</li>
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-				<li>
-					<h5>Description</h5>
-					<p class="text-secondary">
-						<%= product.productInfo?.description %>
-					</p>
-				</li>
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<h5>Product Information</h5>
-					<h6>GENERAL INFORMATION</h6>
-					<div class="d-flex justify-content-between">
-						<span>Brand</span>
-						<span>
-							<%= product.productInfo?.brand %>
-						</span>
-					</div>
-					<div class="d-flex justify-content-between">
-						<span>Manufacturer</span>
-						<span>
-							<%= product.productInfo?.soldBy %>
-						</span>
-					</div>
-					<div class="d-flex justify-content-between">
-						<span>Address</span>
-						<span>
-							<%= product.productInfo?.address %>
-						</span>
-					</div>
-					<button class="btn btn-outline-secondary rounded-pill">
-						<span>Add</span>
-					</button>
-				</li>
-				<li>
-					<div class="w-100 bg-secondary divider"></div>
-				</li>
-
-				<li>
-					<div class="d-flex">
-						<p>Article ID: 491085607</p>
-						<i class="fa-solid fa-copy"></i>
-					</div>
-				</li>
-			</ul>
-		</section>
-		<!-- *end  details -->
-	</div>
+		 <div class="container-fluid d-md-flex justify-content-center flex-sm-row flex-cloumn  singleProductContainer">
+			 <!-- * image -->
+			 <section class="d-flex col-xl-4 col-lg-5 py-5 productImageSection ">
+				 <div class="d-block col-3 ">
+					 <% for(const image of product.image) {%>
+						 <div class="cardStokeSmallImage p-2 my-2 shadow">
+							 <img src="<%= image.path %>" alt="<%= image.originalName  %>">
+						 </div>
+						 <% } %>
+				 </div>
+	 
+				 <!-- * zoom content start -->
+				 <div class="productMainImageContainer shadow py-2 px-1">
+					 <div class="productMainImage shadow-sm  w-100">
+						 <img id="productImage" src="<%= product.image[0].path %>" alt="<%= product.image[0].originalName %>">
+						 <div id="magnifier"></div>
+					 </div>
+					 <div class="d-flex justify-content-center">
+						 <button class="btn btn-outline-primary rounded-pill w-100 px-3 addToCartBtn" data-id="<%= product._id %>"
+							 data-price="<%= product.finalPrice %>"> Add to Cart</button>
+					 </div>
+				 </div>
+				 <!-- * zoom content end -->
+			 </section>
+			 <!-- * end image -->
+	 
+			 <!-- * details -->
+			 <section class="d-flex col-lg-7 col-md-6 col-12 ml-md-4 mt-xxl-1 mt-4 justify-content-center align-items-center ">
+				 <ul class="productDetailsList col-sm-10 col-12">
+					 <li>
+						 <h6>
+							 <%= product.productInfo?.brand %>
+						 </h6>
+					 </li>
+					 <li>
+						 <h4>
+							 <%= product.name %>
+								 </h3>
+					 </li>
+					 <li>
+						 <div class="d-flex justify-content-between py-2 align-items-center">
+							 <section class="d-flex align-items-center">
+								 <div class="d-flex align-items-center pb-3 pr-5 ">
+									 <% for(let i=0;i< 5 ;i++) {%>
+										 <% if(i<product.rating) {%>
+											 <i class="fa-solid fa-star fa-lg text-warning"></i>
+											 <% } else { %>
+												 <i class="fa-regular fa-star fa-lg text-warning"></i>
+												 <% } %>
+													 <% } %>
+								 </div>
+								 <div>
+									 <span class="h5 text-secondary">
+										 <%= product.peopleRated %>
+									 </span>
+								 </div>
+							 </section>
+							 <section>
+								 <a class="addToWishlistBtn ml-3" data-id="<%= product._id %>">
+									 <i
+										 class="fa-solid fa-heart fa-xl <%= product.isWishlisted ? 'wishlistBtnIcon' : 'text-secondary'   %>"></i>
+								 </a>
+								 <a class="text-secondary">
+									 <i class="fa-solid fa-share-nodes fa-xl"></i>
+								 </a>
+							 </section>
+						 </div>
+					 </li>
+					 <li>
+						 <div class="flex">
+							 <h5 class="priceTextColor">
+								 ₹ <%= product.finalPrice %>
+							 </h5>
+							 <% if(product.offer && product?.offer?.discountType) {%>
+								 <div class="d-flex">
+									 <h5 class=" mr-2 text-secondary textLineTrough mr-3">₹<%= product.price %>
+									 </h5>
+									 <% if(product.offer.discountType==='percentage' ) { %>
+										 <h5 class="text-success">
+											 <%= product?.offer.discountValue %>% OFF
+										 </h5>
+										 <% }else { %>
+											 <h5 class="text-success">₹<%= product?.offer.discountValue %> OFF</h5>
+											 <% } %>
+								 </div>
+								 <% } %>
+						 </div>
+					 </li>
+	 
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <article class="">
+							 <h5>Offers (3)</h5>
+							 <div>
+								 <h6>ADDITIONAL OFFERS</h6>
+								 <p>Rs 100 Cashback on the first purchase of Rs 600 Or Above</p>
+								 <small>6 Offer/s Available</small>
+							 </div>
+							 <div>
+								 <h6>ADDITIONAL OFFERS</h6>
+								 <p>Rs 100 Cashback on the first purchase of Rs 600 Or Above</p>
+								 <small>6 Offer/s Available</small>
+							 </div>
+							 <button class="btn btn-outline-secondary rounded-pill">
+								 <span>View all</span>
+							 </button>
+						 </article>
+					 </li>
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <h5>Deliver to</h5>
+						 <div>
+							 <p>pin <span>address</span></p>
+							 <p class="">
+								 <% if(product.stock>0) {%>
+									 <span class="text-success">In stock</span>
+									 <% }else { %>
+										 <span class="text-danger">Out of stock</span>
+										 <% } %>
+											 Delivery Between 21st Jun to 23rd Jun
+							 </p>
+						 </div>
+					 </li>
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <h5 class="">Sold by</h5>
+						 <p>
+							 <%= product.productInfo?.soldBy %>
+						 </p>
+					 </li>
+	 
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <h5>Features & Details</h5>
+						 <p class="text-secondary">
+							 <%= product.productInfo?.featuresAndDetails %>
+						 </p>
+					 </li>
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+					 <li>
+						 <h5>Description</h5>
+						 <p class="text-secondary">
+							 <%= product.productInfo?.description %>
+						 </p>
+					 </li>
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <h5>Product Information</h5>
+						 <h6>GENERAL INFORMATION</h6>
+						 <div class="d-flex justify-content-between">
+							 <span>Brand</span>
+							 <span>
+								 <%= product.productInfo?.brand %>
+							 </span>
+						 </div>
+						 <div class="d-flex justify-content-between">
+							 <span>Manufacturer</span>
+							 <span>
+								 <%= product.productInfo?.soldBy %>
+							 </span>
+						 </div>
+						 <div class="d-flex justify-content-between">
+							 <span>Address</span>
+							 <span>
+								 <%= product.productInfo?.address %>
+							 </span>
+						 </div>
+						 <button class="btn btn-outline-secondary rounded-pill">
+							 <span>Add</span>
+						 </button>
+					 </li>
+					 <li>
+						 <div class="w-100 bg-secondary divider"></div>
+					 </li>
+	 
+					 <li>
+						 <div class="d-flex">
+							 <p>Article ID: 491085607</p>
+							 <i class="fa-solid fa-copy"></i>
+						 </div>
+					 </li>
+				 </ul>
+			 </section>
+			 <!-- *end  details -->
+		 </div>
 	<!-- * product details -->
 
 	<!-- * suggestions -->
@@ -328,7 +328,7 @@
 
 	<div class="container-fluid d-md-flex justify-content-center flex-sm-row flex-cloumn my-5 singleProductContainer">
 		<!-- * rating -->
-		<section class="col-xl-4 col-lg-5 col-md-5 col-12 py-4 mx-md-3 mx-0  rounded-3 shadow ratingSection">
+		<section class="col-xl-4 col-lg-4 col-md-3 col-12 py-4 mx-md-3 mx-0  rounded-3 shadow ratingSection">
 			<h4>Ratings & Reviews</h4>
 			<div>
 				<h5>

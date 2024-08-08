@@ -946,8 +946,9 @@ const getOrderDetailsAggregation = async ({ orderId }) => {
         _id: '$_id',
         userId: { $first: '$userId' },
         addressId: { $first: '$addressId' },
-        addressDetails: { $first: '$addressDetails' }, // Include full address details
+        addressDetails: { $first: '$addressDetails' },
         orderStatus: { $first: '$orderStatus' },
+        originalTotal: { $first: '$originalTotal' },
         total: { $first: '$total' },
         paymentMethod: { $first: '$paymentMethod' },
         coupon: { $first: '$coupon' },

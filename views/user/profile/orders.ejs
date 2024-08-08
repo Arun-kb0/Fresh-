@@ -73,9 +73,11 @@
 
 					<div class="imageCollection d-flex flex-wrap shadow rounded mr-3">
 						<% let n=(order?.products?.length < 4) ? order?.products?.length : 4 %>
+							<% if(order?.products) {%>
 							<% for(let i=0;i< n;i++) {%>
 								<img class="p-1" src="<%= order.products[i]?.image?.[0]?.path %>" alt="">
 								<% } %>
+							<% } %>
 					</div>
 
 					<div class="d-flex flex-column mx-3 justify-content-start">

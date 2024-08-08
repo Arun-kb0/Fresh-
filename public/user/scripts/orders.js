@@ -40,7 +40,13 @@ $(function () {
 
 
   // * pagination
-  let { page, numberOfPages } = pageDetails
+  let numberOfPages = 0
+  let page=0
+  if (pageDetails) {
+   numberOfPages = pageDetails.numberOfPages
+   page = pageDetails.page
+  } 
+  
   if (numberOfPages === page) {
     nextBtn.prop("disabled", true)
   }
@@ -198,6 +204,7 @@ $(function () {
     const paymentStatus = parent.find('.paymentStatus')
     const returnBtn = parent.find(".orderReturnBtn")
 
+
     console.log(orderId)
     $.ajax({
       url: '/cart/order/cancel',
@@ -350,6 +357,7 @@ $(function () {
   paymentStatus.each(function () {
     const element = $(this)
     const elementValue = element.text().trim()
+    console.log(elementValue)
     switch (elementValue) {
       case 'Pending':
         element

@@ -252,9 +252,7 @@ const getAllOrdersPageController = async (req, res, next) => {
       { $skip: startIndex },
       { $limit: LIMIT }
     ])
-    console.log('image')
-    console.log(ordersWithProducts[0].products[0]?.image[0])
-    // res.status(OK).json({ orders:ordersWithProducts[0] })
+    
     res.render('user/profile/orders', {
       ...viewUsersPage,
       orders: ordersWithProducts, 

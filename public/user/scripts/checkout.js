@@ -48,8 +48,9 @@ $(function () {
     priceDetailsPaymentMethod.text(paymentMethod)
     showAlert(`payment method ${title} selected`)
     paypalSection.hide()
+    paymentBtn.show()
     if (paymentMethod === 'paypal') {
-      console.log(paypalSection.html())
+      paymentBtn.hide()
       paypalSection.show()
     }
     console.log(paymentMethod)
