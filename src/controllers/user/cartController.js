@@ -249,7 +249,7 @@ const getCheckoutPageController = async (req, res, next) => {
 
 
 const orderUsingCodController = async (req, res, next) => {
-  const { addressId ,isContinuePayment=false , orderId} = req.body
+  const { addressId, isContinuePayment = false, orderId } = req.body
   try {
     const user = JSON.parse(req.cookies.user)
     const deliveryFee = 10
@@ -266,13 +266,13 @@ const orderUsingCodController = async (req, res, next) => {
     let cart
     if (isContinuePayment) {
       if (!mongoose.isObjectIdOrHexString(orderId)) {
-        throw new CustomError('invalid orderId',BAD_REQUEST)
+        throw new CustomError('invalid orderId', BAD_REQUEST)
       }
-      cart = await orderModel.findOne({_id:orderId})
+      cart = await orderModel.findOne({ _id: orderId })
     } else {
       cart = await cartModel.findOne({ userId: user.userId });
     }
-    
+
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
@@ -309,7 +309,7 @@ const orderUsingCodController = async (req, res, next) => {
       res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
       return
     }
-    
+
 
     const newOrder = await orderModel.create({
       addressId: address._id,
@@ -359,9 +359,135 @@ const orderUsingCodController = async (req, res, next) => {
   }
 }
 
+const orderUsingWalletController = async (req, res, next) => {
+  const { addressId, isContinuePayment = false, orderId } = req.body
+  try {
+    const user = JSON.parse(req.cookies.user)
+    const deliveryFee = 10
+
+    if (!mongoose.isObjectIdOrHexString(addressId)) {
+      throw new CustomError("invalid address id", BAD_REQUEST)
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      throw new CustomError('Address not found', BAD_REQUEST);
+    }
+
+    let cart
+    if (isContinuePayment) {
+      if (!mongoose.isObjectIdOrHexString(orderId)) {
+        throw new CustomError('invalid orderId', BAD_REQUEST)
+      }
+      cart = await orderModel.findOne({ _id: orderId })
+    } else {
+      cart = await cartModel.findOne({ userId: user.userId });
+    }
+
+    if (!cart || cart.products.length === 0) {
+      throw new CustomError('Cart is empty', BAD_REQUEST);
+    }
+
+    // * decreasing stock
+    for (const item of cart.products) {
+      const product = await productModel.findById(item.productId);
+      if (!product) {
+        throw new CustomError('Product not found', BAD_REQUEST);
+      }
+      if (product.stock < item.quantity) {
+        throw new CustomError(`Insufficient stock for product: ${product.name}`, BAD_REQUEST);
+      }
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    const wallet = await walletModel.findOne({ userId: user.userId })
+    if (cart.total > wallet.balance) {
+      throw new CustomError('not enough balance in wallet',CONFLICT)
+    }
+
+    await walletModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $push: {
+          transactions: {
+            amount: cart.total,
+            debit: true,
+            credit: false,
+          }
+        },
+        $inc: { balance: -cart.total }
+      }
+    )
+
+    // * return here if payment continue
+    if (isContinuePayment) {
+      const newOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId },
+        {
+          $set: {
+            paymentMethod: 'wallet',
+            paymentStatus: 'Completed',
+          }
+        },
+        { new: true }
+      )
+      res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+      return
+    }
+
+
+    const newOrder = await orderModel.create({
+      addressId: address._id,
+      orderStatus: 'Pending',
+      products: cart.products,
+      originalTotal: cart.total,
+      total: cart.total,
+      paymentMethod: 'wallet',
+      paymentStatus: 'Completed',
+      userId: user.userId,
+      coupon: cart.coupon ? cart.coupon : null
+    });
+
+    await cartModel.findOneAndUpdate(
+      { userId: user.userId },
+      {
+        $set: {
+          products: [],
+          coupon: null,
+          couponId: null,
+          total: 0
+        }
+      }
+    )
+    if (cart.couponId) {
+      await usedCouponsModel.findOneAndUpdate(
+        { userId: user.userId },
+        {
+          userId: user.userId,
+          $addToSet: {
+            coupons: cart.couponId
+          }
+        },
+        {
+          upsert: true,
+        }
+      )
+      await couponModel.findOneAndUpdate(
+        { _id: cart.couponId },
+        { $inc: { usageLimit: 1 } }
+      )
+    }
+
+    res.status(CREATED).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 const orderUsingPaypalController = async (req, res, next) => {
-  const { addressId, isContinuePayment=false,orderId } = req.body
+  const { addressId, isContinuePayment = false, orderId } = req.body
   try {
     console.log(" addressId ", addressId)
     const user = JSON.parse(req.cookies.user)
@@ -380,13 +506,13 @@ const orderUsingPaypalController = async (req, res, next) => {
     let cart
     if (isContinuePayment) {
       if (!mongoose.isObjectIdOrHexString(orderId)) {
-        throw new CustomError('invalid order id',BAD_REQUEST)
+        throw new CustomError('invalid order id', BAD_REQUEST)
       }
-      cart = await orderModel.findOne({_id:orderId})
+      cart = await orderModel.findOne({ _id: orderId })
     } else {
-      cart = await cartModel.findOneAndUpdate({ userId: user.userId }); 
+      cart = await cartModel.findOneAndUpdate({ userId: user.userId });
     }
-    
+
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
@@ -430,7 +556,7 @@ const orderSuccessPaypalController = async (req, res, next) => {
     let cart
     if (isContinuePayment) {
       if (!mongoose.isObjectIdOrHexString(dbOrderId)) {
-        throw new CustomError('invalid order id',BAD_REQUEST)
+        throw new CustomError('invalid order id', BAD_REQUEST)
       }
       cart = await orderModel.findOne({ _id: dbOrderId })
     } else {
@@ -462,7 +588,7 @@ const orderSuccessPaypalController = async (req, res, next) => {
       const newOrder = await orderModel.findOneAndUpdate(
         { _id: dbOrderId },
         { $set: { paymentStatus: 'Completed' } },
-        {new:true}
+        { new: true }
       )
       await createLedgerBookTransaction({
         amount: newOrder.total,
@@ -678,8 +804,8 @@ const cancelOrderController = async (req, res, next) => {
         type: "Debit",
       })
     }
-    
-    
+
+
 
     // console.log(cancelledOrder)
     res.status(OK).json({ message: "order cancelled", order: cancelledOrder })
@@ -973,6 +1099,7 @@ module.exports = {
   getCheckoutPageController,
 
   orderUsingCodController,
+  orderUsingWalletController,
   orderUsingPaypalController,
   orderSuccessPaypalController,
   orderFailedPaypalController,

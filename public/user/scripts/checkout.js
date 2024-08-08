@@ -158,21 +158,12 @@ $(function () {
       return
     }
 
-    if (paymentMethod === 'paypal') {
-      scrollToPaypalSection()
-    }
-
     switch (paymentMethod) {
       case 'cod':
         placeOrderUsingCod(addressId)
         break
-      // case 'paypal':
-      //   paypalSection
-      //     .removeClass('d-none')
-      //     .addClass('d-flex')
-      //   break
       case 'wallet':
-        // placeOrderUsingCod()
+        placeOrderUsingWallet(addressId)
         break
       default:
         console.log("invalid payment option value")
@@ -200,6 +191,29 @@ $(function () {
       }
     })
   }
+
+  function placeOrderUsingWallet(addressId) {
+    $.ajax({
+      url: '/cart/order/wallet',
+      method: 'POST',
+      data: { addressId },
+      success: function (data) {
+        if (data.order) {
+          console.log(data.order)
+          window.location.href = '/cart/order/success'
+        } else {
+          console.log('no order found')
+        }
+      },
+      error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
+        console.log(error)
+      }
+    })
+  }
+
+  //  * order functions end
 
 
   function enterCouponCode() {

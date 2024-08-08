@@ -16,7 +16,8 @@ const {
   returnSingleOrderOrderController,
   orderFailedPaypalController,
   getPaymentFailedPageController,
-  getPaymentSuccessPageController
+  getPaymentSuccessPageController,
+  orderUsingWalletController
 } = require('../../controllers/user/cartController')
 const router = express.Router()
 
@@ -36,6 +37,7 @@ router.patch('/checkout/coupon/remove', removeCouponController)
 
 
 router.post('/order/cod', orderUsingCodController)
+router.post('/order/wallet', orderUsingWalletController)
 router.patch('/order/cancel',cancelOrderController)
 router.patch('/order/return',returnOrderController)
 
