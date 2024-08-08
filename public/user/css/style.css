@@ -168,6 +168,11 @@
   list-style: none;
 }
 
+.reviewCard{
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
 /* * rating  */
 .ratingSection {
   position: sticky !important;
@@ -201,8 +206,14 @@
 }
 
 /* * address add card */
+.addressCard {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
 .addAddressCard {
-  background-color: #F0F2F2;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED) !important;
 }
 
 /* * cart  */
@@ -347,6 +358,13 @@
 }
 
 .walletTransactions {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
+
+/*  * edit user  */
+.editUserCard{
   background-color: var(--CARDS-BG_COLOR);
   border-radius: var(--CARD-RADIUS-ROUNDED);
 }

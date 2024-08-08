@@ -35,9 +35,9 @@
 	<div class=" container d-sm-flex justify-content-center flex-sm-row flex-cloumn col-12 my-5 ">
 		
 
-		<section class="container d-flex justify-content-start flex-wrap align-items-center ">
+		<section class="container d-flex justify-content-sm-start justify-content-center flex-wrap align-items-center">
 
-			<a class=" d-flex justify-content-center flex-column p-3 shadow rounded mb-5 mx-3 addAddressCard "
+			<a class=" d-flex justify-content-center flex-column p-3 shadow rounded mb-5 mx-3 col-xl-3  col-lg-3  col-sm-5 col-12 addAddressCard "
 				data-bs-toggle="modal" data-bs-target="#createModal">
 				<div class="pr-4 d-flex justify-content-center align-items-center ">
 					<i class="fa-solid fa-plus fa-4x orangeTextColor"></i>
@@ -49,8 +49,8 @@
 
 
 			<% for(const item of address) {%>
-				<div class="card mt-0 shadow mx-3">
-					<h5 class="card-header ">Address</h5>
+				<div class="card addressCard mt-3 mt-sm-0 shadow mx-3 col-xl-3 col-lg-3 col-sm-5 col-12 ">
+					<h5 class="card-header bg-white w-100">Address</h5>
 					<div class="card-body d-flex flex-column px-5">
 						<span class="card-text">
 							<%= item.name %>

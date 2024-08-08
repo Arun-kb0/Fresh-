@@ -1,9 +1,11 @@
 $(function () {
   const logoutBtn = $("#logoutBtn")
   const logoutBtn2 = $("#logoutBtn2")
+  const profileLogoutBtn = $("#profileLogoutBtn")
 
   logoutBtn.on("click", handleLogout)
   logoutBtn2.on("click", handleLogout)
+  profileLogoutBtn.on("click", handleLogout)
 
 
   function handleLogout() {
