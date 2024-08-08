@@ -82,7 +82,7 @@
 
 </head>
 
-<body >
+<body class="<%= !isAdmin && !isAuthPage ? 'backgroundBodyColor marginTopForBody' : '' %>">
 
   <% if(!isAuthPage && isAdmin && !isPageNotFound) {%>
     <%- include('admin/components/adminNavbar') %>

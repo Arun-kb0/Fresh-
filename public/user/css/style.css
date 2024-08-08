@@ -1,5 +1,15 @@
+:root {
+  --BODY-BG-LIGHT: #FFFFF9;
+  --CARDS-BG_COLOR: #fff;
+  --CARD-RADIUS-ROUNDED: 15px;
+}
+
 .authContainer {
   background-color: #FFF5EE;
+}
+
+.backgroundBodyColor {
+  background-color: #f5f5f9;
 }
 
 .navbarColor {
@@ -24,7 +34,8 @@
 
 .cardStoke {
   border: 1px solid #D5D9D9;
-  border-radius: 15px;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
   box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
@@ -100,20 +111,24 @@
   width: 450px;
   height: 450px;
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: var(--CARD-RADIUS-ROUNDED);
   position: relative;
 }
 
 .cardStokeSmallImage {
-  border-radius: 15px;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
 }
 
+.productMainImageContainer {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
 
 .productMainImage img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
 }
 
 .sticky {
@@ -137,6 +152,10 @@
 
 .productDetailsList {
   list-style: none;
+  display: grid;
+  gap: 10px;
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+  background-color: var(--CARDS-BG_COLOR);
 }
 
 .divider {
@@ -145,18 +164,24 @@
   margin-bottom: 16px;
 }
 
+.reviewSection {
+  list-style: none;
+}
+
 /* * rating  */
 .ratingSection {
   position: sticky !important;
   top: 150px;
   left: 0;
   align-self: flex-start;
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
 }
 
 @media (max-width: 768px) {
+
   .productImageSection,
-  .ratingSection
-   {
+  .ratingSection {
     position: relative !important;
     top: auto;
     left: auto;
@@ -188,6 +213,15 @@
   overflow: hidden,
 }
 
+.cartCard {
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
+#priceDetails div {
+  background-color: var(--CARDS-BG_COLOR);
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+}
+
 
 #qtyDropDownUl {
   max-height: 150px;
@@ -205,6 +239,15 @@
 }
 
 /* * checkout  */
+#addressContainer {
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+  background-color: var(--BODY-BG-LIGHT);
+}
+
+#paymentMethodContainer {
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+  background-color: var(--BODY-BG-LIGHT);
+}
 
 .addressTitle {
   background-color: #F0F2F2;
@@ -228,6 +271,10 @@
   align-self: flex-start;
 }
 
+#priceDetailsContainer div {
+  border-radius: var(--CARD-RADIUS-ROUNDED);
+  background-color: var(--CARDS-BG_COLOR);
+}
 
 /* * profile orders page */
 .imageCollection {

@@ -44,11 +44,11 @@
 			<!-- * address and payment -->
 			<div class="col-md-7 col-sm-8  col-12 order-2 order-sm-1">
 				<!-- * addresses -->
-				<section class="col-12 form-check" id="addressContainer">
+				<section class="col-12 form-check p-2 shadow" id="addressContainer">
 					<h4 class="addressTitle rounded-top p-2 text-center text-info">Your addresses</h4>
 					<% let i=1 %>
 						<% for(const item of checkoutCart.addresses){ %>
-							<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+							<div class="card mb-3 d-flex flex-row shadow-sm rounded-3 cartCard">
 
 								<div class="card-body mx-3 d-flex flex-column ">
 									<input class="form-check-input" type="radio" name="addressRadioBtn" data-addressId="<%= item._id %>"
@@ -95,9 +95,9 @@
 				<!-- * addresses end -->
 
 				<!-- * payment -->
-				<section class="col-12 my-5 form-check" id="paymentMethodContainer">
+				<section class="col-12 my-5 p-2 form-check shadow" id="paymentMethodContainer">
 					<h4 class="addressTitle rounded-top p-2 text-center text-info">Payment</h4>
-					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+					<div class="card mb-3 d-flex flex-row shadow-sm rounded-3 cartCard">
 						<div class="card-body mx-3 d-flex flex-column">
 							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn1"
 								data-title="Wallet" checked>
@@ -113,7 +113,7 @@
 					<hr class="my-1">
 
 					<h5>Other payment methods</h5>
-					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+					<div class="card mb-3 d-flex flex-row shadow-sm rounded-3 cartCard">
 						<div class="card-body mx-3 d-flex flex-column">
 							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn2"
 								data-title="Paypal" checked>
@@ -131,7 +131,7 @@
 						</div>
 					</div>
 
-					<div class="card mb-3 d-flex flex-row shadow rounded-3 cartCard">
+					<div class="card mb-3 d-flex flex-row shadow-sm rounded-3 cartCard">
 						<div class="card-body mx-3 d-flex flex-column">
 							<input class="form-check-input" type="radio" name="paymentRadioBtn" id="paymentRadioBtn3" data-title="COD"
 								checked>
