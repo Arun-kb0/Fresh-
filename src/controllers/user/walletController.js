@@ -30,7 +30,8 @@ const getWalletController = async (req, res, next) => {
       ...viewUsersPage,
       wallet,
       page,
-      numberOfPages
+      numberOfPages,
+      paypalClientId: process.env.PAYPAL_CLIENT_ID
     })
   } catch (error) {
     next(error)
@@ -38,10 +39,12 @@ const getWalletController = async (req, res, next) => {
 }
 
 const addAmountToWalletController = async (req, res, next) => {
-  const { creditAmount } = req.body
+  let { amount } = req.body
   try {
+    console.log(amount)
+    amount = parseFloat(amount)
     const user = JSON.parse(req.cookies.user)
-    if (!creditAmount || creditAmount < 10) {
+    if (!amount || amount < 10) {
       throw new CustomError('amount must be grater than 10', BAD_REQUEST)
     }
     const wallet = await walletModel.findOneAndUpdate(
@@ -49,14 +52,13 @@ const addAmountToWalletController = async (req, res, next) => {
       {
         $push: {
           transactions: {
-            amount: Number(creditAmount),
+            amount: Number(amount),
             debit: false,
             credit: true,
-            date: new Date()
           }
         },
         $inc: {
-          balance: Number(creditAmount)
+          balance: Number(amount)
         }
       },
       { new: true }
