@@ -13,9 +13,8 @@ const {sessionConfig} = require('./src/config/sessionConfig')
 const authRouter = require('./src/routes/auth/authRoutes')
 const adminRouter = require('./src/routes/admin/adminRoutes')
 const errorHandler = require('./src/middleware/errorHandler')
-const { auth } = require('./src/middleware/authMiddleware')
+const { adminAuth, userAuth } = require('./src/middleware/authMiddleware')
 const productRouter = require('./src/routes/user/productRoutes')
-const { userCheck, adminCheck } = require('./src/middleware/adminAndUserCheckMiddleware')
 const { logger } = require('./src/middleware/loggerMiddleware')
 require('./src/config/passportGoogleConfig')
 require('./src/config/passportFacebookConfig')
@@ -56,16 +55,13 @@ app.use(logger)
 // * routes
 app.use('/auth', authRouter)
 
-// * auth middleware
-// app.use(auth)
-
 // * admin routes
-app.use('/admin', auth, adminCheck, adminRouter)
+app.use('/admin', adminAuth, adminRouter)
 
 // * user routes
 app.use('/', productRouter)
-app.use('/profile', auth, userCheck, profileRouter)
-app.use('/cart', auth, userCheck, cartRouter)
+app.use('/profile', userAuth, profileRouter)
+app.use('/cart', userAuth, cartRouter)
 
 
 app.use(handleNotFound)

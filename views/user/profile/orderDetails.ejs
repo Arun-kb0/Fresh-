@@ -348,9 +348,10 @@
 						const pageDetails = null
 					</script>
 
-					<% scriptBlock=` <script
-						src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
-						data-sdk-integration-source="developer-studio">
+					<% scriptBlock=` 
+						<script
+							src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
+							data-sdk-integration-source="developer-studio">
 						</script>
 
 						<script> var addressId = ${ JSON.stringify(order.addressDetails._id) }  </script>

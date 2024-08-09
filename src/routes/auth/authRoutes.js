@@ -8,12 +8,13 @@ const {
   getVerifyPageController,
   verifyEmailController,
   resendOtpController,
-  logoutController,
   oauthSuccessController,
   forgotPasswordController,
   validateOtpForChangePasswordController,
   getPasswordChangePageController,
   changePasswordController,
+  userLogoutController,
+  adminLogoutController,
 } = require('../../controllers/auth/authControllers')
 const passport = require('passport')
 
@@ -45,7 +46,8 @@ router.route('/verifyemail')
 router.post('/resendotp', resendOtpController)
 
 // * logout
-router.get('/logout', logoutController)
+router.get('/admin/logout', adminLogoutController)
+router.get('/logout', userLogoutController)
 
 
 // * google oAuth passport

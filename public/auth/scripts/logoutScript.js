@@ -7,10 +7,17 @@ $(function () {
   logoutBtn2.on("click", handleLogout)
   profileLogoutBtn.on("click", handleLogout)
 
+  console.log('logout script')
+  console.log(window.location.pathname)
+  console.log(window.location.pathname.startsWith('/admin'))
 
   function handleLogout() {
+    const url = window.location.pathname.startsWith('/admin')
+      ? "/auth/admin/logout"
+      : "/auth/logout"
+    
     $.ajax({
-      url: "/auth/logout",
+      url: url,
       type: "GET",
       success: function (data) {
         console.log(data)

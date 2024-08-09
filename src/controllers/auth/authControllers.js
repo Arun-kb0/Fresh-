@@ -35,10 +35,11 @@ const getAdminLoginPageController = async (req, res, next) => {
   const { isAuthorized, user } = req?.session
   try {
     console.log("get admin page ")
-    if (isAuthorized) {
-      user?.isAdmin
-        ? res.redirect('/admin')
-        : res.redirect('/')
+    if (isAuthorized && user.isAdmin) {
+      // user?.isAdmin
+      //   ? res.redirect('/admin')
+      //   : res.redirect('/')
+      res.redirect('/admin')
       return
     }
     res.render('auth/login', { ...viewAdminAuthPage })
@@ -51,26 +52,30 @@ const adminLoginController = async (req, res, next) => {
   const { username, password } = req.body
   try {
     const admin = await authenticate(username, password, adminModel)
-    req.session.user = {
+    // req.session.user = {
+    //   name: admin.name,
+    //   username: admin.username,
+    //   isAdmin: true
+    // }
+    req.session.admin = {
       name: admin.name,
       username: admin.username,
       isAdmin: true
     }
     req.session.isAuthorized = true
     // console.log(req.session)
-    // const sessionUser = {
-    //   name: admin.name,
-    //   username: admin.username,
-    //   isAdmin: true,
-    //   provider: null
-    // }
-    // req.session.user = sessionUser
-    // req.session.isAuthorized = true
-    // res.cookie(
-    //   'admin',
-    //   JSON.stringify(sessionUser),
-    //   { maxAge: sessionCookieMaxAge }
-    // )
+    const sessionUser = {
+      name: admin.name,
+      username: admin.username,
+      isAdmin: true,
+      provider: null
+    }
+    const sessionCookieMaxAge = 24 * 60 * 60 * 1000; 
+
+    res.cookie('adminSession', JSON.stringify(sessionUser), {
+      maxAge: sessionCookieMaxAge, 
+      httpOnly: true, 
+    });
 
     res.status(OK).json({ message: "admin login success", user: admin })
   } catch (error) {
@@ -83,10 +88,12 @@ const adminLoginController = async (req, res, next) => {
 // * user login
 const getLoginPageController = async (req, res) => {
   try {
-    if (req?.session?.isAuthorized) {
-      req?.session?.user?.isAdmin
-        ? res.redirect('/admin')
-        : res.redirect('/')
+    // if (req?.session?.isAuthorized && !req?.session?.user) {
+    if(req.cookies.user){
+      // req?.session?.user?.isAdmin
+      //   ? res.redirect('/admin')
+      //   : res.redirect('/')
+       res.redirect('/')
       return
     }
 
@@ -289,19 +296,29 @@ const resendOtpController = async (req, res, next) => {
 }
 
 
-const logoutController = async (req, res) => {
+const adminLogoutController = async (req, res, next) => {
   try {
-    const isAdmin = req?.session?.user?.isAdmin
-      ? true : false
+    res.clearCookie('adminSession')
+    console.log('admin session cleared')
     await req.session.destroy()
-    res.clearCookie('connect.sid')
-    res.clearCookie('user')
-    console.log("logout success")
-    res.status(OK).json({ message: "logout success", isAdmin })
+    res.status(OK).json({ message: "logout success", isAdmin:true })
   } catch (error) {
-    console.log(error)
+    next(error)
   }
 }
+
+const userLogoutController = async (req, res, next) => {
+  try {
+    res.clearCookie('connect.sid')
+    res.clearCookie('user')
+    console.log('user session cleared')
+    await req.session.destroy()
+    res.status(OK).json({ message: "logout success", isAdmin:false })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 // *  oauth success response
 const oauthSuccessController = async (req, res, next) => {
@@ -432,6 +449,7 @@ const changePasswordController = async (req, res, next) => {
 module.exports = {
   getAdminLoginPageController,
   adminLoginController,
+  adminLogoutController,
 
   getVerifyPageController,
   verifyEmailController,
@@ -441,7 +459,7 @@ module.exports = {
   getSignUpPageController,
   loginController,
   signUpController,
-  logoutController,
+  userLogoutController,
 
   oauthSuccessController,
   forgotPasswordController,

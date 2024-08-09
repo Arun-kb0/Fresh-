@@ -298,7 +298,7 @@ $(function () {
         } catch (error) {
           console.log("payment error catched on createOrder ")
           console.error(error);
-          window.location.href = '/cart/order/paypal/failed'
+          window.location.href = '/cart/order/failed'
         }
       },
       async onApprove(data, actions) {

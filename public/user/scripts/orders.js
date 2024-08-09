@@ -1,6 +1,6 @@
 $(function () {
 
-  let paymentMethod 
+  let paymentMethod
 
   const orderStatus = $(".orderStatus")
   const paymentStatus = $('.paymentStatus')
@@ -22,9 +22,9 @@ $(function () {
   const prevBtn = $("#prevBtn")
   const nextBtn = $("#nextBtn")
 
-  prevBtn.on('click',handlePrev)
-  nextBtn.on('click',handleNext)
-  
+  prevBtn.on('click', handlePrev)
+  nextBtn.on('click', handleNext)
+
   paymentMethodContainer.hide()
   paypalSection.hide()
 
@@ -33,20 +33,20 @@ $(function () {
 
   cancelSingleProductBtn.on('click', handleCancelSingleOrder)
   returnSingleProductBtn.on('click', handleReturnSingleOrder)
-  
+
   invoiceDownloadBtn.on('click', handleDownloadInvoice)
   continuePaymentBtn.on('click', showPaymentSection)
-  
+
 
 
   // * pagination
   let numberOfPages = 0
-  let page=0
+  let page = 0
   if (pageDetails) {
-   numberOfPages = pageDetails.numberOfPages
-   page = pageDetails.page
-  } 
-  
+    numberOfPages = pageDetails.numberOfPages
+    page = pageDetails.page
+  }
+
   if (numberOfPages === page) {
     nextBtn.prop("disabled", true)
   }
@@ -110,7 +110,7 @@ $(function () {
     const orderId = urlParams.get('orderId')
     console.log(orderId)
     const url = `/profile/orderdetails?orderId=${orderId}&isInvoiceDownload=true`
-    window.location.href= url
+    window.location.href = url
   }
 
   function handleCancelSingleOrder() {
@@ -126,7 +126,7 @@ $(function () {
     $.ajax({
       url: '/cart/order/single/cancel',
       method: 'PATCH',
-      data:{productId, orderId},
+      data: { productId, orderId },
       success: function (data) {
         if (!data.order) {
           console.log('no data returned')
@@ -136,7 +136,7 @@ $(function () {
         currentSingleOrderStatus
           .text('Cancelled')
           .addClass('text-white bg-danger')
-        
+
         cancelBtn.hide()
         returnBtn.hide()
 
@@ -153,7 +153,7 @@ $(function () {
       }
     })
   }
-  
+
   function handleReturnSingleOrder() {
     const productId = $(this).attr('data-productId')
     const orderId = $(this).attr('data-orderId')
@@ -271,7 +271,7 @@ $(function () {
             .text(data.order.orderStatus)
             .removeClass()
             .addClass("px-3 rounded-pill text-white orderStatus bg-warning")
-          
+
           paymentStatus
             .text(data.order.paymentStatus)
             .removeClass()
@@ -464,9 +464,9 @@ $(function () {
     }
   })
 
-  
+
   // * cancel order function call id all orders are cancelled
-  function cancelOrderAjaxCall({orderId}) {
+  function cancelOrderAjaxCall({ orderId }) {
     $.ajax({
       url: '/cart/order/cancel',
       method: "PATCH",
@@ -508,7 +508,7 @@ $(function () {
     $.ajax({
       url: '/cart/order/cod',
       method: 'POST',
-      data: { addressId ,orderId , isContinuePayment:true},
+      data: { addressId, orderId, isContinuePayment: true },
       success: function (data) {
         if (data.order) {
           console.log(data.order)
@@ -527,88 +527,91 @@ $(function () {
 
 
   // * paypal code
-  window.paypal
-    .Buttons({
-      style: {
-        shape: "rect",
-        layout: "vertical",
-        color: "gold",
-        label: "paypal",
-      },
-      message: {
-        amount: 100,
-      },
-      async createOrder() {
-        try {
-          const response = await fetch("/cart/order/paypal", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ addressId , isContinuePayment:true,orderId })
-          });
-
-          const orderData = await response.json();
-          console.log(orderData)
-          if (orderData.id) {
-            return orderData.id;
-          }
-          const errorDetail = orderData?.details?.[0];
-          const errorMessage = errorDetail
-            ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
-            : JSON.stringify(orderData);
-
-          throw new Error(errorMessage);
-        } catch (error) {
-          console.log("payment error catched on createOrder ")
-          console.error(error);
-          window.location.href = '/cart/order/failed'
-        }
-      },
-      async onApprove(data, actions) {
-        try {
-          console.log(data)
-          console.log(actions)
-          const orderData = await actions.order.capture()
-          const errorDetail = orderData?.details?.[0];
-          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
-            return actions.restart();
-          } else if (errorDetail) {
-            throw new Error(`${errorDetail.description} (${orderData.debug_id})`);
-          } else if (!orderData.purchase_units) {
-            throw new Error(JSON.stringify(orderData));
-          } else {
-            const transaction =
-              orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
-              orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
-            console.log(transaction)
-            console.log(
-              "Capture result",
-              orderData,
-              JSON.stringify(orderData, null, 2)
-            );
-            if (!transaction || transaction?.status !== "COMPLETED") {
-              throw new Error(`payment capture ${transaction?.status}`)
-            }
-
-            const response = await fetch(`/cart/order/paypal/success`, {
+  console.log(window.location.pathname)
+  if (window.location.pathname === '/profile/orderdetails') {
+    window.paypal
+      .Buttons({
+        style: {
+          shape: "rect",
+          layout: "vertical",
+          color: "gold",
+          label: "paypal",
+        },
+        message: {
+          amount: 100,
+        },
+        async createOrder() {
+          try {
+            const response = await fetch("/cart/order/paypal", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ...data, addressId ,isContinuePayment:true, dbOrderId:orderId})
+              body: JSON.stringify({ addressId, isContinuePayment: true, orderId })
             });
-            window.location.href = '/cart/order/success'
+
+            const orderData = await response.json();
+            console.log(orderData)
+            if (orderData.id) {
+              return orderData.id;
+            }
+            const errorDetail = orderData?.details?.[0];
+            const errorMessage = errorDetail
+              ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
+              : JSON.stringify(orderData);
+
+            throw new Error(errorMessage);
+          } catch (error) {
+            console.log("payment error catched on createOrder ")
+            console.error(error);
+            window.location.href = '/cart/order/failed'
           }
-        } catch (error) {
-          console.log("payment error catched on onApprove ")
-          console.error(error);
-          const response = await fetch('/cart/order/paypal/failed', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ addressId , orderId })
-          });
-          window.location.href = '/cart/order/failed'
-        }
-      },
-    })
-    .render("#paypal-button-container");
+        },
+        async onApprove(data, actions) {
+          try {
+            console.log(data)
+            console.log(actions)
+            const orderData = await actions.order.capture()
+            const errorDetail = orderData?.details?.[0];
+            if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+              return actions.restart();
+            } else if (errorDetail) {
+              throw new Error(`${errorDetail.description} (${orderData.debug_id})`);
+            } else if (!orderData.purchase_units) {
+              throw new Error(JSON.stringify(orderData));
+            } else {
+              const transaction =
+                orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
+                orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
+              console.log(transaction)
+              console.log(
+                "Capture result",
+                orderData,
+                JSON.stringify(orderData, null, 2)
+              );
+              if (!transaction || transaction?.status !== "COMPLETED") {
+                throw new Error(`payment capture ${transaction?.status}`)
+              }
+
+              const response = await fetch(`/cart/order/paypal/success`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...data, addressId, isContinuePayment: true, dbOrderId: orderId })
+              });
+              window.location.href = '/cart/order/success'
+            }
+          } catch (error) {
+            console.log("payment error catched on onApprove ")
+            console.error(error);
+            const response = await fetch('/cart/order/paypal/failed', {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ addressId, orderId })
+            });
+            window.location.href = '/cart/order/failed'
+          }
+        },
+      })
+      .render("#paypal-button-container");    
+  }
 
 
 })
