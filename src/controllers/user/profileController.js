@@ -309,6 +309,13 @@ const getOrderDetailsPageController = async (req, res, next) => {
 const getCouponsPageController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
+    const isUsedCoupons = await usedCouponsModel.findOne({ userId: user.userId })
+    if (!isUsedCoupons) {
+      await usedCouponsModel.create({
+        userId: user.userId,
+        coupons:[]
+      })
+    }
     const result = await usedCouponsModel.aggregate([
       {
         $match: {
@@ -338,7 +345,12 @@ const getCouponsPageController = async (req, res, next) => {
       }
     ])
 
-    res.render('user/profile/coupons', { ...viewUsersPage, coupons: result[0].unusedCoupons })
+    res.render('user/profile/coupons', {
+      ...viewUsersPage,
+      coupons: (result && result.length !== 0)  
+        ? result[0].unusedCoupons
+        : []
+    })
   } catch (error) {
     next(error)
   }
