@@ -40,287 +40,215 @@
 
 
 	<!-- * products  -->
-		 <div	class="container-fluid position-relative d-sm-flex flex-sm-row flex-cloumn justify-content-center  my-5 singleProductContainer">
-			 <!-- * filters -->
-			 <% if(!isSearchPage) {%>
-				 <section class="d-flex col-xl-2 col-lg-3 col-sm-4 col-12 start-0  py-5  position-relative">
-					 <div class="filterSection container shadow rounded-3 px-2 py-3 position-sm-absolute top-0 ">
-						 <ul class="list-group list-group-flush">
-	 
-							 <li class="list-group-item ">
-								 <div class="dropdown">
-									 <button class="btn w-100 h5 text-capitalize dropdown-toggle" id="categoryDropdownBtn" type="button"
-										 data-bs-toggle="dropdown" aria-expanded="false">
-										 categories
-									 </button>
-									 <ul class="dropdown-menu w-100" id="categoryDropdown">
-										 <li>
-											 <a data-id='<%= null %>' class="dropdown-item text-danger">
-												 <i class="fa-solid fa-circle-xmark"></i>
-												 <span class="h6 text-danger"> Remove </span>
-											 </a>
-										 </li>
-										 <% for(const category of categories) {%>
-											 <li><a class="dropdown-item" data-id="<%= category._id %>">
-													 <%= category.name %>
-												 </a></li>
-											 <% } %>
-									 </ul>
-								 </div>
-							 </li>
-							 <li class="list-group-item ">
-								 <div class="dropdown">
-									 <button class="btn text-capitalize h5 w-100 dropdown-toggle" id="subcategoryDropdownBtn" type="button"
-										 data-bs-toggle="dropdown" aria-expanded="false">
-										 subcategories
-									 </button>
-									 <ul class="dropdown-menu w-100" id="subcategoryDropdown">
-										 <li>
-											 <a data-id='<%= null %>' class="dropdown-item text-danger">
-												 <i class="fa-solid fa-circle-xmark"></i>
-												 <span class="h6 text-danger"> Remove </span>
-											 </a>
-										 </li>
-										 <% for(const subcategory of subcategories) {%>
-											 <li><a class="dropdown-item" data-id="<%= subcategory._id %>">
-													 <%= subcategory.name %>
-												 </a></li>
-											 <% } %>
-									 </ul>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <h5 class="text-center text-secondary">Sort</h5>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="aToz" name="sortRadioBtn" id="flexRadioDefault1"
-										 <%=radioBtnValue==='aToz' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexRadioDefault1">
-										 a to z
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="price" name="sortRadioBtn" id="flexRadioDefault5"
-										 <%=radioBtnValue==='price' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexRadioDefault5">
-										 price low to high
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="priceHighToLow" name="sortRadioBtn"
-										 id="flexRadioDefault6" <%=radioBtnValue==='priceHighToLow' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexRadioDefault6">
-										 price high to low
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="rating" name="sortRadioBtn" id="flexRadioDefault2"
-										 <%=radioBtnValue==='rating' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexRadioDefault2">
-										 rating
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="newArrivals" name="sortRadioBtn"
-										 id="flexCheckDefault3" <%=radioBtnValue==='newArrivals' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexCheckDefault3">
-										 new arrivals
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item">
-								 <div class="form-check d-flex align-items-center">
-									 <input class="form-check-input" type="radio" value="popularity" name="sortRadioBtn"
-										 id="flexCheckDefault4" <%=radioBtnValue==='popularity' ? 'checked' :'' %>
-									 >
-									 <label class="form-check-label text-capitalize mx-2" for="flexCheckDefault4">
-										 popular
-									 </label>
-								 </div>
-							 </li>
-							 <li class="list-group-item d-flex justify-content-center">
-								 <button id="sortBtn" class="btn btn-info rounded-pill">Apply</button>
-							 </li>
-						 </ul>
-					 </div>
-				 </section>
-				 <% } %>
-					 <!-- * end filters -->
-	 
-					 <!-- * products -->
-					 <section class='d-flex <%= isSearchPage ? "col-10" : "col-xl-8 col-md-8 col-sm-6 col-12" %>   '>
-						 <div class="d-flex flex-wrap ">
-							 <% for(let item of products){ %>
-								 <!-- * mycard -->
-								 <div class="position-relative col-xl-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke allCategoriesCard">
-									 <div class="position-absolute top-0 start-0">
-										 <a class="addToWishlistBtn" data-id="<%= item._id %>">
-											 <i class="fa-solid fa-heart fa-xl text-secondary"></i>
-										 </a>
-									 </div>
-									 <div class="d-flex flex-column align-content-center ">
-										 <div class="d-flex justify-content-center ">
-											 <a class="cardImage" href="/product?productId=<%=item._id %>">
-												 <img src="<%= item.image[0]?.path  %>" alt="<%= item.image[0].originalName  %>">
-											 </a>
-										 </div>
-										 <h6>
-											 <%= item.name %>
-										 </h6>
-										 <h5 class="priceTextColor">₹<%= item.finalPrice %>
-										 </h5>
-										 <% if(item?.offer?.discountType) {%>
-											 <div class="d-flex justify-content-center ">
-												 <p class=" text-secondary px-3 textLineTrough">
-													 ₹<%= item.price %>
-												 </p>
-												 <% if(item.offer.discountType==='percentage' ) {%>
-													 <p class="text-success px-3">
-														 <%= item.offer.discountValue %>% OFF
-													 </p>
-													 <% }else{ %>
-														 <p class="text-success px-3">₹<%= item.offer.discountValue %> OFF</p>
-														 <% } %>
-											 </div>
-											 <% } else { %>
-												 <div style='height:42px'></div>
-												 <% } %>
-													 <div class="d-flex align-items-baseline justify-content-center">
-														 <div class="d-flex pb-3 px-3">
-															 <% for(let i=0;i< 5 ;i++) {%>
-																 <% if(i<item.rating) {%>
-																	 <i class="fa-solid fa-star fa-lg text-warning"></i>
-																	 <% } else { %>
-																		 <i class="fa-regular fa-star fa-lg text-warning"></i>
-																		 <% } %>
-																			 <% } %>
-														 </div>
-														 <span class="text-secondary">
-															 <%= item.peopleRated %>
-														 </span>
-													 </div>
-													 <button class="btn btn-outline-info rounded-pill addToCartBtn" data-id="<%= item._id %>"
-														 data-price="<%= item.finalPrice %>">
-														 <span>Add to Cart</span>
-													 </button>
-									 </div>
-								 </div>
-								 <!-- * end card -->
-								 <% } %>
-						 </div>
-					 </section>
-					 <!-- *end  products -->
+	<div
+		class="container-fluid position-relative d-sm-flex flex-sm-row flex-cloumn justify-content-center  my-5 singleProductContainer">
+		<!-- * filters -->
+		<% if(!isSearchPage) {%>
+			<section class="d-flex col-xl-2 col-lg-3 col-sm-4 col-12 start-0  py-5  position-relative">
+				<div class="filterSection container shadow rounded-3 px-2 py-3 position-sm-absolute top-0 ">
+					<ul class="list-group list-group-flush">
 
-					</div>
-					<!-- * product details -->
-					
-					<!-- *pagination  -->
-					<div class="d-flex justify-content-center align-items-center p-2 ">
-						<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
-							<i class="fa-solid fa-chevron-left fa-xs"></i>
-						</button>
-						<div id="pageInfoContainer">
-							<span>
-								<%= page %> out of
-							</span>
-							<span>
-								<%= numberOfPages %>
-							</span>
-						</div>
-						<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
-							<i class="fa-solid fa-chevron-right"></i>
-						</button>
-					</div>
-					<!-- *pagination end -->
-
-
-
-
-	<!-- footer -->
-	<div class="footer-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box about-widget">
-						<h2 class="widget-title">About us</h2>
-						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-							laudantium, totam rem aperiam, eaque ipsa quae.</p>
-					</div>
+						<li class="list-group-item ">
+							<div class="dropdown">
+								<button class="btn w-100 h5 text-capitalize dropdown-toggle" id="categoryDropdownBtn" type="button"
+									data-bs-toggle="dropdown" aria-expanded="false">
+									categories
+								</button>
+								<ul class="dropdown-menu w-100" id="categoryDropdown">
+									<li>
+										<a data-id='<%= null %>' class="dropdown-item text-danger">
+											<i class="fa-solid fa-circle-xmark"></i>
+											<span class="h6 text-danger"> Remove </span>
+										</a>
+									</li>
+									<% for(const category of categories) {%>
+										<li><a class="dropdown-item" data-id="<%= category._id %>">
+												<%= category.name %>
+											</a></li>
+										<% } %>
+								</ul>
+							</div>
+						</li>
+						<li class="list-group-item ">
+							<div class="dropdown">
+								<button class="btn text-capitalize h5 w-100 dropdown-toggle" id="subcategoryDropdownBtn" type="button"
+									data-bs-toggle="dropdown" aria-expanded="false">
+									subcategories
+								</button>
+								<ul class="dropdown-menu w-100" id="subcategoryDropdown">
+									<li>
+										<a data-id='<%= null %>' class="dropdown-item text-danger">
+											<i class="fa-solid fa-circle-xmark"></i>
+											<span class="h6 text-danger"> Remove </span>
+										</a>
+									</li>
+									<% for(const subcategory of subcategories) {%>
+										<li><a class="dropdown-item" data-id="<%= subcategory._id %>">
+												<%= subcategory.name %>
+											</a></li>
+										<% } %>
+								</ul>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<h5 class="text-center text-secondary">Sort</h5>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="aToz" name="sortRadioBtn" id="flexRadioDefault1"
+									<%=radioBtnValue==='aToz' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault1">
+									a to z
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="price" name="sortRadioBtn" id="flexRadioDefault5"
+									<%=radioBtnValue==='price' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault5">
+									price low to high
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="priceHighToLow" name="sortRadioBtn"
+									id="flexRadioDefault6" <%=radioBtnValue==='priceHighToLow' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault6">
+									price high to low
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="rating" name="sortRadioBtn" id="flexRadioDefault2"
+									<%=radioBtnValue==='rating' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexRadioDefault2">
+									rating
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="newArrivals" name="sortRadioBtn"
+									id="flexCheckDefault3" <%=radioBtnValue==='newArrivals' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexCheckDefault3">
+									new arrivals
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item">
+							<div class="form-check d-flex align-items-center">
+								<input class="form-check-input" type="radio" value="popularity" name="sortRadioBtn"
+									id="flexCheckDefault4" <%=radioBtnValue==='popularity' ? 'checked' :'' %>
+								>
+								<label class="form-check-label text-capitalize mx-2" for="flexCheckDefault4">
+									popular
+								</label>
+							</div>
+						</li>
+						<li class="list-group-item d-flex justify-content-center">
+							<button id="sortBtn" class="btn btn-info rounded-pill">Apply</button>
+						</li>
+					</ul>
 				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Get in Touch</h2>
-						<ul>
-							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-							<li>support@fruitkha.com</li>
-							<li>+00 111 222 3333</li>
-						</ul>
+			</section>
+			<% } %>
+				<!-- * end filters -->
+
+				<!-- * products -->
+				<section class='d-flex <%= isSearchPage ? "col-10" : "col-xl-8 col-md-8 col-sm-6 col-12" %>   '>
+					<div class="d-flex flex-wrap ">
+						<% for(let item of products){ %>
+							<!-- * mycard -->
+							<div
+								class="position-relative col-xl-2 col-md-3 m-1 mx-3 mb-3 text-center p-2 cardStoke allCategoriesCard">
+								<div class="position-absolute top-0 start-0">
+									<a class="addToWishlistBtn" data-id="<%= item._id %>">
+										<i class="fa-solid fa-heart fa-xl text-secondary"></i>
+									</a>
+								</div>
+								<div class="d-flex flex-column align-content-center ">
+									<div class="d-flex justify-content-center ">
+										<a class="cardImage" href="/product?productId=<%=item._id %>">
+											<img src="<%= item.image[0]?.path  %>" alt="<%= item.image[0].originalName  %>">
+										</a>
+									</div>
+									<h6>
+										<%= item.name %>
+									</h6>
+									<h5 class="priceTextColor">₹<%= item.finalPrice %>
+									</h5>
+									<% if(item?.offer?.discountType) {%>
+										<div class="d-flex justify-content-center ">
+											<p class=" text-secondary px-3 textLineTrough">
+												₹<%= item.price %>
+											</p>
+											<% if(item.offer.discountType==='percentage' ) {%>
+												<p class="text-success px-3">
+													<%= item.offer.discountValue %>% OFF
+												</p>
+												<% }else{ %>
+													<p class="text-success px-3">₹<%= item.offer.discountValue %> OFF</p>
+													<% } %>
+										</div>
+										<% } else { %>
+											<div style='height:42px'></div>
+											<% } %>
+												<div class="d-flex align-items-baseline justify-content-center">
+													<div class="d-flex pb-3 px-3">
+														<% for(let i=0;i< 5 ;i++) {%>
+															<% if(i<item.rating) {%>
+																<i class="fa-solid fa-star fa-lg text-warning"></i>
+																<% } else { %>
+																	<i class="fa-regular fa-star fa-lg text-warning"></i>
+																	<% } %>
+																		<% } %>
+													</div>
+													<span class="text-secondary">
+														<%= item.peopleRated %>
+													</span>
+												</div>
+												<button class="btn btn-outline-info rounded-pill addToCartBtn" data-id="<%= item._id %>"
+													data-price="<%= item.finalPrice %>">
+													<span>Add to Cart</span>
+												</button>
+								</div>
+							</div>
+							<!-- * end card -->
+							<% } %>
 					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box pages">
-						<h2 class="widget-title">Pages</h2>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
-							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box subscribe">
-						<h2 class="widget-title">Subscribe</h2>
-						<p>Subscribe to our mailing list to get the latest updates.</p>
-						<form action="index.html">
-							<input type="email" placeholder="Email">
-							<button type="submit"><i class="fas fa-paper-plane"></i></button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+				</section>
+				<!-- *end  products -->
+
 	</div>
-	<!-- end footer -->
+	<!-- * product details -->
 
-	<!-- copyright -->
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.<br>
-						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
-					</p>
-				</div>
-				<div class="col-lg-6 text-right col-md-12">
-					<div class="social-icons">
-						<ul>
-							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
+	<!-- *pagination  -->
+	<div class="d-flex justify-content-center align-items-center p-2 ">
+		<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="prevBtn">
+			<i class="fa-solid fa-chevron-left fa-xs"></i>
+		</button>
+		<div id="pageInfoContainer">
+			<span>
+				<%= page %> out of
+			</span>
+			<span>
+				<%= numberOfPages %>
+			</span>
 		</div>
+		<button class="btn btn-secondary  rounded-pill mx-2 w-auto smallBtn " id="nextBtn">
+			<i class="fa-solid fa-chevron-right"></i>
+		</button>
 	</div>
+	<!-- *pagination end -->
+
 
 	<script>
 		const pageDetails = {

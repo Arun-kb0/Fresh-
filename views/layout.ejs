@@ -89,12 +89,14 @@
     <%- include('admin/components/adminSidebar') %>
     <% } else if(!isAuthPage && !isAdmin && !isPageNotFound){ %>
     <%- include('user/components/navbar') %>
-    
   <% } %>
 
 
   <%- body%>
 
+  <%  if(!isAuthPage && !isAdmin && !isPageNotFound){ %>
+    <%- include('user/components/footer') %>
+  <% } %>
 
 
   <script src="/static/auth/scripts/logoutScript.js"></script>
