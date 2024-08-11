@@ -24,11 +24,12 @@ passport.deserializeUser(async (userId, done) => {
 })
 
 
-
+const ipAddress  = process.env.IP_ADDRESS
+const port = process.env.PORT
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/callback",
+  callbackURL: `${ipAddress}:${port}/auth/google/callback`,
   passReqToCallback: true
 },
   async function (req, accessToken, refreshToken, profile, done) {

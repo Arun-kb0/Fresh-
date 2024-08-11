@@ -22,10 +22,13 @@ passport.deserializeUser(async (userId, done) => {
   }
 })
 
+
+const ipAddress = process.env.IP_ADDRESS
+const port = process.env.PORT
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: "http://localhost:3000/auth/facebook/callback",
+  callbackURL: `${ipAddress}:${port}/auth/facebook/callback`,
   profileFields: ['id', 'displayName', 'photos', 'email']
 },
   async function (accessToken, refreshToken, profile, cb) {
