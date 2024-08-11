@@ -2,8 +2,8 @@ $(function () {
   appliedCoupon
 
   let addressId = ''
-  let paymentMethod = 'cod'
-  let addressTitle = 'Address 1'
+  let paymentMethod = ''
+  let addressTitle = ''
 
   const addressRadioBtn = $("#addressRadioBtn")
   const paymentRadioBtn = $("#paymentRadioBtn")
@@ -277,7 +277,7 @@ $(function () {
         amount: 100,
       },
       async createOrder() {
-        try {
+        try {    
           const response = await fetch("/cart/order/paypal", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

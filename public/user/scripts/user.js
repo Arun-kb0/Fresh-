@@ -21,6 +21,7 @@ $(function () {
   const $userName = $("#userName");
   const $logoutBtn = $("#logoutBtn");
   const $logoutBtn2 = $("#logoutBtn2");
+  const loginBtnNavBottom = $("#loginBtnNavBottom")
 
   const user = JSON.parse(localStorage.getItem("user"))
   // console.log(user)
@@ -32,11 +33,12 @@ $(function () {
     //*  second btn hide
     $logoutBtn.hide();
     $logoutBtn2.show();
-
+    loginBtnNavBottom.hide()
     // getWishlistProductIds()
   } else {
     $loginSection.show();
     $userSection.hide();
+    loginBtnNavBottom.show()
   }
 
 
