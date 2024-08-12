@@ -116,7 +116,7 @@
 										<% if(!isInvoiceDownload && order.orderStatus==='Delivered' ){ %>
 											<button id="invoiceDownloadBtn" class="btn btn-outline-info rounded-pill">Download
 												invoice</button>
-											<% } %>
+										<% } %>
 						</div>
 
 					</div>
@@ -251,10 +251,11 @@
 													</div>
 
 													<% if(!isInvoiceDownload) { %>
-														<div class="d-flex justify-content-end w-100 align-items-start">
+														<div class="w-100 align-items-start">
 															<a href="/product?productId=<%= product.productId  %>"
-																class="btn btn-outline-info rounded-pill">View
-																product</a>
+																class="btn btn-outline-info rounded-pill">
+																View product</a>
+															<button data-productId="<%= product.productId %>" class="ratingBtn btn btn-outline-info rounded-pill mt-lg- mt-2">rate this product </button>
 														</div>
 														<% } %>
 										</div>
@@ -280,6 +281,8 @@
 							src="https://www.paypal.com/sdk/js?client-id=${paypalClientId}&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo"
 							data-sdk-integration-source="developer-studio">
 						</script>
+
+						<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 						<script> var addressId = ${ JSON.stringify(order.addressDetails._id) }  </script>
 						<script> var orderId = ${ JSON.stringify(order._id) }  </script>

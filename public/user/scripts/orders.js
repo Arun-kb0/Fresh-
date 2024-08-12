@@ -2,6 +2,10 @@ $(function () {
 
   let paymentMethod
 
+  // * handling delegation
+  $(document).on('click', '.starBtn', updateRating);
+  $(document).on('input', '.reviewInput', updateReviewInput);
+
   const orderStatus = $(".orderStatus")
   const paymentStatus = $('.paymentStatus')
   const createdAt = $(".createdAt")
@@ -11,12 +15,16 @@ $(function () {
   const singleProductStatus = $(".singleProductStatus")
   const cancelSingleProductBtn = $(".cancelSingleProductBtn")
   const returnSingleProductBtn = $(".returnSingleProductBtn")
+  const ratingBtn = $(".ratingBtn")
+  const starBtn = $(".starBtn")
+  const reviewInput = $(".reviewInput")
 
   const invoiceDownloadBtn = $("#invoiceDownloadBtn")
   const paymentMethodContainer = $("#paymentMethodContainer")
   const continuePaymentBtn = $("#continuePaymentBtn")
   const selectPaymentBtn = $("#selectPaymentBtn")
   const paypalSection = $("#paypalSection")
+
 
   // * pagination btns
   const prevBtn = $("#prevBtn")
@@ -37,7 +45,66 @@ $(function () {
   invoiceDownloadBtn.on('click', handleDownloadInvoice)
   continuePaymentBtn.on('click', showPaymentSection)
 
+  let rating = 0
+  let review=''
+  ratingBtn.on('click', handleViewRating)
+  starBtn.on('click', updateRating)
+  reviewInput.on('input', updateReviewInput)
 
+
+  let productId
+  function handleViewRating() {
+    productId = $(this).attr('data-productId')
+    // console.log(productId)
+
+    Swal.fire({
+      title: "<h4>Rate product</h4>",
+      icon: "info",
+      html: `
+    <section class="col-12 ">
+      <h5 id='starsCount-${productId}' class='text-primary' >0 Stars</h6>
+      <div class='d-flex justify-content-center' >
+				<div id='stars-${productId}'  class="d-flex pb-3" >
+            <a data-value='1'  class='starBtn'> <i class="fa-regular fa-star fa-xl text-warning"></i> </a>
+            <a data-value='2'  class='starBtn'> <i class="fa-regular fa-star fa-xl text-warning"></i> </a>
+            <a data-value='3'  class='starBtn'> <i class="fa-regular fa-star fa-xl text-warning"></i> </a>
+            <a data-value='4'  class='starBtn'> <i class="fa-regular fa-star fa-xl text-warning"></i> </a>
+            <a data-value='5'  class='starBtn'> <i class="fa-regular fa-star fa-xl text-warning"></i> </a>
+				</div>
+      </div>
+      <input id='reviewInput-${productId}'  class='form-control reviewInput' type='text' placeholder='add review' />
+		</section>
+  `,
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: `Submit`,
+      confirmButtonAriaLabel: "Thumbs up, great!",
+      cancelButtonText: `Cancel`,
+      cancelButtonAriaLabel: "Cancel",
+      preConfirm: () => {
+        submitReview();
+      }
+    });
+  }
+
+  function updateRating() {
+    rating = $(this).attr('data-value')
+    $(`#starsCount-${productId}`).text(`${rating} stars`)
+  }
+  function updateReviewInput() {
+    review  = $(this).val().trim()
+  }
+
+  // ! do back end for updating rating
+  function submitReview() {
+    console.log(productId)
+    console.log(rating)
+    console.log(review)
+    rating = 0
+    review=''
+    productId=''
+  }
 
   // * pagination
   let numberOfPages = 0
@@ -610,7 +677,7 @@ $(function () {
           }
         },
       })
-      .render("#paypal-button-container");    
+      .render("#paypal-button-container");
   }
 
 
