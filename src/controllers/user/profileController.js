@@ -338,12 +338,18 @@ const getCouponsPageController = async (req, res, next) => {
                 },
                 isDeleted: false
               }
+            },
+            {
+              $sort: {
+                startDate: -1
+              }
             }
           ],
           as: "unusedCoupons"
         }
       }
-    ])
+    ]
+)
 
     res.render('user/profile/coupons', {
       ...viewUsersPage,

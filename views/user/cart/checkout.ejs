@@ -180,7 +180,7 @@
 						</span>
 					</h6>
 					<h6 class="text-secondary">Delivery Fee : ₹<span class="fs-5" id="deliveryFee">
-							<%= checkoutCart.deliveryFee %>
+							<%= checkoutCart.deliveryFee ? checkoutCart.deliveryFee : 10 %>
 						</span>
 					</h6>
 					<div class="my-2">

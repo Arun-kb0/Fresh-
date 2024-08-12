@@ -841,25 +841,35 @@ const cartCheckoutAggregation = async ({ userId }) => {
           {
             $match: {
               $expr: {
-                $not: {
-                  $in: [
-                    "$_id",
-                    {
-                      $reduce: {
-                        input: "$$usedCoupons",
-                        initialValue: [],
-                        in: {
-                          $setUnion: [
-                            "$$value",
-                            "$$this.coupons"
-                          ]
+                $and: [
+                  {
+                    $not: {
+                      $in: [
+                        "$_id",
+                        {
+                          $reduce: {
+                            input: "$$usedCoupons",
+                            initialValue: [],
+                            in: {
+                              $setUnion: [
+                                "$$value",
+                                "$$this.coupons"
+                              ]
+                            }
+                          }
                         }
-                      }
+                      ]
                     }
-                  ]
-                }
+                  },
+                  {
+                    $gte: ["$endDate", new Date()]
+                  },
+                  {
+                    $lte: ["$startDate", new Date()]
+                  }
+                ]
               },
-              isDeleted: false // adding not deleted 
+              isDeleted: false // adding not deleted
             }
           }
         ],
