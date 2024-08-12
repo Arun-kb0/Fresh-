@@ -251,18 +251,18 @@
 													</div>
 
 													<% if(!isInvoiceDownload) { %>
-														<div class="w-100 align-items-start">
-															<a href="/product?productId=<%= product.productId  %>"
-																class="btn btn-outline-info rounded-pill">
-																View product</a>
-															<% const reviewBtnVisibleStates = ["Delivered","Return Requested","Return Approved","Returned"] %>
+														<div class="w-100 align-items-end">
+															<% const reviewBtnVisibleStates=["Delivered","Return Requested","Return Approved","Returned"] %>
 															<% if(reviewBtnVisibleStates.includes(product.orderStatus)) {%>
-																<button data-productId="<%= product.productId %>"
-																	class="ratingBtn btn btn-outline-info rounded-pill mt-lg-0 mt-2">rate this product
+																<button data-productId="<%= product.productId %>" class="ratingBtn btn btn-outline-info rounded-pill my-2">rate this
+																	product
 																</button>
 															<%} %>
+															<a href="/product?productId=<%= product.productId  %>"	class="btn btn-outline-info rounded-pill my-2">
+																View product
+																</a>
 														</div>
-														<% } %>
+													<% } %>
 										</div>
 									</section>
 									<% } %>

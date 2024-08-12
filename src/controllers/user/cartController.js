@@ -112,41 +112,55 @@ const addToCartController = async (req, res, next) => {
       return res.status(NOT_FOUND).json({ message: "Not enough stock" });
     }
 
-    const cart = await cartModel.findOne({ userId: userId, 'products.productId': productId });
-    const pricePerQuantity = product.finalPrice * quantity
+    const isCartExists = await cartModel.findOne({userId})
+    
 
 
     let updatedCart
-    if (cart) {
-      updatedCart = await cartModel.findOneAndUpdate(
-        { userId: userId, 'products.productId': productId },
-        {
-          $inc: {
-            'products.$.quantity': quantity,
-            'products.$.price': pricePerQuantity,
-          },
-        },
-        { new: true }
-      ).populate('products.productId', 'image productInfo.soldBy stock');
-
-    } else {
-      // If the product does not exist, add it to the cart
-      updatedCart = await cartModel.findOneAndUpdate(
-        { userId: userId },
-        {
-          $set: {
-            userId: userId,
-          },
-          $addToSet: {
-            products: {
-              productId: product._id,
-              quantity: quantity,
-              price: product.finalPrice
+    if (isCartExists) {
+      const cart = await cartModel.findOne({ userId: userId, 'products.productId': productId });
+      const pricePerQuantity = product.finalPrice * quantity
+      if (cart) {
+        updatedCart = await cartModel.findOneAndUpdate(
+          { userId: userId, 'products.productId': productId },
+          {
+            $inc: {
+              'products.$.quantity': quantity,
+              'products.$.price': pricePerQuantity,
             },
-          }
-        },
-        { new: true, upsert: true }
-      ).populate('products.productId', 'image productInfo.soldBy stock');
+          },
+          { new: true }
+        ).populate('products.productId', 'image productInfo.soldBy stock');
+  
+      } else {
+          //*  If the product does not exist, add it to the cart
+          updatedCart = await cartModel.findOneAndUpdate(
+            { userId: userId },
+            {
+              $set: {
+                userId: userId,
+              },
+              $addToSet: {
+                products: {
+                  productId: product._id,
+                  quantity: quantity,
+                  price: product.finalPrice
+                },
+              }
+            },
+            { new: true }
+          ).populate('products.productId', 'image productInfo.soldBy stock');
+        }
+    } else {
+      //*  If cart does not exist, add it to the cart
+      updatedCart = await cartModel.create({
+        userId: userId,
+        products: [{
+          productId: product._id,
+          quantity: quantity,
+          price: product.finalPrice * quantity,
+        }]
+      })
     }
     res.status(OK).json({ message: "item added", product })
   } catch (error) {
@@ -510,7 +524,7 @@ const orderUsingPaypalController = async (req, res, next) => {
       }
       cart = await orderModel.findOne({ _id: orderId })
     } else {
-      cart = await cartModel.findOneAndUpdate({ userId: user.userId });
+      cart = await cartModel.findOne({ userId: user.userId });
     }
 
     if (!cart || cart.products.length === 0) {

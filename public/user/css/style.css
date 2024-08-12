@@ -381,3 +381,8 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* * sweet alert - showAlert function */
+.custom-swal-top-margin {
+  margin-top: 170px !important;
+}

@@ -131,9 +131,8 @@ $(function () {
       method: 'PATCH',
       data: { productId },
       success: function (data) {
-        console.log(data)
-        if(!data.product){
-          console.log('no data found')
+        if (!data.product) {
+          window.location.href ='/auth/login'
           return
         }
         showAlert(`${data.product.name} added to cart`)
@@ -182,5 +181,7 @@ $(function () {
       }
     })
   }
+
+
 
 })
