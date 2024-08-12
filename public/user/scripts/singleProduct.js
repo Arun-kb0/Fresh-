@@ -8,6 +8,8 @@ $(function () {
   const $magnifier = $("#magnifier");
   const zoomLevel = 2; // Adjust zoom level
 
+  const reviewCreatedAt = $(".reviewCreatedAt")
+
   // * image section
   $(".cardStokeSmallImage img").on("click", function () {
     const newSrc = $(this).attr("src");
@@ -62,6 +64,15 @@ $(function () {
     suggestionsContainer.animate({ scrollLeft: '+=300' }, 800);
   });
   // * scroll functions en
+
+  // * convert time to readable format
+  reviewCreatedAt.each(function () {
+    const currentCreatedAtValue = $(this).text()
+    console.log(currentCreatedAtValue)
+    const formattedCreatedAt = moment(currentCreatedAtValue).format('ll');
+    $(this).text(formattedCreatedAt)
+  })
+
 
 
 })

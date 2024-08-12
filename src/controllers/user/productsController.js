@@ -159,6 +159,7 @@ const getNewProductsController = async (req, res, next) => {
 
 
 
+
 const getSingleProductController = async (req, res, next) => {
   const { productId } = req.query
   console.log(productId)
@@ -219,10 +220,60 @@ const getSingleProductController = async (req, res, next) => {
       },
       {
         $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "productId",
+          as: "reviews"
+        }
+      },
+      {
+        $unwind: {
+          path: "$reviews",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "reviews.userId",
+          foreignField: "userId",
+          as: "reviews.userDetails"
+        }
+      },
+      {
+        $addFields: {
+          "reviews.userDetails": {
+            $arrayElemAt: ["$reviews.userDetails", 0]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          reviews: {
+            $push: "$reviews"
+          },
+          productDetails: {
+            $first: "$$ROOT"
+          }
+        }
+      },
+      {
+        $addFields: {
+          "productDetails.reviews": "$reviews"
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$productDetails"
+        }
+      },
+      {
+        $lookup: {
           from: "wishlists",
           let: {
             productId: "$_id",
-            userId: userId
+            userId: userId,
           },
           pipeline: [
             {

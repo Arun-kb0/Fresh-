@@ -343,25 +343,10 @@
 								<% } %>
 									<% } %>
 				</div>
-				<span>
-					<%= product.peopleRated %>
-				</span>
-			</div>
-
-			<div>
-				<h5>Review this product</h5>
-				<div class="d-flex pb-3 pr-5 ">
-					<% for(let i=0;i< 5 ;i++) {%>
-						<% if(i<product.rating) {%>
-							<i class="fa-solid fa-star fa-lg text-warning"></i>
-							<% } else { %>
-								<i class="fa-regular fa-star fa-lg text-warning"></i>
-								<% } %>
-									<% } %>
+				<div class="d-flex">
+					<h5 class="pr-2"> People rated</h5>
+					<h5><%= product.peopleRated %></h5>
 				</div>
-				<button class="btn btn-outline-secondary rounded-pill">
-					<span>Write a review</span>
-				</button>
 			</div>
 		</section>
 		<!-- * end rating -->
@@ -372,29 +357,48 @@
 				<li>
 					<h4>Reviews from customers</h4>
 				</li>
-				<% for(let i=0;i<5;i++){ %>
+				<% if(product?.reviews?.[0]?.rating) { %>
+				<% for(const review of product?.reviews){ %>
 					<li class="my-3 ">
 						<section class="card shadow reviewCard">
 							<div class="card-body">
 								<div class="d-flex justify-content-between">
 									<div class="d-flex pb-3 pr-5 ">
 										<% for(let i=0;i< 5 ;i++) {%>
-											<% if(i<product.rating) {%>
+											<% if(i < review.rating) {%>
 												<i class="fa-solid fa-star fa-lg text-warning"></i>
 												<% } else { %>
 													<i class="fa-regular fa-star fa-lg text-warning"></i>
-													<% } %>
-														<% } %>
+												<% } %>
+											<% } %>
 									</div>
-									<span>8 Apr 22</span>
+									<span class="reviewCreatedAt"> <%= review.createdAt %> </span>
 								</div>
-								<h6>Nice</h6>
-								<p>Fragrance is awesome.</p>
+								<h6><%= review.review %></h6>
+								<div class="d-flex ">
+									<% if (review?.userDetails?.image) { %>
+										<div class="reviewImageContainer">
+											<img class="reviewImage" src="<%= review?.userDetails?.image %>"  alt="">
+										</div>
+									<% } else { %>
+										<div class="reviewImageContainer">
+											<img class="reviewImage" src="/static/user/assets/img/avatars/1.png"  alt="">
+										</div>
+									<% } %>
+									<span class="px-2">
+										<%= review?.userDetails?.name %>
+									</span>
+
+								</div>
 							</div>
 						</section>
 					</li>
-					<% } %>
-
+				<% } %>
+				<% } else { %>
+					<li>
+						<h5 class="text-center text-secondary py-3">No reviews yet</h5>
+					</li>
+				<% } %>
 			</ul>
 
 		</section>
@@ -402,8 +406,9 @@
 	</div>
 
 
-	<% scriptBlock=` <script src="static/user/scripts/singleProduct.js">
-		</script>
+	<% scriptBlock=` 
+		<script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+		<script src="static/user/scripts/singleProduct.js"></script>
 		<script src="static/user/scripts/user.js"></script>
 		<script src="/static/user/scripts/cart.js"></script>
 		`
