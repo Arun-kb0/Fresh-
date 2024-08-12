@@ -46,7 +46,7 @@ $(function () {
   continuePaymentBtn.on('click', showPaymentSection)
 
   let rating = 0
-  let review=''
+  let review = ''
   ratingBtn.on('click', handleViewRating)
   starBtn.on('click', updateRating)
   reviewInput.on('input', updateReviewInput)
@@ -93,7 +93,7 @@ $(function () {
     $(`#starsCount-${productId}`).text(`${rating} stars`)
   }
   function updateReviewInput() {
-    review  = $(this).val().trim()
+    review = $(this).val().trim()
   }
 
   // ! do back end for updating rating
@@ -101,9 +101,32 @@ $(function () {
     console.log(productId)
     console.log(rating)
     console.log(review)
-    rating = 0
-    review=''
-    productId=''
+
+    $.ajax({
+      url: '/profile/review',
+      method: 'PATCH',
+      data: { productId, rating, reviewMessage: review },
+      success: function (data) {
+        if (!data) {
+          console.log('invalid data')
+          return 
+        }
+        Swal.fire({
+          position: "top",
+          icon: "success",
+          title: "your review has updated",
+          showConfirmButton: false,
+          timer: 1500
+        });
+
+        rating = 0
+        review = ''
+        productId = ''
+      },
+      error: function (xhr, status, error) {
+        console.log(error)
+      }
+    })
   }
 
   // * pagination

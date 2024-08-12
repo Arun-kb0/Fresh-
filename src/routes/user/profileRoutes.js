@@ -16,6 +16,7 @@ const {
 } = require('../../controllers/user/profileController')
 const { addToWishlistController, getWishlistController, getWhitelistedProductIdsController } = require('../../controllers/user/wishlistController')
 const { getWalletController, addAmountToWalletController } = require('../../controllers/user/walletController')
+const { createReviewController } = require('../../controllers/user/reviewController')
 const router = express.Router()
 
 
@@ -50,5 +51,9 @@ router.get('/wishlist/productIds', getWhitelistedProductIdsController)
 router.route('/wallet')
   .get(getWalletController)
   .post(addAmountToWalletController)
+
+
+router.route('/review')
+  .patch(createReviewController)
 
 module.exports = router
