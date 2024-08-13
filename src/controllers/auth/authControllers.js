@@ -35,10 +35,7 @@ const getAdminLoginPageController = async (req, res, next) => {
   const { isAuthorized, user } = req?.session
   try {
     console.log("get admin page ")
-    if (isAuthorized && user.isAdmin) {
-      // user?.isAdmin
-      //   ? res.redirect('/admin')
-      //   : res.redirect('/')
+    if (isAuthorized && req.cookies.adminSession) {
       res.redirect('/admin')
       return
     }
@@ -88,11 +85,7 @@ const adminLoginController = async (req, res, next) => {
 // * user login
 const getLoginPageController = async (req, res) => {
   try {
-    // if (req?.session?.isAuthorized && !req?.session?.user) {
     if(req.cookies.user){
-      // req?.session?.user?.isAdmin
-      //   ? res.redirect('/admin')
-      //   : res.redirect('/')
        res.redirect('/')
       return
     }
@@ -130,10 +123,8 @@ const loginController = async (req, res, next) => {
 // * user signup
 const getSignUpPageController = async (req, res, next) => {
   try {
-    if (req?.session?.isAuthorized) {
-      req?.session?.user?.isAdmin
-        ? res.redirect('/admin')
-        : res.redirect('/')
+    if (req.cookies.user) {
+      res.redirect('/')
       return
     }
     res.render('auth/signup', { ...viewAuthPage })
