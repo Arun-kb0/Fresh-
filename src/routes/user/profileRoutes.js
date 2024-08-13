@@ -1,10 +1,12 @@
 const express = require('express')
 const {
-  getAllOrdersPageController,
-  getOrderDetailsPageController,
   getCouponsPageController,
 } = require('../../controllers/user/profileController')
-const { addToWishlistController, getWishlistController, getWhitelistedProductIdsController } = require('../../controllers/user/wishlistController')
+const {
+  addToWishlistController,
+  getWishlistController,
+  getWhitelistedProductIdsController
+} = require('../../controllers/user/wishlistController')
 const { getWalletController, addAmountToWalletController } = require('../../controllers/user/walletController')
 const { createReviewController } = require('../../controllers/user/reviewController')
 const {
@@ -20,6 +22,11 @@ const {
   editUserController,
   getUserDetailsController
 } = require('../../controllers/user/userController')
+const {
+  getAllOrdersPageController,
+  getOrderDetailsPageController
+} = require('../../controllers/user/orderController')
+
 const router = express.Router()
 
 
