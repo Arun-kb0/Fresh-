@@ -3,8 +3,6 @@ const { viewUsersPage } = require("../../constants/pageConfid")
 const usedCouponsModel = require("../../model/usedCouponsModel")
 
 
-
-
 const getCouponsPageController = async (req, res, next) => {
   try {
     const user = JSON.parse(req.cookies.user)
