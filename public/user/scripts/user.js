@@ -5,7 +5,7 @@ $(function () {
     try {
       const decodedCookieUser = decodeURIComponent(cookieUser);
       const userData = JSON.parse(decodedCookieUser);
-      console.log("User cookie:", userData);
+      // console.log("User cookie:", userData);
       localStorage.setItem('user', JSON.stringify(userData))
     } catch (error) {
       console.error("Error parsing cookie:", error);

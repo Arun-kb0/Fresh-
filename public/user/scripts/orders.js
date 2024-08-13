@@ -124,6 +124,8 @@ $(function () {
         productId = ''
       },
       error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
         console.log(error)
       }
     })
@@ -565,6 +567,8 @@ $(function () {
         window.location.reload()
       },
       error: function (xhr, status, error) {
+        const res = JSON.parse(xhr.responseText)
+        showAlert(res.message)
         console.log(error)
       }
     })
