@@ -5,20 +5,23 @@ const {
   updateQuantityController,
   deleteItemFromCartController,
   getCheckoutPageController,
-  orderUsingCodController,
-  cancelOrderController,
-  returnOrderController,
   applyCouponController,
+  removeCouponController,
+} = require('../../controllers/user/cartController')
+const {
+  orderUsingCodController,
+  orderUsingWalletController,
   orderUsingPaypalController,
   orderSuccessPaypalController,
-  removeCouponController,
-  cancelSingleOrderOrderController,
-  returnSingleOrderOrderController,
   orderFailedPaypalController,
   getPaymentFailedPageController,
   getPaymentSuccessPageController,
-  orderUsingWalletController
-} = require('../../controllers/user/cartController')
+  cancelOrderController,
+  returnOrderController,
+  cancelSingleOrderOrderController,
+  returnSingleOrderOrderController
+} = require('../../controllers/user/orderController')
+ 
 const router = express.Router()
 
 

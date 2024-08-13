@@ -60,6 +60,8 @@ const getCouponsPageController = async (req, res, next) => {
 }
 
 
+
+
 module.exports = {
-  getCouponsPageController
+  getCouponsPageController,
 }

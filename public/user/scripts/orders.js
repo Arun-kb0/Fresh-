@@ -313,11 +313,11 @@ $(function () {
             returnBtn.show()
           }
           orderStatus
-            .text(data.order.orderStatus)
+            .text('Cancelled')
             .removeClass()
             .addClass(orderStatusClassValue)
           paymentStatus
-            .text(data.order.paymentStatus)
+            .text('Failed')
             .removeClass()
             .addClass(paymentStatusClassValue)
           showAlert(data.message)
