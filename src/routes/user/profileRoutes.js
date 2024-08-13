@@ -1,11 +1,6 @@
 const express = require('express')
 const {
   getProfileController,
-  getAddressController,
-  createAddressController,
-  editAddressController,
-  deleteAddressController,
-  getSingleAddressController,
   getUserDetailsController,
   editUserController,
   getUserDetailsPageController,
@@ -17,17 +12,24 @@ const {
 const { addToWishlistController, getWishlistController, getWhitelistedProductIdsController } = require('../../controllers/user/wishlistController')
 const { getWalletController, addAmountToWalletController } = require('../../controllers/user/walletController')
 const { createReviewController } = require('../../controllers/user/reviewController')
+const {
+  getAddressController,
+  createAddressController,
+  editAddressController,
+  deleteAddressController,
+  getSingleAddressController
+} = require('../../controllers/user/addressController')
 const router = express.Router()
 
 
 
 router.get('/', getProfileController)
+
 router.route('/address')
   .get(getAddressController)
   .post(createAddressController)
   .patch(editAddressController)
   .delete(deleteAddressController)
-
 router.get('/singleaddress', getSingleAddressController)
 
 // * edit profile
