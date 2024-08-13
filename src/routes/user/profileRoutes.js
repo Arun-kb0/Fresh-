@@ -1,8 +1,5 @@
 const express = require('express')
 const {
-  getCouponsPageController,
-} = require('../../controllers/user/profileController')
-const {
   addToWishlistController,
   getWishlistController,
   getWhitelistedProductIdsController
@@ -26,6 +23,7 @@ const {
   getAllOrdersPageController,
   getOrderDetailsPageController
 } = require('../../controllers/user/orderController')
+const { getCouponsPageController } = require('../../controllers/user/couponController')
 
 const router = express.Router()
 

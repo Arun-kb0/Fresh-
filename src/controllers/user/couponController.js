@@ -1,18 +1,8 @@
-const { sessionCookieMaxAge } = require("../../config/sessionConfig")
 const CustomError = require("../../constants/CustomError")
-const { OK, NOT_FOUND, BAD_REQUEST } = require("../../constants/httpStatusCodes")
-const { viewUsersPage, viewPageNotFound } = require("../../constants/pageConfid")
-const productModel = require("../../model/productModel")
-const userModel = require("../../model/userModel")
-const bcrypt = require('bcrypt')
-const orderModel = require('../../model/orderModel')
-const mongoose = require("mongoose")
+const { viewUsersPage } = require("../../constants/pageConfid")
 const usedCouponsModel = require("../../model/usedCouponsModel")
-const { getProductsAggregation, getOrderDetailsAggregation } = require("../../helpers/aggregationPipelines")
-const walletModel = require("../../model/walletModel")
-const htmlToPdf = require('html-pdf-node')
-const ejs = require('ejs')
-const path = require('path')
+
+
 
 
 const getCouponsPageController = async (req, res, next) => {
@@ -22,7 +12,7 @@ const getCouponsPageController = async (req, res, next) => {
     if (!isUsedCoupons) {
       await usedCouponsModel.create({
         userId: user.userId,
-        coupons:[]
+        coupons: []
       })
     }
     const result = await usedCouponsModel.aggregate([
@@ -58,11 +48,11 @@ const getCouponsPageController = async (req, res, next) => {
         }
       }
     ]
-)
+    )
 
     res.render('user/profile/coupons', {
       ...viewUsersPage,
-      coupons: (result && result.length !== 0)  
+      coupons: (result && result.length !== 0)
         ? result[0].unusedCoupons
         : []
     })
@@ -73,5 +63,5 @@ const getCouponsPageController = async (req, res, next) => {
 
 
 module.exports = {
-  // getCouponsPageController
+  getCouponsPageController
 }
