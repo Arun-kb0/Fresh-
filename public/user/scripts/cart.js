@@ -157,11 +157,12 @@ $(function () {
       method: 'POST',
       data: { productId },
       success: function (data) {
-        if (!data) {
+        if (!data.wishlist) {
           console.log('addToWishlist no data')
+          window.location.href='/auth/login'
           return
         }
-        console.log(data)
+        // console.log(data)
         if (window.location.pathname === '/profile/wishlist') {
           card.remove()
         } else {
