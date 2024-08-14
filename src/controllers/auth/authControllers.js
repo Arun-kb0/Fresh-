@@ -80,7 +80,7 @@ const adminLoginController = async (req, res, next) => {
     next(error)
   }
 }
-
+ 
 
 // * user login
 const getLoginPageController = async (req, res) => {
