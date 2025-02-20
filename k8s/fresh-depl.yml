@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: fresh-depl
+  labels:
+    app: fresh
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: fresh
+  template:
+    metadata:
+      labels:
+        app: fresh
+    spec:
+      containers:
+        - name: fresh-app
+          image: arun0kb/app-fresh:1.0
+          ports:
+            - containerPort: 3000
+          env:
+            # database url
+            - name: DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: database-uri
+
+            # express session 
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: session-secret
+
+            # smtp server 
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: smtp-host
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: smtp-user
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: smtp-pass
+
+              # fire base
+            - name: FIREBASE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-api-key
+            - name: FIREBASE_AUTH_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-auth-domain
+            - name: FIREBASE_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-project-id
+            - name: FIREBASE_STORAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-storage-bucket
+            - name: FIREBASE_MESSAGING_SENDER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-messaging-sender-id
+            - name: FIREBASE_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-app-id
+            - name: FIREBASE_MEASUREMENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: firebase-measurement-id
+            
+            # passport google auth
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: google-client-id              
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: google-client-secret              
+            - name: PASSPORT_GOOGLE_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: passport-google-callback-url
+            
+            # passport facebook auth
+            - name: FACEBOOK_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: facebook-app-id
+            - name: FACEBOOK_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: facebook-app-secret
+            - name: PASSPORT_FACEBOOK_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: passport-facebook-callback-url
+            
+            # paypal client id
+            - name: PAYPAL_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: paypal-client-id
+            - name: PAYPAL_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fresh-secret
+                  key: paypal-client-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fresh-service
+spec:
+  type: NodePort
+  selector:
+    app: fresh
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30007
+    
+                    
+
+
