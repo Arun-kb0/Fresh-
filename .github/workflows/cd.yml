@@ -18,4 +18,9 @@ jobs:
     - name: Delete Old docker container
       run: sudo docker rm -f fresh-api-container || true
     - name: Run Docker Container
-      run: sudo docker run -d -p 8080:3000 --name fresh-api-container arun0kb/fresh
+      run: |
+          sudo docker run -d \
+            --name fresh-api-container \
+            -p 3000:3000 \
+            --env-file ./.env \
+            arun0kb/fresh:latest
