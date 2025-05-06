@@ -1,21 +1,21 @@
 name: CD Pipeline
 
-on: 
+on:
   workflow_run:
     workflows: ["CI Pipeline"]
-    types: 
+    types:
       - completed
 
-jobs: 
+jobs:
 
   build:
 
-    run-on: self-hosted
+    runs-on: self-hosted
 
-    steps: 
-    - name: pull Docker image
+    steps:
+    - name: Pull Docker image
       run: sudo docker pull arun0kb/fresh:latest
-    - name: Delete the old container 
-      run: sudo docker rm -f fresh-container || true
-    - name: Run Docker container
-      run: sudo docker run -d -p 8080:8080 --name fresh-container
+    - name: Delete Old docker container
+      run: sudo docker rm -f fresh-api-container || true
+    - name: Run Docker Container
+      run: sudo docker run -d -p 8080:3000 --name fresh-api-container arun0kb/fresh
