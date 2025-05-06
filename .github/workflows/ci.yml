@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Login to Dockerhub
+      env: 
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+        DOCKER_TOKEN: ${{secrets.DOCKER_TOKEN}}
+      run: |
+          echo "$DOCKER_TOKEN" | docker login \
+            --username "$DOCKER_USERNAME" \
+            --password-stdin
+            
+    - name: Build the Docker image
+      run: docker build -t arun0kb/fresh .
+
+    - name: Push Image to Dockerhub
+      run:  docker push arun0kb/fresh:latest
