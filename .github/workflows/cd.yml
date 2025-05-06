@@ -22,5 +22,5 @@ jobs:
           sudo docker run -d \
             --name fresh-api-container \
             -p 3000:3000 \
-            --env-file ./.env \
+            --env-file ~/.env \
             arun0kb/fresh:latest
