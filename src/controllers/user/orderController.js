@@ -13,14 +13,12 @@ const addressModel = require("../../model/addressModel")
 const couponModel = require("../../model/couponModel")
 const usedCouponsModel = require("../../model/usedCouponsModel")
 const paypal = require('@paypal/checkout-server-sdk')
-const CC = require('currency-converter-lt')
 const { validateOrderStatusTransactions, orderStatusValues, paymentStatusValues } = require('../../constants/statusValues')
 const walletModel = require("../../model/walletModel")
 const { cancelOrReturnWholeOrder } = require("../../helpers/orderHelpers")
 const { createLedgerBookTransaction } = require("../../helpers/ledgerBookHelpers")
+const axios = require('axios')
 
-
-let currencyConverter = new CC({ from: "INR", to: "USD", amount: 100 })
 
 const Environment =
   process.env.NODE_ENV === 'prod'
@@ -423,12 +421,15 @@ const orderUsingPaypalController = async (req, res, next) => {
     if (!cart || cart.products.length === 0) {
       throw new CustomError('Cart is empty', BAD_REQUEST);
     }
-
     const request = new paypal.orders.OrdersCreateRequest()
-    let totalInUsd = await currencyConverter.convert(cart.total)
-    totalInUsd = totalInUsd.toFixed(2)
 
-    console.log("totalInUsd ", totalInUsd)
+    const { data } = await axios.get('https://open.er-api.com/v6/latest/INR')
+    if (data.result !== 'success' || !data.rates?.USD) {
+      throw new Error('Failed to fetch exchange rate')
+    }
+    const rate = data.rates.USD
+    const totalInUsd = (rate * cart.total).toFixed(2)
+    if (isNaN(totalInUsd)) throw new CustomError(`currency converter returned ${totalInUsd}`, NOT_FOUND)
 
     request.prefer('return=representation')
     request.requestBody({
